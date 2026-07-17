@@ -1,0 +1,79 @@
+.main {
+  display: flex;
+  flex-direction: column;
+}
+
+.backLink {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-text);
+  padding: 0;
+  margin-bottom: var(--spacing-small);
+}
+
+.subHeader {
+  padding: var(--spacing-medium) var(--spacing-small);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1.5px solid rgba(106, 101, 101, 0.08);
+  margin-bottom: var(--spacing-medium);
+}
+
+.titleContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-small);
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.badge {
+  background-color: rgba(36, 223, 226, 0.15);
+  padding: 4px 10px;
+  border-radius: var(--radius-large);
+}
+
+.badgeText {
+  color: #009fa2;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.addClassButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-medium);
+  box-shadow: var(--shadow-medium);
+  cursor: pointer;
+}
+
+.addClassText {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.list {
+  max-width: 640px;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  color: #64748b;
+}

@@ -1,8 +1,20 @@
-export default function ClassesPlaceholderPage() {
+"use client";
+
+import ClassesPage from "@/features/classes/ClassesPage";
+import { useParams, useSearchParams } from "next/navigation";
+
+export default function ClassesRoute() {
+  const params = useParams<{ courseId: string; unitId: string }>();
+  const searchParams = useSearchParams();
+  const unitName = searchParams.get("unitName") || undefined;
+  const unitOrder = searchParams.get("unitOrder") || undefined;
+
   return (
-    <div>
-      <h1 className="text-headline-2">Classes</h1>
-      <p>Esta sección (lecciones dentro de la unidad) se implementa en la Fase 3.</p>
-    </div>
+    <ClassesPage
+      courseId={params.courseId}
+      unitId={params.unitId}
+      unitName={unitName}
+      unitOrder={unitOrder}
+    />
   );
 }

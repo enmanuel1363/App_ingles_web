@@ -1,0 +1,95 @@
+.container {
+  width: 100%;
+}
+
+.itemContainer {
+  margin-top: var(--spacing-medium);
+  padding: var(--spacing-medium);
+  background-color: #fafafa;
+  border-radius: var(--radius-medium);
+  border: 1px solid #d1d5db;
+}
+
+.itemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-small);
+}
+
+.itemTitle {
+  font-weight: 700;
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+.removeButton {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.section {
+  margin-top: var(--spacing-small);
+}
+
+.sectionLabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-small);
+  margin-left: 4px;
+  display: block;
+}
+
+.pillsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-small);
+  margin-bottom: var(--spacing-medium);
+}
+
+.pill {
+  background-color: #f3f4f6;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e5e7eb;
+  font-size: 14px;
+}
+
+.pillRemove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #595c5d;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.separator {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: var(--spacing-small) 0;
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  margin-top: var(--spacing-medium);
+  border-radius: var(--radius-medium);
+  border: 1px dashed var(--color-primary);
+  background: none;
+  color: var(--color-primary);
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+}

@@ -1,0 +1,33 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: var(--spacing-medium);
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-left: 4px;
+}
+
+.input {
+  border: 1.5px solid #d1d5db;
+  border-radius: var(--radius-medium);
+  padding: 12px 14px;
+  font-size: 15px;
+  font-family: var(--font-family);
+  background-color: var(--color-white);
+  color: var(--color-text);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+textarea.input {
+  resize: vertical;
+  min-height: 70px;
+}

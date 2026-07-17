@@ -1,0 +1,66 @@
+.card {
+  background-color: var(--color-white);
+  border-radius: 12px;
+  box-shadow: var(--shadow-light);
+  margin-bottom: var(--spacing-small);
+}
+
+.main {
+  padding: var(--spacing-medium);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.leftContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-small);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.iconView {
+  padding: var(--spacing-small);
+  background-color: rgba(73, 243, 246, 0.2);
+  border-radius: var(--radius-small);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #006668;
+  margin: 0;
+}
+
+.dateContainer {
+  display: flex;
+  gap: var(--spacing-small);
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.highlightText {
+  font-weight: 700;
+}
+
+.rightContent {
+  display: flex;
+  align-items: center;
+}
+
+.actionButton {
+  border: 1px solid rgba(171, 173, 174, 0.2);
+  border-radius: var(--radius-small);
+  padding: 5px 8px;
+  margin-left: 6px;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #595c5d;
+}

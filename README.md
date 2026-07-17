@@ -2,20 +2,21 @@
 
 Conversión de la app móvil (React Native / Expo) a **Next.js** (React puro, CSS normal), solo con las funcionalidades de administrador. El login con Google fue eliminado; el acceso es únicamente por email y contraseña vía Supabase.
 
-## Estado: Fase 2 — Dashboard + Courses + Units ✅
+## Estado: Fase 4a — Infraestructura de Exercises + 2 de 11 tipos ✅
 
 Completado en esta fase:
-- **Dashboard**: placeholder (igual que en la app original, ahí tampoco tenía lógica implementada)
-- **Courses ("My Classes")**: listado real desde Supabase, tarjeta por curso con grado y cantidad de estudiantes, modal para crear nuevo curso (con selector de grado académico)
-- **Units**: por cada curso (`/courses/[courseId]/units`), listado de unidades, modal para crear unidad con nombre/orden/dificultad
-- Navegación con rutas dinámicas de Next.js (`[courseId]`, `[unitId]`) en vez de query params de Expo Router
-- Placeholder para "Classes" (lecciones dentro de una unidad) — se completa en la Fase 3
+- **Infraestructura completa de ejercicios**: tipos, servicio de Supabase, store de edición (Zustand), servicio de subida de archivos a Storage adaptado a `File` del navegador (`storage.service.ts`)
+- **Página "Config exercises"** (`/courses/[courseId]/units/[unitId]/classes/[classId]/exercises`): agregar/quitar/reordenar slots de ejercicio, validaciones (mínimo 2 de "Introducción", mínimo 3 de "Validación", máximo 12 items en total), guardar todo
+- Selector de tipo de ejercicio por slot, con categorías
+- **2 de 11 tipos de lección completamente funcionales**: Type Answer y Complete Word
+- Los 9 tipos restantes muestran un formulario "pendiente" (placeholder) — se completan en las Fases 4b y 4c
 
 ## Pendiente (próximas fases)
 
-- Fase 3: Classes (lecciones dentro de una unidad) + Lesson admin (los 11 tipos de lección y sus formularios)
-- Fase 4: Rewards, Games, Profile (administrador)
-- Fase 5: Reactivar autenticación + revisión general y ajustes finales
+- Fase 4b: tipos con carga de imagen simple — Write a word, Say the word, Image gallery, Match the names
+- Fase 4c: tipos con audio/video/otros — Video session, Story Telling, Vocabulary (overview), Reading quiz, Speaking
+- Fase 5: Rewards, Games, Profile (administrador)
+- Fase 6: Reactivar autenticación + revisión general y ajustes finales
 
 ## Configuración
 
