@@ -1,0 +1,94 @@
+.card {
+  background-color: var(--color-white);
+  border-radius: var(--radius-medium);
+  margin-bottom: var(--spacing-medium);
+  box-shadow: var(--shadow-light);
+  overflow: hidden;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  padding-left: var(--spacing-medium);
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-medium) 0;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.iconContainer {
+  background-color: rgba(73, 243, 246, 0.1);
+  padding: var(--spacing-small);
+  border-radius: var(--radius-small);
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.infoContainer {
+  padding-left: var(--spacing-medium);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #006668;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.description {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 2px 0 0 0;
+}
+
+.segmentsContainer {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+  width: 60px;
+}
+
+.segment {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background-color: #f3f4f6;
+}
+
+.lowActive {
+  background-color: var(--color-secondary);
+}
+.mediumActive {
+  background-color: var(--color-primary);
+}
+.hardActive {
+  background-color: var(--color-tertiary);
+}
+
+.actionContainer {
+  display: flex;
+  align-items: center;
+  padding-right: var(--spacing-medium);
+  gap: 6px;
+}
+
+.actionButton {
+  border: 1px solid rgba(171, 173, 174, 0.2);
+  border-radius: var(--radius-small);
+  padding: 5px 8px;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+}

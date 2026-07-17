@@ -1,0 +1,152 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 100;
+}
+
+.modal {
+  background-color: var(--color-white);
+  border-radius: 24px;
+  padding: 24px;
+  max-height: 90vh;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.field {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.input,
+.select,
+.textarea {
+  border: 1.5px solid #f3f4f6;
+  border-radius: 16px;
+  padding: 14px 16px;
+  background-color: #f9fafb;
+  font-size: 16px;
+  color: #1f2937;
+  font-family: var(--font-family);
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.inputError {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.errorText {
+  color: #ef4444;
+  font-size: 12px;
+  margin: 4px 0 0 0;
+}
+
+.textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.buttonsRow {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.button {
+  flex: 1;
+  padding: 14px;
+  border-radius: 16px;
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.createButton {
+  background-color: var(--color-primary);
+  color: #005859;
+  box-shadow: 0px 4px 8px rgba(36, 223, 226, 0.3);
+}
+
+.cancelButton {
+  background-color: #f3f4f6;
+  color: #b00000;
+}
+
+.difficultyRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.difficultyButton {
+  flex: 1;
+  background-color: #f3f4f6;
+  border: 1.5px solid #f3f4f6;
+  padding: 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  height: 36px;
+}
+
+.difficultyLow {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+}
+.difficultyMedium {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.difficultyHard {
+  background-color: var(--color-tertiary);
+  border-color: var(--color-tertiary);
+}
+
+.disclaimer {
+  margin-top: 8px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 13px;
+}
