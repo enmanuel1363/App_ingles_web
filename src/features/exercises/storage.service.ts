@@ -95,9 +95,6 @@ export async function processExerciseFiles<T extends { type: string; content: an
               cover_image: item.cover_image
                 ? await uploadFile(item.cover_image, "exercise-assets")
                 : item.cover_image,
-              audio_url: item.audio_url
-                ? await uploadFile(item.audio_url, "exercise-audios")
-                : item.audio_url,
             })),
           );
         }

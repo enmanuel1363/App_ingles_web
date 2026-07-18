@@ -1,0 +1,94 @@
+.galleryGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-small);
+  margin-bottom: var(--spacing-small);
+}
+
+.imageCard {
+  width: 47%;
+  margin-bottom: var(--spacing-small);
+}
+
+.previewContainerSmall {
+  width: 100%;
+  height: 100px;
+  border-radius: var(--radius-medium);
+  overflow: hidden;
+  background-color: #e5e7eb;
+  position: relative;
+}
+
+.imagePreview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.removeButton {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: var(--color-white);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  z-index: 1;
+}
+
+.imageDescriptionText {
+  font-size: 13px;
+  color: rgba(89, 92, 93, 1);
+  font-weight: 700;
+  margin-top: var(--spacing-small);
+}
+
+.emptyImages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-large) 0;
+  gap: var(--spacing-small);
+  border: 1px dashed #e5e7eb;
+  border-radius: var(--radius-medium);
+  margin-bottom: var(--spacing-small);
+  background-color: #f9fafb;
+}
+
+.emptyImagesText {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.uploadButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-medium);
+  padding: 12px;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  color: var(--color-white);
+  font-weight: 700;
+}
+
+.uploadButton:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.uploadButtonSmall {
+  padding: 6px 10px;
+  border-radius: var(--radius-small);
+  border: none;
+  cursor: pointer;
+  background-color: rgba(36, 223, 226, 0.1);
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 13px;
+}
