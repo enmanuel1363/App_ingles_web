@@ -1,12 +1,14 @@
 "use client";
 
-import { BookOpen } from "lucide-react";
+import { BookOpen, Edit2, Trash2 } from "lucide-react";
 
 type Props = {
   order?: number;
   name: string;
   difficulty: string;
   onPress?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 };
 
 const DIFFICULTY_CONFIG: Record<
@@ -30,11 +32,11 @@ const DIFFICULTY_CONFIG: Record<
   },
 };
 
-export default function UnitCard({ order, name, difficulty, onPress }: Props) {
+export default function UnitCard({ order, name, difficulty, onPress, onEdit, onDelete }: Props) {
   const config = DIFFICULTY_CONFIG[difficulty] || DIFFICULTY_CONFIG.low;
 
   return (
-    <button
+    <div
       className="w-full text-left bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm hover:border-cyan-400 hover:shadow-md hover:shadow-cyan-400/5 transition-all duration-300 group flex flex-col justify-between min-h-[160px] cursor-pointer focus:outline-none"
       onClick={onPress}
     >
@@ -43,13 +45,41 @@ export default function UnitCard({ order, name, difficulty, onPress }: Props) {
           <BookOpen className="w-5 h-5 text-cyan-600" />
         </div>
 
-        <div className="space-y-1.5 flex-1">
+        <div className="space-y-1.5 flex-1 min-w-0">
           <p className="text-xs font-bold text-cyan-600 uppercase tracking-wider">
             Unidad {order}
           </p>
-          <h3 className="text-base font-bold text-slate-800 group-hover:text-slate-950 transition-colors line-clamp-2 leading-snug">
-            {name}
-          </h3>
+          <div className="flex items-center justify-between gap-1.5 w-full">
+            <h3 className="text-base font-bold text-slate-800 group-hover:text-slate-950 transition-colors line-clamp-2 leading-snug truncate">
+              {name}
+            </h3>
+            <div className="flex items-center space-x-1 shrink-0">
+              {onEdit && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit();
+                  }}
+                  className="text-slate-400 hover:text-cyan-600 p-1 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
+                  title="Editar unidad"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                </button>
+              )}
+              {onDelete && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete();
+                  }}
+                  className="text-slate-400 hover:text-rose-600 p-1 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
+                  title="Eliminar unidad"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -74,6 +104,6 @@ export default function UnitCard({ order, name, difficulty, onPress }: Props) {
           </div>
         </div>
       </div>
-    </button>
+    </div>
   );
 }

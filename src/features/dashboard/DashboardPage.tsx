@@ -324,7 +324,7 @@ export default function DashboardPage() {
                       {act.isComplete ? "Completado" : "En curso"}
                     </span>
                     <span className="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/60 shadow-sm">
-                      {act.score}/100
+                      {act.score}/10
                     </span>
                   </div>
                 </div>

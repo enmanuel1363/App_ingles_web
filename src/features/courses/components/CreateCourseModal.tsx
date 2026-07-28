@@ -5,13 +5,16 @@ import { useCourses } from "../hooks/useCourses";
 import { X, AlertCircle } from "lucide-react";
 import Button from "@/components/ui/Button";
 
+import { CourseWithGrade } from "../course.types";
+
 type Props = {
   visible: boolean;
   onClose: () => void;
+  courseToEdit?: CourseWithGrade | null;
 };
 
-export default function CreateCourseModal({ visible, onClose }: Props) {
-  const { grades, createCourse, isLoading } = useCourses();
+export default function CreateCourseModal({ visible, onClose, courseToEdit }: Props) {
+  const { grades, createCourse, updateCourse, isLoading } = useCourses();
   const [className, setClassName] = useState("");
   const [description, setDescription] = useState("");
   const [academicLevel, setAcademicLevel] = useState("");
@@ -25,26 +28,45 @@ export default function CreateCourseModal({ visible, onClose }: Props) {
 
   useEffect(() => {
     if (visible) {
-      setAcademicLevel("");
-      setClassName("");
-      setDescription("");
+      if (courseToEdit) {
+        setClassName(courseToEdit.name);
+        setDescription(courseToEdit.description || "");
+        setAcademicLevel(courseToEdit.id_grade);
+      } else {
+        setAcademicLevel("");
+        setClassName("");
+        setDescription("");
+      }
       setError(null);
     }
-  }, [visible]);
+  }, [visible, courseToEdit]);
 
   if (!visible) return null;
 
-  const handleCreate = async () => {
+  const handleSave = async () => {
     if (!className.trim() || !academicLevel) {
       setError("Completa el nombre de la clase y selecciona un nivel.");
       return;
     }
 
-    const result = await createCourse(className, academicLevel, description);
-    if (result.success) {
-      onClose();
+    if (courseToEdit) {
+      const result = await updateCourse(courseToEdit.id, {
+        name: className,
+        id_grade: academicLevel,
+        description: description.trim() || null,
+      });
+      if (result.success) {
+        onClose();
+      } else {
+        setError(result.error || "No se pudo actualizar el curso");
+      }
     } else {
-      setError(result.error || "No se pudo crear el curso");
+      const result = await createCourse(className, academicLevel, description);
+      if (result.success) {
+        onClose();
+      } else {
+        setError(result.error || "No se pudo crear el curso");
+      }
     }
   };
 
@@ -60,7 +82,7 @@ export default function CreateCourseModal({ visible, onClose }: Props) {
         {/* Header */}
         <div className="flex justify-between items-center border-b border-slate-100 pb-4">
           <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-            New Class
+            {courseToEdit ? "Edit Class" : "New Class"}
           </h2>
           <button
             onClick={onClose}
@@ -139,12 +161,12 @@ export default function CreateCourseModal({ visible, onClose }: Props) {
           </Button>
           <Button
             variant="primary"
-            onClick={handleCreate}
+            onClick={handleSave}
             isLoading={isLoading}
             disabled={!className.trim() || !academicLevel}
             className="min-w-[120px]"
           >
-            Create Course
+            {courseToEdit ? "Save Changes" : "Create Course"}
           </Button>
         </div>
       </div>

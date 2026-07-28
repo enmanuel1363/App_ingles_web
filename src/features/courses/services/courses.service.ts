@@ -44,4 +44,28 @@ export const coursesService = {
     if (error) throw error;
     return data;
   },
+
+  async updateCourse(
+    id: string,
+    course: Partial<Omit<Course, "id" | "created_at" | "updated_at">>,
+  ): Promise<Course> {
+    const { data, error } = await supabase
+      .from("course")
+      .update(course)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteCourse(id: string): Promise<void> {
+    const { error } = await supabase
+      .from("course")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
+  },
 };
