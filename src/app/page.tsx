@@ -1,7 +1,5 @@
-import { redirect } from "next/navigation";
+import LoginPage from "@/features/login/components/LoginPage";
 
-// TODO: reactivar el login al final del proyecto.
-// La versión original con formulario de email/contraseña quedó respaldada en page.auth-backup.tsx
-export default function Index() {
-  redirect("/dashboard");
+export default function HomeRoute() {
+  return <LoginPage />;
 }

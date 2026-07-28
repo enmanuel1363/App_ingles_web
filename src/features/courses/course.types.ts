@@ -12,7 +12,7 @@ export type Course = {
   name: string;
   created_at: string;
   updated_at: string;
-  description?: string;
+  description?: string | null;
 };
 
 export type CourseWithGrade = Course & {

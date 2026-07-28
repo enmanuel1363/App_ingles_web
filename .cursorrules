@@ -1,0 +1,35 @@
+# Reglas de Diseño, Estilos y Estructura del Proyecto (My English app)
+
+Este documento define la paleta de colores oficiales, las reglas de interfaz y la estructura arquitectónica que deben seguir todos los agentes de codificación al realizar cambios o refactorizaciones en este proyecto.
+
+---
+
+## 🎨 Paleta de Colores Oficiales (Tema Claro Premium)
+
+- **Fondo Global (Body)**: `#fffcf2` (Tono crema/marfil claro y cálido)
+- **Color Primario**: `#24DFE2` (Cian claro / turquesa brillante)
+- **Color Secundario**: `#B4FF2B` (Verde claro / verde lima brillante)
+- **Color Terciario**: `#FF9400` (Naranja vibrante)
+- **Color de Tarjetas (Cards)**: `#ffffff` (Blanco puro con sombras sutiles y bordes muy delgados)
+- **Color de Bordes**: `#e2e8f0` / `#f1f5f9` (Gris claro)
+- **Texto Principal**: `#0f172a` (Slate oscuro) para garantizar contraste accesible y premium.
+- **Esquema de Color**: Claro (`color-scheme: light`).
+
+---
+
+## 🏗️ Arquitectura Basada en Características (Feature-Based Architecture - FBA)
+
+Este proyecto está organizado estrictamente bajo el patrón **FBA**. Todo agente debe respetar la separación entre capas y la encapsulación de características:
+
+1. **Estructura FBA en `src/features/`**:
+   Todo el código de negocio (componentes de maquetación, hooks de queries, servicios de conexión y tipos específicos) debe ser encapsulado en su respectivo módulo bajo `src/features/[featureName]/`.
+2. **Capa de Rutas Limpia en `src/app/`**:
+   Las rutas físicas del App Router de Next.js (`src/app/`) deben ser contenedores simples de enlace. Su única responsabilidad es importar el componente principal de la feature y renderizarlo, inyectando los parámetros necesarios.
+3. **Componentes Globales**:
+   Solo los componentes puramente atómicos y genéricos (como `Button`, `FormInput`, modales de subida genéricos) deben colocarse en `src/components/ui/`.
+4. **Alias de Importaciones**:
+   Utiliza importaciones absolutas configuradas en el proyecto (ej: `import Button from "@/components/ui/Button"`).
+
+> [!NOTE]
+> Para ver la guía completa con ejemplos y el árbol detallado de directorios, consulta el archivo:
+> [AGENTS.md](file:///C:/proyectos/React/App_ingles_web/AGENTS.md)

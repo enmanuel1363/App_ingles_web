@@ -4,8 +4,9 @@ import {
   fetchUserRole,
   getSession,
   onAuthStateChange,
+  signInWithGoogle,
   signInWithPassword,
-} from "@/services/auth.service";
+} from "@/features/login/services/auth.service";
 import type { user_role } from "@/types/global.types";
 import type { Session } from "@supabase/supabase-js";
 import { useCallback, useEffect, useState } from "react";
@@ -39,26 +40,49 @@ export function useAuth() {
     return () => sub.unsubscribe();
   }, []);
 
-  const handleLogin = useCallback(async (email: string, password: string) => {
+  const handlePasswordLogin = useCallback(
+    async (email: string, password: string) => {
+      setAuthLoading(true);
+      try {
+        const { data, error } = await signInWithPassword(email, password);
+        if (error) return error.message;
+
+        const user = data?.session?.user;
+        if (user) {
+          const role = await fetchUserRole(user.id);
+          if (role !== "admin") {
+            return "Esta cuenta no tiene acceso de administrador";
+          }
+        }
+        return null;
+      } catch (e: any) {
+        return e?.message ?? "Error al iniciar sesión";
+      } finally {
+        setAuthLoading(false);
+      }
+    },
+    [],
+  );
+
+  const handleGoogleLogin = useCallback(async () => {
     setAuthLoading(true);
     try {
-      const { data, error } = await signInWithPassword(email, password);
+      const { error } = await signInWithGoogle();
       if (error) return error.message;
-
-      const user = data?.session?.user;
-      if (user) {
-        const role = await fetchUserRole(user.id);
-        if (role !== "admin") {
-          return "Esta cuenta no tiene acceso de administrador";
-        }
-      }
       return null;
     } catch (e: any) {
-      return e?.message ?? "Error al iniciar sesión";
+      return e?.message ?? "Error al conectar con Google";
     } finally {
       setAuthLoading(false);
     }
   }, []);
 
-  return { session, userRole, loading, authLoading, handleLogin };
+  return {
+    session,
+    userRole,
+    loading,
+    authLoading,
+    handleLogin: handlePasswordLogin,
+    handleGoogleLogin,
+  };
 }
