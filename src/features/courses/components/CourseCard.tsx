@@ -2,16 +2,18 @@
 
 import { useRouter } from "next/navigation";
 import GradeIcon from './GradeIcon';
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Edit2, Trash2 } from "lucide-react";
 
 type Props = {
   id: string;
   title: string;
   grade: string;
   students: number;
+  onEdit?: () => void;
+  onDelete?: () => void;
 };
 
-export default function CourseCard({ id, title, grade, students }: Props) {
+export default function CourseCard({ id, title, grade, students, onEdit, onDelete }: Props) {
   const router = useRouter();
 
   // Custom colors for avatars to make it look premium on light theme
@@ -23,8 +25,8 @@ export default function CourseCard({ id, title, grade, students }: Props) {
 
   return (
     <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm hover:border-cyan-400 hover:shadow-md hover:shadow-cyan-400/5 transition-all duration-300 group flex flex-col justify-between min-h-[160px]">
-      <div className="flex justify-between items-start space-x-4">
-        <div className="space-y-1">
+      <div className="flex justify-between items-start space-x-4 w-full">
+        <div className="space-y-1.5 flex-grow min-w-0">
           <h3 className="text-base font-bold text-slate-800 group-hover:text-slate-950 transition-colors line-clamp-2 leading-snug">
             {title}
           </h3>
@@ -32,7 +34,35 @@ export default function CourseCard({ id, title, grade, students }: Props) {
             Nivel: {grade}
           </p>
         </div>
-        <GradeIcon grade={grade} />
+        <div className="flex items-center space-x-2 shrink-0">
+          <div className="flex items-center space-x-1">
+            {onEdit && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+                className="text-slate-400 hover:text-cyan-600 p-1 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
+                title="Editar curso"
+              >
+                <Edit2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+            {onDelete && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                }}
+                className="text-slate-400 hover:text-rose-600 p-1 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
+                title="Eliminar curso"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+          <GradeIcon grade={grade} />
+        </div>
       </div>
 
       <div className="flex justify-between items-center mt-6 pt-4 border-t border-slate-100">

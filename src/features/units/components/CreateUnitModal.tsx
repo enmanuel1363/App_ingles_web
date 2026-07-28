@@ -1,14 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useCreateUnit, useUnits } from '../hooks/useUnits';
+import { useCreateUnit, useUnits, useUpdateUnit } from '../hooks/useUnits';
 import { X, AlertCircle } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { Unit } from "../unit.types";
 
 type Props = {
   visible: boolean;
   onClose: () => void;
   courseId: string;
+  unitToEdit?: Unit | null;
 };
 
 type DifficultyLevel = "low" | "medium" | "hard";
@@ -21,9 +23,12 @@ const LEVEL_LABELS: Record<DifficultyLevel, string> = {
 
 const LEVEL_ORDER: DifficultyLevel[] = ["low", "medium", "hard"];
 
-export default function CreateUnitModal({ visible, onClose, courseId }: Props) {
-  const { mutate: createUnit, isPending } = useCreateUnit();
+export default function CreateUnitModal({ visible, onClose, courseId, unitToEdit }: Props) {
+  const { mutate: createUnit, isPending: isCreating } = useCreateUnit();
+  const { mutate: updateUnit, isPending: isUpdating } = useUpdateUnit();
   const { data: units } = useUnits(courseId);
+
+  const isPending = isCreating || isUpdating;
 
   const [level, setLevel] = useState<DifficultyLevel>("low");
   const [unitName, setUnitName] = useState("");
@@ -31,13 +36,19 @@ export default function CreateUnitModal({ visible, onClose, courseId }: Props) {
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    if (visible && units) {
-      setOrderIndex((units.length + 1).toString());
+    if (visible) {
+      if (unitToEdit) {
+        setUnitName(unitToEdit.name);
+        setLevel(unitToEdit.difficulty as DifficultyLevel);
+        setOrderIndex(unitToEdit.order_index.toString());
+      } else {
+        setOrderIndex(units ? (units.length + 1).toString() : "1");
+        setUnitName("");
+        setLevel("low");
+      }
       setHasError(false);
-      setUnitName("");
-      setLevel("low");
     }
-  }, [visible, units]);
+  }, [visible, units, unitToEdit]);
 
   if (!visible) return null;
 
@@ -46,18 +57,32 @@ export default function CreateUnitModal({ visible, onClose, courseId }: Props) {
     setHasError(text !== "" && !/^\d+$/.test(text));
   };
 
-  const handleCreate = () => {
+  const handleSave = () => {
     if (!unitName.trim() || hasError || !orderIndex) return;
 
-    createUnit(
-      {
-        id_course: courseId,
-        name: unitName,
-        order_index: parseInt(orderIndex) || (units?.length || 0) + 1,
-        difficulty: level,
-      },
-      { onSuccess: onClose },
-    );
+    if (unitToEdit && unitToEdit.id) {
+      updateUnit(
+        {
+          id: unitToEdit.id,
+          unit: {
+            name: unitName,
+            order_index: parseInt(orderIndex) || unitToEdit.order_index,
+            difficulty: level,
+          },
+        },
+        { onSuccess: onClose },
+      );
+    } else {
+      createUnit(
+        {
+          id_course: courseId,
+          name: unitName,
+          order_index: parseInt(orderIndex) || (units?.length || 0) + 1,
+          difficulty: level,
+        },
+        { onSuccess: onClose },
+      );
+    }
   };
 
   return (
@@ -71,7 +96,9 @@ export default function CreateUnitModal({ visible, onClose, courseId }: Props) {
       >
         {/* Header */}
         <div className="flex justify-between items-center border-b border-slate-100 pb-4">
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">Create New Unit</h2>
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+            {unitToEdit ? "Edit Unit" : "Create New Unit"}
+          </h2>
           <button 
             onClick={onClose}
             className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-55 transition-all duration-200 cursor-pointer"
@@ -165,12 +192,12 @@ export default function CreateUnitModal({ visible, onClose, courseId }: Props) {
           </Button>
           <Button
             variant="primary"
-            onClick={handleCreate}
+            onClick={handleSave}
             isLoading={isPending}
             disabled={isPending || hasError || !unitName.trim()}
             className="min-w-[120px]"
           >
-            Create Unit
+            {unitToEdit ? "Save Changes" : "Create Unit"}
           </Button>
         </div>
       </div>

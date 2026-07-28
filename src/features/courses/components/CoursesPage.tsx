@@ -1,12 +1,51 @@
 "use client";
 
+import { useState } from "react";
 import CourseCard from "./CourseCard";
 import CreateCourseButton from "./CreateCourseButton";
+import CreateCourseModal from "./CreateCourseModal";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { useCourses } from "../hooks/useCourses";
 import { Loader2, AlertCircle, BookOpen } from "lucide-react";
+import { CourseWithGrade } from "../course.types";
 
 export default function CoursesPage() {
-  const { courses, isLoading, error } = useCourses();
+  const { courses, isLoading, error, deleteCourse } = useCourses();
+  
+  const [selectedCourse, setSelectedCourse] = useState<CourseWithGrade | null>(null);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+
+  const [courseToDelete, setCourseToDelete] = useState<CourseWithGrade | null>(null);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleEditCourse = (course: CourseWithGrade) => {
+    setSelectedCourse(course);
+    setIsEditModalVisible(true);
+  };
+
+  const handleDeleteClick = (course: CourseWithGrade) => {
+    setCourseToDelete(course);
+    setIsDeleteModalVisible(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!courseToDelete) return;
+    setIsDeleting(true);
+    try {
+      const result = await deleteCourse(courseToDelete.id);
+      if (result.success) {
+        setIsDeleteModalVisible(false);
+        setCourseToDelete(null);
+      } else {
+        alert(result.error || "No se pudo eliminar el curso.");
+      }
+    } catch (err: any) {
+      alert("Error al intentar eliminar el curso.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div className="space-y-8 animate-fade-in text-slate-800">
@@ -17,8 +56,7 @@ export default function CoursesPage() {
             Cursos
           </h1>
           <p className="text-slate-500 text-sm mt-1">
-            Administra y realiza el seguimiento académico de tus aulas de
-            inglés.
+            Administra y realiza el seguimiento académico de tus aulas de inglés.
           </p>
         </div>
         <div className="sm:self-end">
@@ -50,6 +88,8 @@ export default function CoursesPage() {
               title={item.name}
               grade={item.grade?.abbreviation || "N/A"}
               students={item.students_count || 0}
+              onEdit={() => handleEditCourse(item)}
+              onDelete={() => handleDeleteClick(item)}
             />
           ))
         )}
@@ -63,6 +103,31 @@ export default function CoursesPage() {
           </div>
         )}
       </div>
+
+      {/* Edit Course Modal */}
+      <CreateCourseModal
+        visible={isEditModalVisible}
+        onClose={() => {
+          setIsEditModalVisible(false);
+          setSelectedCourse(null);
+        }}
+        courseToEdit={selectedCourse}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        visible={isDeleteModalVisible}
+        onClose={() => {
+          setIsDeleteModalVisible(false);
+          setCourseToDelete(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="¿Eliminar Curso?"
+        description={`¿Estás seguro de que deseas eliminar la clase "${courseToDelete?.name}"? Esta acción borrará todas sus unidades y lecciones asociadas de manera permanente.`}
+        confirmText="Eliminar Clase"
+        isLoading={isDeleting}
+        variant="danger"
+      />
     </div>
   );
 }

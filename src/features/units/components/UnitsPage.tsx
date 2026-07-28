@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import CreateUnitButton from "./CreateUnitButton";
+import CreateUnitModal from "./CreateUnitModal";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import UnitCard from './UnitCard';
-import { useUnits } from '../hooks/useUnits';
+import { useUnits, useDeleteUnit } from '../hooks/useUnits';
 import { Unit } from '../unit.types';
 import { ArrowLeft, Loader2, BookOpen } from "lucide-react";
 
@@ -15,7 +18,41 @@ type Props = {
 export default function UnitsPage({ courseId, courseTitle }: Props) {
   const router = useRouter();
   const { data, isLoading } = useUnits(courseId);
+  const { mutate: deleteUnit } = useDeleteUnit();
   const units = data || [];
+
+  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+
+  const [unitToDelete, setUnitToDelete] = useState<Unit | null>(null);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleEditUnit = (unit: Unit) => {
+    setSelectedUnit(unit);
+    setIsEditModalVisible(true);
+  };
+
+  const handleDeleteClick = (unit: Unit) => {
+    setUnitToDelete(unit);
+    setIsDeleteModalVisible(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!unitToDelete || !unitToDelete.id) return;
+    setIsDeleting(true);
+    deleteUnit(unitToDelete.id, {
+      onSuccess: () => {
+        setIsDeleteModalVisible(false);
+        setUnitToDelete(null);
+        setIsDeleting(false);
+      },
+      onError: (err: any) => {
+        alert(err.message || "No se pudo eliminar la unidad.");
+        setIsDeleting(false);
+      }
+    });
+  };
 
   const goToClasses = (item: Unit) => {
     router.push(
@@ -72,10 +109,38 @@ export default function UnitsPage({ courseId, courseTitle }: Props) {
               name={item.name}
               difficulty={item.difficulty}
               onPress={() => goToClasses(item)}
+              onEdit={() => handleEditUnit(item)}
+              onDelete={() => handleDeleteClick(item)}
             />
           ))
         )}
       </div>
+
+      {/* Edit Unit Modal */}
+      <CreateUnitModal
+        visible={isEditModalVisible}
+        onClose={() => {
+          setIsEditModalVisible(false);
+          setSelectedUnit(null);
+        }}
+        courseId={courseId}
+        unitToEdit={selectedUnit}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        visible={isDeleteModalVisible}
+        onClose={() => {
+          setIsDeleteModalVisible(false);
+          setUnitToDelete(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="¿Eliminar Unidad?"
+        description={`¿Estás seguro de que deseas eliminar la unidad "${unitToDelete?.name}"? Esta acción borrará todas sus lecciones y ejercicios asociados de manera permanente.`}
+        confirmText="Eliminar Unidad"
+        isLoading={isDeleting}
+        variant="danger"
+      />
     </div>
   );
 }
