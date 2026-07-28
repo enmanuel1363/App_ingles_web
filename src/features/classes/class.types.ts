@@ -7,7 +7,7 @@ export type ClassModel = {
   type: class_type;
   order_index: number;
   created_at?: string;
-  updated_at?: string;
+  updated_at?: string | null;
 };
 
 export type CreateClassDTO = Omit<

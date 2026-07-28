@@ -1,6 +1,6 @@
 "use client";
 
-import UnitsPage from "@/features/units/UnitsPage";
+import UnitsPage from "@/features/units/components/UnitsPage";
 import { useParams, useSearchParams } from "next/navigation";
 
 export default function UnitsRoute() {

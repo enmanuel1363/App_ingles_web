@@ -3,7 +3,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "App_ingles — Admin",
+  title: "My English app - Admin",
   description: "Panel de administración de App_ingles",
 };
 

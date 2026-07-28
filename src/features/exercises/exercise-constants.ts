@@ -3,20 +3,20 @@ import { lesson_type } from "@/types/global.types";
 export const lessonTypeOptions: {
   label: string;
   value: lesson_type;
-  icon: string;
+  icon: string; // Lucide icon name reference
   color: string;
 }[] = [
-  { label: "Complete word", value: "complete_word", icon: "🔤", color: "#F97316" },
-  { label: "Image gallery", value: "image_gallery", icon: "🖼️", color: "#EC4899" },
-  { label: "Match the names", value: "match_names", icon: "🔗", color: "#006668" },
-  { label: "Reading quiz", value: "reading_quiz", icon: "📝", color: "#14B8A6" },
-  { label: "Say the word", value: "say_word", icon: "🗣️", color: "#D946EF" },
-  { label: "Speaking", value: "speak", icon: "🎙️", color: "#EF4444" },
-  { label: "Story Telling", value: "audio_session", icon: "📖", color: "#2DD4BF" },
-  { label: "Type answer", value: "type_answer", icon: "⌨️", color: "#84CC16" },
-  { label: "Video session", value: "video_session", icon: "▶️", color: "#F43F5E" },
-  { label: "Vocabulary", value: "overview_session", icon: "🔠", color: "#A855F7" },
-  { label: "Write a word", value: "write_word", icon: "✍️", color: "#6366F1" },
+  { label: "Complete word", value: "complete_word", icon: "Type", color: "#F97316" },
+  { label: "Image gallery", value: "image_gallery", icon: "Image", color: "#EC4899" },
+  { label: "Match the names", value: "match_names", icon: "Link2", color: "#006668" },
+  { label: "Reading quiz", value: "reading_quiz", icon: "FileText", color: "#14B8A6" },
+  { label: "Say the word", value: "say_word", icon: "Volume2", color: "#D946EF" },
+  { label: "Speaking", value: "speak", icon: "Mic", color: "#EF4444" },
+  { label: "Story Telling", value: "audio_session", icon: "BookOpen", color: "#2DD4BF" },
+  { label: "Type answer", value: "type_answer", icon: "Keyboard", color: "#84CC16" },
+  { label: "Video session", value: "video_session", icon: "Play", color: "#F43F5E" },
+  { label: "Vocabulary", value: "overview_session", icon: "Languages", color: "#A855F7" },
+  { label: "Write a word", value: "write_word", icon: "PenTool", color: "#6366F1" },
 ];
 
 export const EXERCISE_CATEGORIES: Record<lesson_type, string> = {

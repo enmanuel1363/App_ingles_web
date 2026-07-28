@@ -8,9 +8,9 @@ export type Exercise<T = any> = {
   type: lesson_type;
   content: T;
   order_index: number;
-  points_reward?: number;
+  points_reward?: number | null;
   created_at?: string;
-  updated_at?: string;
+  updated_at?: string | null;
 };
 
 export type CreateExerciseDTO<T = any> = Omit<

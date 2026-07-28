@@ -1,6 +1,6 @@
 "use client";
 
-import ClassesPage from "@/features/classes/ClassesPage";
+import ClassesPage from "@/features/classes/components/ClassesPage";
 import { useParams, useSearchParams } from "next/navigation";
 
 export default function ClassesRoute() {
