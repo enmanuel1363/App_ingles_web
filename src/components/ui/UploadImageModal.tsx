@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import FormInput from "./FormInput";
 import { X, ImagePlus, Trash2, Plus } from "lucide-react";
 import Button from "./Button";
+import { useModal } from "@/components/ui/ModalProvider";
 
 type Props = {
   visible: boolean;
@@ -26,6 +27,7 @@ export default function UploadImageModal({
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [description, setDescription] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const { showAlert } = useModal();
 
   if (!visible) return null;
 
@@ -43,11 +45,19 @@ export default function UploadImageModal({
 
   const handleSave = () => {
     if (!file) {
-      alert("You must select an image.");
+      showAlert({
+        title: "Seleccionar imagen",
+        message: "Debes seleccionar una imagen para continuar.",
+        type: "error",
+      });
       return;
     }
     if (description.length < 2) {
-      alert("The description is too short.");
+      showAlert({
+        title: "Descripción corta",
+        message: "La descripción es demasiado corta.",
+        type: "error",
+      });
       return;
     }
     onSave({ url: file, description });

@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button";
 import { GoalWithReward, GoalType, Reward } from "../goals.types";
 import { goalsService } from "../services/goals.service";
 import { DEFAULT_GOAL_VALIDATIONS } from "../goals.constants";
+import { useModal } from "@/components/ui/ModalProvider";
 
 interface CreateGoalModalProps {
   visible: boolean;
@@ -39,6 +40,7 @@ export default function CreateGoalModal({
   const [classes, setClasses] = useState<{ id: string; name: string }[]>([]);
   const [isLoadingRewards, setIsLoadingRewards] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { showAlert } = useModal();
 
   // Cargar cursos y clases para catálogos
   useEffect(() => {
@@ -116,19 +118,29 @@ export default function CreateGoalModal({
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      alert("El nombre es requerido.");
+      showAlert({
+        title: "Campo requerido",
+        message: "El nombre es requerido.",
+        type: "error",
+      });
       return;
     }
 
     const isStringType = type === "lesson" || type === "classes";
     if (isStringType && !target) {
-      alert(
-        `Debes seleccionar la ${type === "lesson" ? "lección" : "clase/curso"} requerida.`,
-      );
+      showAlert({
+        title: "Selección requerida",
+        message: `Debes seleccionar la ${type === "lesson" ? "lección" : "clase/curso"} requerida.`,
+        type: "error",
+      });
       return;
     }
     if (!isStringType && (typeof target !== "number" || target <= 0)) {
-      alert("La meta numérica debe ser mayor a cero.");
+      showAlert({
+        title: "Valor inválido",
+        message: "La meta numérica debe ser mayor a cero.",
+        type: "error",
+      });
       return;
     }
 
@@ -147,7 +159,11 @@ export default function CreateGoalModal({
       }
     } catch (err) {
       console.error(err);
-      alert("Ocurrió un error al guardar el objetivo.");
+      showAlert({
+        title: "Error",
+        message: "Ocurrió un error al guardar el objetivo.",
+        type: "error",
+      });
     } finally {
       setIsSubmitting(false);
     }

@@ -9,6 +9,7 @@ import UnitCard from './UnitCard';
 import { useUnits, useDeleteUnit } from '../hooks/useUnits';
 import { Unit } from '../unit.types';
 import { ArrowLeft, Loader2, BookOpen } from "lucide-react";
+import { useModal } from "@/components/ui/ModalProvider";
 
 type Props = {
   courseId: string;
@@ -20,6 +21,7 @@ export default function UnitsPage({ courseId, courseTitle }: Props) {
   const { data, isLoading } = useUnits(courseId);
   const { mutate: deleteUnit } = useDeleteUnit();
   const units = data || [];
+  const { showAlert } = useModal();
 
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -46,9 +48,18 @@ export default function UnitsPage({ courseId, courseTitle }: Props) {
         setIsDeleteModalVisible(false);
         setUnitToDelete(null);
         setIsDeleting(false);
+        showAlert({
+          title: "Unidad eliminada",
+          message: "La unidad ha sido eliminada correctamente.",
+          type: "success",
+        });
       },
       onError: (err: any) => {
-        alert(err.message || "No se pudo eliminar la unidad.");
+        showAlert({
+          title: "Error",
+          message: err.message || "No se pudo eliminar la unidad.",
+          type: "error",
+        });
         setIsDeleting(false);
       }
     });

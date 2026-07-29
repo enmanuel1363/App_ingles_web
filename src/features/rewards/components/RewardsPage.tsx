@@ -7,6 +7,7 @@ import { useRewards } from "../hooks/useRewards";
 import RewardCard from "./RewardCard";
 import CreateRewardModal from "./CreateRewardModal";
 import { RewardWithGoal, CreateRewardDTO } from "../rewards.types";
+import { useModal } from "@/components/ui/ModalProvider";
 
 export default function RewardsPage() {
   const {
@@ -19,6 +20,7 @@ export default function RewardsPage() {
     deleteReward,
     refreshRewards,
   } = useRewards();
+  const { showAlert } = useModal();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedReward, setSelectedReward] = useState<RewardWithGoal | null>(null);
@@ -38,18 +40,36 @@ export default function RewardsPage() {
       // Editar
       const res = await updateReward(selectedReward.id, rewardData, file);
       if (res.success) {
+        showAlert({
+          title: "Recompensa guardada",
+          message: "La recompensa ha sido actualizada correctamente.",
+          type: "success",
+        });
         return true;
       } else {
-        alert(`Error al actualizar la recompensa: ${res.error}`);
+        showAlert({
+          title: "Error",
+          message: `Error al actualizar la recompensa: ${res.error}`,
+          type: "error",
+        });
         return false;
       }
     } else {
       // Crear
       const res = await createReward(rewardData, file);
       if (res.success) {
+        showAlert({
+          title: "Recompensa creada",
+          message: "La recompensa ha sido creada correctamente.",
+          type: "success",
+        });
         return true;
       } else {
-        alert(`Error al crear la recompensa: ${res.error}`);
+        showAlert({
+          title: "Error",
+          message: `Error al crear la recompensa: ${res.error}`,
+          type: "error",
+        });
         return false;
       }
     }
@@ -58,7 +78,17 @@ export default function RewardsPage() {
   const handleDeleteReward = async (id: string) => {
     const res = await deleteReward(id);
     if (!res.success) {
-      alert(`Error al eliminar la recompensa: ${res.error}`);
+      showAlert({
+        title: "Error",
+        message: `Error al eliminar la recompensa: ${res.error}`,
+        type: "error",
+      });
+    } else {
+      showAlert({
+        title: "Recompensa eliminada",
+        message: "La recompensa ha sido eliminada correctamente.",
+        type: "success",
+      });
     }
   };
 

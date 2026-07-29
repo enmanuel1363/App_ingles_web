@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Target, Trash2, Edit2, Award, Info } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { GoalWithReward } from "../goals.types";
+import { useModal } from "@/components/ui/ModalProvider";
 
 interface GoalCardProps {
   goal: GoalWithReward;
@@ -41,9 +42,15 @@ function getGoalTypeBadgeClass(type: string): string {
 
 export default function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const { confirm } = useModal();
 
   const handleDelete = async () => {
-    if (window.confirm(`¿Estás seguro de que deseas eliminar el objetivo "${goal.name}"?`)) {
+    const confirmed = await confirm({
+      title: "Eliminar objetivo",
+      description: `¿Estás seguro de que deseas eliminar el objetivo "${goal.name}"?`,
+      variant: "danger",
+    });
+    if (confirmed) {
       setIsDeleting(true);
       try {
         await onDelete(goal.id);
