@@ -5,6 +5,7 @@ import { X, ImagePlus, Trash2, Plus, Save } from "lucide-react";
 import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
 import { Goal, RewardWithGoal, RewardType } from "../rewards.types";
+import { useModal } from "@/components/ui/ModalProvider";
 
 interface CreateRewardModalProps {
   visible: boolean;
@@ -28,6 +29,7 @@ export default function CreateRewardModal({
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { showAlert } = useModal();
 
   useEffect(() => {
     if (rewardToEdit) {
@@ -65,11 +67,19 @@ export default function CreateRewardModal({
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      alert("El nombre es requerido.");
+      showAlert({
+        title: "Campo requerido",
+        message: "El nombre es requerido.",
+        type: "error",
+      });
       return;
     }
     if (!previewUrl) {
-      alert("Debes seleccionar una imagen o GIF.");
+      showAlert({
+        title: "Imagen requerida",
+        message: "Debes seleccionar una imagen o GIF.",
+        type: "error",
+      });
       return;
     }
 
@@ -88,7 +98,11 @@ export default function CreateRewardModal({
       }
     } catch (err) {
       console.error(err);
-      alert("Ocurrió un error al guardar la recompensa.");
+      showAlert({
+        title: "Error",
+        message: "Ocurrió un error al guardar la recompensa.",
+        type: "error",
+      });
     } finally {
       setIsSubmitting(false);
     }

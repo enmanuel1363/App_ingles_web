@@ -7,6 +7,7 @@ import { useGoals } from "../hooks/useGoals";
 import GoalCard from "./GoalCard";
 import CreateGoalModal from "./CreateGoalModal";
 import { GoalWithReward, CreateGoalDTO } from "../goals.types";
+import { useModal } from "@/components/ui/ModalProvider";
 
 export default function GoalsPage() {
   const {
@@ -18,6 +19,7 @@ export default function GoalsPage() {
     deleteGoal,
     refreshGoals,
   } = useGoals();
+  const { showAlert } = useModal();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<GoalWithReward | null>(null);
@@ -40,18 +42,36 @@ export default function GoalsPage() {
       // Editar
       const res = await updateGoal(selectedGoal.id, goalData, rewardId);
       if (res.success) {
+        showAlert({
+          title: "Objetivo guardado",
+          message: "El objetivo ha sido actualizado correctamente.",
+          type: "success",
+        });
         return true;
       } else {
-        alert(`Error al actualizar el objetivo: ${res.error}`);
+        showAlert({
+          title: "Error",
+          message: `Error al actualizar el objetivo: ${res.error}`,
+          type: "error",
+        });
         return false;
       }
     } else {
       // Crear
       const res = await createGoal(goalData, rewardId);
       if (res.success) {
+        showAlert({
+          title: "Objetivo creado",
+          message: "El objetivo ha sido creado correctamente.",
+          type: "success",
+        });
         return true;
       } else {
-        alert(`Error al crear el objetivo: ${res.error}`);
+        showAlert({
+          title: "Error",
+          message: `Error al crear el objetivo: ${res.error}`,
+          type: "error",
+        });
         return false;
       }
     }
@@ -60,7 +80,17 @@ export default function GoalsPage() {
   const handleDeleteGoal = async (id: string) => {
     const res = await deleteGoal(id);
     if (!res.success) {
-      alert(`Error al eliminar el objetivo: ${res.error}`);
+      showAlert({
+        title: "Error",
+        message: `Error al eliminar el objetivo: ${res.error}`,
+        type: "error",
+      });
+    } else {
+      showAlert({
+        title: "Objetivo eliminado",
+        message: "El objetivo ha sido eliminado correctamente.",
+        type: "success",
+      });
     }
   };
 

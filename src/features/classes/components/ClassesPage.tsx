@@ -8,6 +8,7 @@ import { useClasses, useDeleteClass } from "../hooks/useClasses";
 import { ClassModel } from "../class.types";
 import { ArrowLeft, Plus, Loader2, BookOpen } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { useModal } from "@/components/ui/ModalProvider";
 
 type Props = {
   courseId: string;
@@ -28,6 +29,7 @@ export default function ClassesPage({
 
   const { data, isLoading, error } = useClasses(unitId);
   const { mutateAsync: deleteClassMutation } = useDeleteClass();
+  const { confirm, showAlert } = useModal();
 
   const lessons = data || [];
 
@@ -41,15 +43,26 @@ export default function ClassesPage({
   };
 
   const handleDeleteClass = async (id: string, className: string) => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${className}"?`,
-    );
+    const confirmed = await confirm({
+      title: "Eliminar clase",
+      description: `¿Estás seguro de que deseas eliminar la clase "${className}"?`,
+      variant: "danger",
+    });
     if (!confirmed) return;
 
     try {
       await deleteClassMutation({ classId: id, unitId });
+      showAlert({
+        title: "Clase eliminada",
+        message: `La clase "${className}" ha sido eliminada correctamente.`,
+        type: "success",
+      });
     } catch {
-      alert("Failed to delete the class");
+      showAlert({
+        title: "Error",
+        message: "No se pudo eliminar la clase. Por favor, inténtalo de nuevo.",
+        type: "error",
+      });
     }
   };
 

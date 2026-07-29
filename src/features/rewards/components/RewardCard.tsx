@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Gift, Trash2, Edit2, Award, ExternalLink } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { RewardWithGoal } from "../rewards.types";
+import { useModal } from "@/components/ui/ModalProvider";
 
 interface RewardCardProps {
   reward: RewardWithGoal;
@@ -13,9 +14,15 @@ interface RewardCardProps {
 
 export default function RewardCard({ reward, onEdit, onDelete }: RewardCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const { confirm } = useModal();
 
   const handleDelete = async () => {
-    if (window.confirm(`¿Estás seguro de que deseas eliminar la recompensa "${reward.name}"?`)) {
+    const confirmed = await confirm({
+      title: "Eliminar recompensa",
+      description: `¿Estás seguro de que deseas eliminar la recompensa "${reward.name}"?`,
+      variant: "danger",
+    });
+    if (confirmed) {
       setIsDeleting(true);
       try {
         await onDelete(reward.id);

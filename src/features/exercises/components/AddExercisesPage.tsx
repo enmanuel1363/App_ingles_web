@@ -24,6 +24,7 @@ import {
   Loader2,
 } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { useModal } from "@/components/ui/ModalProvider";
 
 type Props = {
   classId: string;
@@ -39,6 +40,7 @@ function generateUUID() {
 
 export default function AddExercisesPage({ classId }: Props) {
   const router = useRouter();
+  const { showAlert } = useModal();
   const {
     data,
     addExercise,
@@ -185,7 +187,11 @@ export default function AddExercisesPage({ classId }: Props) {
         setExercises(savedExercises);
       }
 
-      alert("Exercises saved successfully");
+      await showAlert({
+        title: "Ejercicios guardados",
+        message: "Los ejercicios han sido guardados exitosamente.",
+        type: "success",
+      });
       router.back();
     } catch (error: any) {
       setFormError(error.message || "Failed to save the exercises");

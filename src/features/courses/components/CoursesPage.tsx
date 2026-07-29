@@ -8,9 +8,11 @@ import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { useCourses } from "../hooks/useCourses";
 import { Loader2, AlertCircle, BookOpen } from "lucide-react";
 import { CourseWithGrade } from "../course.types";
+import { useModal } from "@/components/ui/ModalProvider";
 
 export default function CoursesPage() {
   const { courses, isLoading, error, deleteCourse } = useCourses();
+  const { showAlert } = useModal();
   
   const [selectedCourse, setSelectedCourse] = useState<CourseWithGrade | null>(null);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -37,11 +39,24 @@ export default function CoursesPage() {
       if (result.success) {
         setIsDeleteModalVisible(false);
         setCourseToDelete(null);
+        showAlert({
+          title: "Curso eliminado",
+          message: "El curso ha sido eliminado exitosamente.",
+          type: "success",
+        });
       } else {
-        alert(result.error || "No se pudo eliminar el curso.");
+        showAlert({
+          title: "Error",
+          message: result.error || "No se pudo eliminar el curso.",
+          type: "error",
+        });
       }
     } catch (err: any) {
-      alert("Error al intentar eliminar el curso.");
+      showAlert({
+        title: "Error",
+        message: "Error al intentar eliminar el curso.",
+        type: "error",
+      });
     } finally {
       setIsDeleting(false);
     }
