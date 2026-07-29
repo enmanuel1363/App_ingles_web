@@ -13,6 +13,7 @@ type StoreTypes = {
   removeExercise: (index: number) => void;
   moveUp: (index: number) => void;
   moveDown: (index: number) => void;
+  reorderExercises: (fromIndex: number, toIndex: number) => void;
   reset: () => void;
 };
 
@@ -59,6 +60,20 @@ export const useExerciseStore = create<StoreTypes>((set) => ({
       if (index < 0 || index >= state.data.length - 1) return {};
       const newData = [...state.data];
       [newData[index], newData[index + 1]] = [newData[index + 1], newData[index]];
+      return { data: newData.map((ex, i) => ({ ...ex, order_index: i })) };
+    }),
+  reorderExercises: (fromIndex, toIndex) =>
+    set((state) => {
+      if (
+        fromIndex < 0 ||
+        fromIndex >= state.data.length ||
+        toIndex < 0 ||
+        toIndex >= state.data.length
+      )
+        return {};
+      const newData = [...state.data];
+      const [removed] = newData.splice(fromIndex, 1);
+      newData.splice(toIndex, 0, removed);
       return { data: newData.map((ex, i) => ({ ...ex, order_index: i })) };
     }),
   reset: () => set({ data: [] }),
