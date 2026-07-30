@@ -45,11 +45,11 @@ export default function AddExercisesPage({ classId }: Props) {
     data,
     addExercise,
     removeExercise,
-    setExercises,
+    initializeExercises,
+    clearDraft,
     moveUp,
     moveDown,
     reorderExercises,
-    reset,
   } = useExerciseStore();
   const [isProcessing, setIsProcessing] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -83,19 +83,8 @@ export default function AddExercisesPage({ classId }: Props) {
   const { mutateAsync: createExercises, isPending } = useCreateExercises();
 
   useEffect(() => {
-    if (existingExercises && existingExercises.length > 0) {
-      setExercises(existingExercises);
-    } else if (existingExercises && existingExercises.length === 0) {
-      addExercise({
-        id_class: classId,
-        name: "",
-        description: EXERCISE_DEFAULT_DESCRIPTIONS["complete_word"] || "",
-        type: "complete_word",
-        content: EXERCISE_DEFAULT_CONTENT["complete_word"],
-        order_index: 0,
-      });
-    }
-    return () => reset();
+    if (existingExercises === undefined) return;
+    initializeExercises(classId, existingExercises);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classId, existingExercises]);
 
@@ -217,6 +206,7 @@ export default function AddExercisesPage({ classId }: Props) {
         message: "Los ejercicios han sido guardados exitosamente.",
         type: "success",
       });
+      clearDraft(classId); // Limpiar el borrador de la clase al guardar con éxito
       router.back();
     } catch (error: any) {
       setFormError(error.message || "Failed to save the exercises");
