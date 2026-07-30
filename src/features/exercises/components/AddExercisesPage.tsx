@@ -196,10 +196,7 @@ export default function AddExercisesPage({ classId }: Props) {
         }),
       );
 
-      const savedExercises = await createExercises(processedExercises);
-      if (savedExercises && savedExercises.length > 0) {
-        setExercises(savedExercises);
-      }
+      await createExercises(processedExercises);
 
       await showAlert({
         title: "Ejercicios guardados",
