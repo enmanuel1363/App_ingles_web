@@ -26,6 +26,8 @@ export default function GalleryExerciseForm({ order_index }: Props) {
   const items = exercise.content?.items || [EMPTY_ITEM];
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadingItemIndex, setUploadingItemIndex] = useState<number | null>(null);
+  const [draggedImgInfo, setDraggedImgInfo] = useState<{ itemIndex: number; imgIndex: number } | null>(null);
+  const [dragOverImgInfo, setDragOverImgInfo] = useState<{ itemIndex: number; imgIndex: number } | null>(null);
 
   const updateField = (field: string, value: any) => {
     updateExercise(order_index, { ...exercise, [field]: value });
@@ -38,9 +40,9 @@ export default function GalleryExerciseForm({ order_index }: Props) {
     });
   };
 
-  const updateItem = (itemIndex: number, field: string, value: any) => {
+  const updateItem = (itemIndex: number, fields: Record<string, any>) => {
     const newItems = items.map((item: any, i: number) =>
-      i === itemIndex ? { ...item, [field]: value } : item,
+      i === itemIndex ? { ...item, ...fields } : item,
     );
     updateContent("items", newItems);
   };
@@ -61,16 +63,22 @@ export default function GalleryExerciseForm({ order_index }: Props) {
   ) => {
     const item = items[itemIndex];
     const newImages = [...(item.images || []), imageData];
-    updateItem(itemIndex, "images", newImages);
+    updateItem(itemIndex, { images: newImages });
   };
 
   const removeImageFromItem = (itemIndex: number, imgIndex: number) => {
     const item = items[itemIndex];
-    updateItem(
-      itemIndex,
-      "images",
-      (item.images || []).filter((_: any, i: number) => i !== imgIndex),
-    );
+    updateItem(itemIndex, {
+      images: (item.images || []).filter((_: any, i: number) => i !== imgIndex),
+    });
+  };
+
+  const reorderImages = (itemIndex: number, fromIndex: number, toIndex: number) => {
+    const item = items[itemIndex];
+    const newImages = [...(item.images || [])];
+    const [removed] = newImages.splice(fromIndex, 1);
+    newImages.splice(toIndex, 0, removed);
+    updateItem(itemIndex, { images: newImages });
   };
 
   const previewSrc = (url: string | File) =>
@@ -109,22 +117,64 @@ export default function GalleryExerciseForm({ order_index }: Props) {
           {item.images?.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
               {item.images.map((img: any, imgIndex: number) => (
-                <div key={imgIndex} className="relative group rounded-xl overflow-hidden border border-slate-200 bg-slate-50/70">
+                <div
+                  key={imgIndex}
+                  draggable
+                  onDragStart={(e) => {
+                    setDraggedImgInfo({ itemIndex, imgIndex });
+                    e.dataTransfer.effectAllowed = "move";
+                    e.dataTransfer.setData("text/plain", `${itemIndex},${imgIndex}`);
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    if (dragOverImgInfo?.itemIndex !== itemIndex || dragOverImgInfo?.imgIndex !== imgIndex) {
+                      setDragOverImgInfo({ itemIndex, imgIndex });
+                    }
+                  }}
+                  onDragLeave={() => {
+                    setDragOverImgInfo(null);
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (draggedImgInfo && draggedImgInfo.itemIndex === itemIndex && draggedImgInfo.imgIndex !== imgIndex) {
+                      reorderImages(itemIndex, draggedImgInfo.imgIndex, imgIndex);
+                    }
+                    setDraggedImgInfo(null);
+                    setDragOverImgInfo(null);
+                  }}
+                  onDragEnd={() => {
+                    setDraggedImgInfo(null);
+                    setDragOverImgInfo(null);
+                  }}
+                  className={`relative group rounded-xl overflow-hidden border border-slate-200 bg-slate-50/70 transition-all duration-200 cursor-grab active:cursor-grabbing ${
+                    draggedImgInfo?.itemIndex === itemIndex && draggedImgInfo?.imgIndex === imgIndex
+                      ? "opacity-30 scale-[0.95]"
+                      : ""
+                  } ${
+                    dragOverImgInfo?.itemIndex === itemIndex && dragOverImgInfo?.imgIndex === imgIndex && draggedImgInfo?.imgIndex !== imgIndex
+                      ? "ring-2 ring-cyan-500 ring-offset-2 scale-[1.03]"
+                      : ""
+                  }`}
+                >
                   <div className="relative w-full h-32">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={previewSrc(img.url)}
                       alt={img.description}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover select-none pointer-events-none"
+                      draggable={false}
                     />
                     <button
-                      className="absolute top-2 right-2 p-1.5 bg-slate-50/80 rounded-lg text-slate-650 hover:text-rose-600 transition-colors opacity-0 group-hover:opacity-100"
-                      onClick={() => removeImageFromItem(itemIndex, imgIndex)}
+                      className="absolute top-2 right-2 p-1.5 bg-slate-50/80 rounded-lg text-slate-650 hover:text-rose-600 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeImageFromItem(itemIndex, imgIndex);
+                      }}
                     >
                       <X size={16} />
                     </button>
                   </div>
-                  <p className="p-3 text-sm text-slate-650 text-center font-medium">{img.description}</p>
+                  <p className="p-3 text-sm text-slate-650 text-center font-medium select-none">{img.description}</p>
                 </div>
               ))}
             </div>
@@ -149,14 +199,7 @@ export default function GalleryExerciseForm({ order_index }: Props) {
         </div>
       ))}
 
-      <Button
-        variant="outlined"
-        onClick={addItem}
-        leftIcon={<Plus size={18} />}
-        className="w-full mt-4 border-dashed hover:border-cyan-500/30 text-cyan-650 hover:bg-cyan-500/5"
-      >
-        Add item
-      </Button>
+
 
       <UploadImageModal
         visible={showUploadModal}

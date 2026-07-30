@@ -38,9 +38,9 @@ export default function WriteWordExerciseForm({ order_index }: Props) {
     });
   };
 
-  const updateItem = (itemIndex: number, field: string, value: any) => {
+  const updateItem = (itemIndex: number, fields: Record<string, any>) => {
     const newItems = items.map((item: any, i: number) =>
-      i === itemIndex ? { ...item, [field]: value } : item,
+      i === itemIndex ? { ...item, ...fields } : item,
     );
     updateContent("items", newItems);
   };
@@ -57,8 +57,10 @@ export default function WriteWordExerciseForm({ order_index }: Props) {
 
   const handleSaveImage = (imageData: { url: string | File; description: string }) => {
     if (uploadingItemIndex === null) return;
-    updateItem(uploadingItemIndex, "image_url", imageData.url);
-    updateItem(uploadingItemIndex, "image_title", imageData.description);
+    updateItem(uploadingItemIndex, {
+      image_url: imageData.url,
+      image_title: imageData.description,
+    });
   };
 
   const previewSrc = (url: string | File) =>
@@ -119,8 +121,7 @@ export default function WriteWordExerciseForm({ order_index }: Props) {
                 <button
                   className="absolute top-2 right-2 p-1.5 bg-slate-50/80 rounded-lg text-slate-650 hover:text-rose-600 transition-colors"
                   onClick={() => {
-                    updateItem(itemIndex, "image_url", "");
-                    updateItem(itemIndex, "image_title", "");
+                    updateItem(itemIndex, { image_url: "", image_title: "" });
                   }}
                 >
                   <X size={16} />

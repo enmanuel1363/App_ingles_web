@@ -45,32 +45,46 @@ export default function AddExercisesPage({ classId }: Props) {
     data,
     addExercise,
     removeExercise,
-    setExercises,
+    initializeExercises,
+    clearDraft,
     moveUp,
     moveDown,
-    reset,
+    reorderExercises,
   } = useExerciseStore();
   const [isProcessing, setIsProcessing] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (draggedIndex === null) return;
+
+    const handleWindowDragOver = (e: DragEvent) => {
+      const threshold = 120; // px desde el borde
+      const speed = 12; // velocidad de desplazamiento
+      const clientY = e.clientY;
+      const windowHeight = window.innerHeight;
+
+      if (clientY < threshold) {
+        window.scrollBy(0, -speed);
+      } else if (clientY > windowHeight - threshold) {
+        window.scrollBy(0, speed);
+      }
+    };
+
+    window.addEventListener("dragover", handleWindowDragOver);
+    return () => {
+      window.removeEventListener("dragover", handleWindowDragOver);
+    };
+  }, [draggedIndex]);
 
   const { data: existingExercises, isLoading: isLoadingExercises } =
     useGetExercises(classId);
   const { mutateAsync: createExercises, isPending } = useCreateExercises();
 
   useEffect(() => {
-    if (existingExercises && existingExercises.length > 0) {
-      setExercises(existingExercises);
-    } else if (existingExercises && existingExercises.length === 0) {
-      addExercise({
-        id_class: classId,
-        name: "",
-        description: EXERCISE_DEFAULT_DESCRIPTIONS["complete_word"] || "",
-        type: "complete_word",
-        content: EXERCISE_DEFAULT_CONTENT["complete_word"],
-        order_index: 0,
-      });
-    }
-    return () => reset();
+    if (existingExercises === undefined) return;
+    initializeExercises(classId, existingExercises);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classId, existingExercises]);
 
@@ -182,16 +196,14 @@ export default function AddExercisesPage({ classId }: Props) {
         }),
       );
 
-      const savedExercises = await createExercises(processedExercises);
-      if (savedExercises && savedExercises.length > 0) {
-        setExercises(savedExercises);
-      }
+      await createExercises(processedExercises);
 
       await showAlert({
         title: "Ejercicios guardados",
         message: "Los ejercicios han sido guardados exitosamente.",
         type: "success",
       });
+      clearDraft(classId); // Limpiar el borrador de la clase al guardar con éxito
       router.back();
     } catch (error: any) {
       setFormError(error.message || "Failed to save the exercises");
@@ -213,6 +225,14 @@ export default function AddExercisesPage({ classId }: Props) {
 
   return (
     <div className="w-full space-y-8 animate-fade-in text-slate-800">
+      <style>{`
+        .custom-grab-cursor {
+          cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='black' stroke='white' stroke-width='2'%3E%3Cpath d='M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v5m4 0V9a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2m4 0v1a6 6 0 0 1-6 6H9.5a5.5 5.5 0 0 1-5.5-5.5V9.5A1.5 1.5 0 0 1 5.5 8v0A1.5 1.5 0 0 1 7 9.5V11m3-4.5V3a1.5 1.5 0 0 1 3 0v8'/%3E%3C/svg%3E") 8 8, grab !important;
+        }
+        .custom-grabbing-cursor:active {
+          cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='black' stroke='white' stroke-width='2'%3E%3Cpath d='M18 13V9a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v4m4 0v-2a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2m4 0v1a6 6 0 0 1-6 6H9.5a5.5 5.5 0 0 1-5.5-5.5v-2A1.5 1.5 0 0 1 5.5 10v0A1.5 1.5 0 0 1 7 11.5V13m3-6.5v2A1.5 1.5 0 0 1 13 10v3'/%3E%3C/svg%3E") 8 8, grabbing !important;
+        }
+      `}</style>
       {/* Navigation Header */}
       <div className="flex flex-col space-y-4">
         <button
@@ -238,13 +258,51 @@ export default function AddExercisesPage({ classId }: Props) {
         {/* Left column: Exercises forms */}
         <div className="lg:col-span-3 space-y-6">
           {data.map((ex, index) => (
-            <CreateExercise
+            <div
               key={ex.tempId}
-              index={index}
-              moveUp={() => moveUp(index)}
-              moveDown={() => moveDown(index)}
-              onRemove={() => handleRemove(index)}
-            />
+              draggable
+              onDragStart={(e) => {
+                setDraggedIndex(index);
+                e.dataTransfer.effectAllowed = "move";
+                e.dataTransfer.setData("text/plain", index.toString());
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                if (dragOverIndex !== index) {
+                  setDragOverIndex(index);
+                }
+              }}
+              onDragLeave={() => {
+                setDragOverIndex(null);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                const fromIndex = draggedIndex;
+                if (fromIndex !== null && fromIndex !== index) {
+                  reorderExercises(fromIndex, index);
+                }
+                setDraggedIndex(null);
+                setDragOverIndex(null);
+              }}
+              onDragEnd={() => {
+                setDraggedIndex(null);
+                setDragOverIndex(null);
+              }}
+              className={`transition-all duration-200 custom-grab-cursor custom-grabbing-cursor ${
+                draggedIndex === index ? "opacity-30 scale-[0.98]" : ""
+              } ${
+                dragOverIndex === index && draggedIndex !== index
+                  ? "ring-2 ring-cyan-500 ring-offset-2 rounded-2xl scale-[1.01]"
+                  : ""
+              }`}
+            >
+              <CreateExercise
+                index={index}
+                moveUp={() => moveUp(index)}
+                moveDown={() => moveDown(index)}
+                onRemove={() => handleRemove(index)}
+              />
+            </div>
           ))}
 
           {/* Form wide error notification */}
@@ -254,29 +312,6 @@ export default function AddExercisesPage({ classId }: Props) {
               <span className="font-semibold">{formError}</span>
             </div>
           )}
-
-          {/* Footer action buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 border-t border-slate-200 pt-6 pb-12">
-            <Button
-              variant="outlined"
-              onClick={handleAddAnother}
-              disabled={isSaving}
-              leftIcon={<Plus className="w-4 h-4" />}
-              className="w-full sm:w-1/2 py-3.5"
-            >
-              Add other exercises
-            </Button>
-            <Button
-              variant="primary"
-              onClick={handleSaveAll}
-              isLoading={isSaving}
-              disabled={isSaving}
-              leftIcon={!isSaving && <Save className="w-4 h-4" />}
-              className="w-full sm:w-1/2 py-3.5"
-            >
-              {isProcessing ? "Subiendo archivos…" : "Save exercises"}
-            </Button>
-          </div>
         </div>
 
         {/* Right column: Info & requirements card (sticky on large screens) */}
@@ -387,9 +422,31 @@ export default function AddExercisesPage({ classId }: Props) {
             {/* Quick Helper Banner */}
             <div className="p-3 bg-slate-55 rounded-xl border border-slate-150 text-[10px] leading-relaxed text-slate-600 font-semibold">
               💡 <span className="text-cyan-700 font-extrabold">Tip:</span>{" "}
-              Puedes arrastrar o reordenar los ejercicios usando las flechas de
-              ordenación (↑, ↓) en cada formulario a la izquierda.
+              Puedes arrastrar las tarjetas de los ejercicios directamente para
+              reordenarlos, o usar las flechas de ordenación (↑, ↓) en cada
+              formulario.
             </div>
+          </div>
+
+          {/* Footer action buttons */}
+          <div className="flex flex-col gap-4 border-t border-slate-200 pt-6 pb-12">
+            <Button
+              variant="outlined"
+              onClick={handleAddAnother}
+              disabled={isSaving}
+              leftIcon={<Plus className="w-4 h-4" />}
+            >
+              Add other exercises
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleSaveAll}
+              isLoading={isSaving}
+              disabled={isSaving}
+              leftIcon={!isSaving && <Save className="w-4 h-4" />}
+            >
+              {isProcessing ? "Subiendo archivos…" : "Save exercises"}
+            </Button>
           </div>
         </div>
       </div>
