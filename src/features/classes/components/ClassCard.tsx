@@ -51,38 +51,48 @@ export default function ClassCard({
   onDelete,
 }: Props) {
   return (
-    <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm hover:border-cyan-400 hover:shadow-md hover:shadow-cyan-400/5 transition-all duration-300 group flex items-center justify-between min-h-[120px]">
-      <button 
-        className="flex items-start space-x-4 flex-1 text-left cursor-pointer focus:outline-none min-w-0" 
-        onClick={() => onPress(id || "")}
-      >
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center border shrink-0 group-hover:scale-105 transition-all duration-200 ${TYPE_COLORS[type]}`}>
+    <div
+      className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm hover:border-cyan-400 hover:shadow-md hover:shadow-cyan-400/5 transition-all duration-300 group flex items-center justify-between min-h-[120px] cursor-pointer"
+      onClick={() => onPress(id || "")}
+    >
+      <div className="flex items-start space-x-4 flex-1 text-left  focus:outline-none min-w-0">
+        <div
+          className={`w-12 h-12 rounded-xl flex items-center justify-center border shrink-0 group-hover:scale-105 transition-all duration-200 ${TYPE_COLORS[type]}`}
+        >
           {ICONS[type]}
         </div>
-        
+
         <div className="space-y-1.5 flex-1 min-w-0 pr-4">
           <h3 className="text-base font-bold text-slate-800 group-hover:text-slate-950 transition-colors line-clamp-2 leading-snug break-words">
             {`${order_index}. ${name}`}
           </h3>
           <div className="flex items-center space-x-1.5 text-[10px] font-semibold text-slate-500">
             <span>Creada:</span>
-            <span className="text-slate-650">{formatDate(created_at || "")}</span>
+            <span className="text-slate-650">
+              {formatDate(created_at || "")}
+            </span>
           </div>
         </div>
-      </button>
+      </div>
 
       {/* Action buttons */}
       <div className="flex items-center space-x-2 shrink-0">
         <button
           className="p-2 rounded-xl border border-slate-200 hover:border-cyan-500/30 text-slate-400 hover:text-cyan-600 hover:bg-cyan-500/5 transition-all duration-200 cursor-pointer bg-white shadow-sm"
-          onClick={onEdit}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit?.();
+          }}
           title="Editar clase"
         >
           <Edit2 className="w-4 h-4" />
         </button>
         <button
           className="p-2 rounded-xl border border-slate-200 hover:border-rose-500/30 text-slate-400 hover:text-rose-600 hover:bg-rose-500/5 transition-all duration-200 cursor-pointer bg-white shadow-sm"
-          onClick={onDelete}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete?.();
+          }}
           title="Eliminar clase"
         >
           <Trash2 className="w-4 h-4" />
