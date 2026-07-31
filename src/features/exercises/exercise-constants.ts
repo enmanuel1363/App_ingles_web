@@ -6,17 +6,67 @@ export const lessonTypeOptions: {
   icon: string; // Lucide icon name reference
   color: string;
 }[] = [
-  { label: "Complete word", value: "complete_word", icon: "Type", color: "#F97316" },
-  { label: "Image gallery", value: "image_gallery", icon: "Image", color: "#EC4899" },
-  { label: "Match the names", value: "match_names", icon: "Link2", color: "#006668" },
-  { label: "Reading quiz", value: "reading_quiz", icon: "FileText", color: "#14B8A6" },
-  { label: "Say the word", value: "say_word", icon: "Volume2", color: "#D946EF" },
+  {
+    label: "Vocabulary",
+    value: "overview_session",
+    icon: "Languages",
+    color: "#A855F7",
+  },
+  {
+    label: "Video session",
+    value: "video_session",
+    icon: "Play",
+    color: "#F43F5E",
+  },
+  {
+    label: "Image gallery",
+    value: "image_gallery",
+    icon: "Image",
+    color: "#EC4899",
+  },
+  {
+    label: "Story Telling",
+    value: "audio_session",
+    icon: "BookOpen",
+    color: "#2DD4BF",
+  },
+  {
+    label: "Reading quiz",
+    value: "reading_quiz",
+    icon: "FileText",
+    color: "#14B8A6",
+  },
+  {
+    label: "Match the names",
+    value: "match_names",
+    icon: "Link2",
+    color: "#006668",
+  },
+  {
+    label: "Complete word",
+    value: "complete_word",
+    icon: "Type",
+    color: "#F97316",
+  },
   { label: "Speaking", value: "speak", icon: "Mic", color: "#EF4444" },
-  { label: "Story Telling", value: "audio_session", icon: "BookOpen", color: "#2DD4BF" },
-  { label: "Type answer", value: "type_answer", icon: "Keyboard", color: "#84CC16" },
-  { label: "Video session", value: "video_session", icon: "Play", color: "#F43F5E" },
-  { label: "Vocabulary", value: "overview_session", icon: "Languages", color: "#A855F7" },
-  { label: "Write a word", value: "write_word", icon: "PenTool", color: "#6366F1" },
+  {
+    label: "Say the word",
+    value: "say_word",
+    icon: "Volume2",
+    color: "#D946EF",
+  },
+  {
+    label: "Type answer",
+    value: "type_answer",
+    icon: "Keyboard",
+    color: "#84CC16",
+  },
+  {
+    label: "Write a word",
+    value: "write_word",
+    icon: "PenTool",
+    color: "#6366F1",
+  },
 ];
 
 export const EXERCISE_CATEGORIES: Record<lesson_type, string> = {
@@ -34,13 +84,19 @@ export const EXERCISE_CATEGORIES: Record<lesson_type, string> = {
 };
 
 export const EXERCISE_DEFAULT_CONTENT: Record<lesson_type, any> = {
-  complete_word: { items: [{ sentence: "", correct_answer: "", possible_answers: [] }] },
+  complete_word: {
+    items: [{ sentence: "", correct_answer: "", possible_answers: [] }],
+  },
   image_gallery: { items: [{ images: [] }] },
   match_names: { items: [{ images: [] }] },
   overview_session: { items: [{ words: [] }] },
-  reading_quiz: { items: [{ phrase: "", correct_answer: "", possible_answers: [] }] },
+  reading_quiz: {
+    items: [{ phrase: "", correct_answer: "", possible_answers: [] }],
+  },
   say_word: { items: [{ image_url: "", image_title: "" }] },
-  type_answer: { items: [{ correct_answer: "", clues: [], descriptive_text: "" }] },
+  type_answer: {
+    items: [{ correct_answer: "", clues: [], descriptive_text: "" }],
+  },
   video_session: { items: [{ video_url: "", disclaimer: "" }] },
   write_word: { items: [{ image_url: "", image_title: "" }] },
   audio_session: { items: [{ cover_image: "", story: "", questions: [] }] },

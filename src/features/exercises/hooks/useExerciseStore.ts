@@ -4,6 +4,32 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { CreateExerciseDTO, Exercise } from '../exercise.types';
 
+// Helper to replace File/Blob objects with serializable placeholders before storing in localStorage
+function replaceFilesWithPlaceholders(val: any): any {
+  if (typeof window !== "undefined" && (val instanceof File || val instanceof Blob)) {
+    return {
+      __isDraftPlaceholder: true,
+      name: (val as any).name || "archivo_temporal",
+      type: val.type,
+      size: val.size,
+    };
+  }
+  if (Array.isArray(val)) {
+    return val.map(replaceFilesWithPlaceholders);
+  }
+  if (val !== null && typeof val === "object") {
+    const obj: any = {};
+    for (const key in val) {
+      if (Object.prototype.hasOwnProperty.call(val, key)) {
+        obj[key] = replaceFilesWithPlaceholders(val[key]);
+      }
+    }
+    return obj;
+  }
+  return val;
+}
+
+
 export type StoreExercise = (CreateExerciseDTO | Exercise) & { tempId: string };
 
 type StoreTypes = {
@@ -180,7 +206,9 @@ export const useExerciseStore = create<StoreTypes>()(
     }),
     {
       name: "exercise-editor-drafts-map",
-      partialize: (state) => ({ drafts: state.drafts }), // Guardamos SOLO el mapa de borradores en localStorage
+      partialize: (state) => ({
+        drafts: replaceFilesWithPlaceholders(state.drafts),
+      }),
     }
   )
 );

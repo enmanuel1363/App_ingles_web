@@ -6,6 +6,8 @@ import UploadImageModal from "@/components/ui/UploadImageModal";
 import { useState } from "react";
 import { useExerciseStore } from '../hooks/useExerciseStore';
 import { X, Plus, Camera, Image as ImageIcon } from "lucide-react";
+import { previewSrc, isDraftPlaceholder } from "../utils/imagePreview";
+
 
 const EMPTY_ITEM = { image_url: "" as string | File, image_title: "" };
 
@@ -63,8 +65,6 @@ export default function WriteWordExerciseForm({ order_index }: Props) {
     });
   };
 
-  const previewSrc = (url: string | File) =>
-    typeof url === "string" ? url : URL.createObjectURL(url);
 
   return (
     <div className="w-full space-y-4">
@@ -111,13 +111,25 @@ export default function WriteWordExerciseForm({ order_index }: Props) {
 
           {item.image_url ? (
             <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50/70">
-              <div className="relative w-full h-48">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={previewSrc(item.image_url)}
-                  alt={item.image_title}
-                  className="w-full h-full object-cover"
-                />
+              <div className="relative w-full h-48 flex items-center justify-center bg-slate-50 border-b border-slate-100">
+                {isDraftPlaceholder(item.image_url) ? (
+                  <div className="flex flex-col items-center justify-center p-3 text-center select-none">
+                    <ImageIcon className="w-8 h-8 text-cyan-600 mb-1" />
+                    <span className="text-xs font-bold text-slate-700 truncate max-w-[200px]" title={(item.image_url as any).name}>
+                      {(item.image_url as any).name}
+                    </span>
+                    <span className="text-[9px] text-rose-500 font-bold uppercase tracking-wider mt-0.5">
+                      Re-upload image
+                    </span>
+                  </div>
+                ) : (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={previewSrc(item.image_url)}
+                    alt={item.image_title}
+                    className="w-full h-full object-cover"
+                  />
+                )}
                 <button
                   className="absolute top-2 right-2 p-1.5 bg-slate-50/80 rounded-lg text-slate-650 hover:text-rose-600 transition-colors"
                   onClick={() => {
