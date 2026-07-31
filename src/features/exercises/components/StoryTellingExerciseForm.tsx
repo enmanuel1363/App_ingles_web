@@ -5,6 +5,8 @@ import Button from "@/components/ui/Button";
 import { useRef, useState } from "react";
 import { useExerciseStore } from '../hooks/useExerciseStore';
 import { X, Plus, Trash2, Image as ImageIcon, CheckCircle2, Circle } from "lucide-react";
+import { previewSrc, isDraftPlaceholder } from "../utils/imagePreview";
+
 
 type AnswerOption = { text: string; isCorrect: boolean };
 type QA = { question: string; options: AnswerOption[] };
@@ -89,8 +91,6 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
     if (file) updateItem(itemIndex, "cover_image", file);
   };
 
-  const previewSrc = (cover: string | File) =>
-    typeof cover === "string" ? cover : URL.createObjectURL(cover);
 
   const handleOptionText = (itemIndex: number, index: number, text: string) => {
     const opts = getNewOptions(itemIndex);
@@ -192,13 +192,25 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
               <p className="text-xs text-slate-500 mb-2">Shown above the story text (16:9 recommended)</p>
 
               {item.cover_image ? (
-                <div className="relative w-full h-40 overflow-hidden rounded-xl border border-slate-200">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={previewSrc(item.cover_image)}
-                    alt="cover"
-                    className="w-full h-full object-cover"
-                  />
+                <div className="relative w-full h-40 overflow-hidden rounded-xl border border-slate-200 flex items-center justify-center bg-slate-50 border-b border-slate-100">
+                  {isDraftPlaceholder(item.cover_image) ? (
+                    <div className="flex flex-col items-center justify-center p-3 text-center select-none">
+                      <ImageIcon className="w-8 h-8 text-cyan-600 mb-1" />
+                      <span className="text-xs font-bold text-slate-700 truncate max-w-[200px]" title={(item.cover_image as any).name}>
+                        {(item.cover_image as any).name}
+                      </span>
+                      <span className="text-[9px] text-rose-500 font-bold uppercase tracking-wider mt-0.5">
+                        Re-upload cover image
+                      </span>
+                    </div>
+                  ) : (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={previewSrc(item.cover_image)}
+                      alt="cover"
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                   <button
                     className="absolute top-2 right-2 p-1.5 bg-slate-50/80 rounded-lg text-slate-650 hover:text-rose-600 transition-colors"
                     onClick={() => updateItem(itemIndex, "cover_image", "")}

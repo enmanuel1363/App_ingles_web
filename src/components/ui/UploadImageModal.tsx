@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FormInput from "./FormInput";
 import { X, ImagePlus, Trash2, Plus } from "lucide-react";
 import Button from "./Button";
@@ -27,6 +27,16 @@ export default function UploadImageModal({
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [description, setDescription] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Clean up Object URL to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (previewUrl && previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
   const { showAlert } = useModal();
 
   if (!visible) return null;

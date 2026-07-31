@@ -5,7 +5,9 @@ import Button from "@/components/ui/Button";
 import UploadImageModal from "@/components/ui/UploadImageModal";
 import { useState } from "react";
 import { useExerciseStore } from '../hooks/useExerciseStore';
-import { X, Plus, Link as LinkIcon } from "lucide-react";
+import { X, Plus, Link as LinkIcon, Image as ImageIcon } from "lucide-react";
+import { previewSrc, isDraftPlaceholder } from "../utils/imagePreview";
+
 
 const EMPTY_ITEM = { images: [] as { url: string | File; description: string }[] };
 
@@ -81,8 +83,6 @@ export default function MatchNamesExerciseForm({ order_index }: Props) {
     updateItem(itemIndex, { images: newImages });
   };
 
-  const previewSrc = (url: string | File) =>
-    typeof url === "string" ? url : URL.createObjectURL(url);
 
   return (
     <div className="w-full space-y-4">
@@ -183,14 +183,26 @@ export default function MatchNamesExerciseForm({ order_index }: Props) {
                           : ""
                       }`}
                     >
-                      <div className="relative w-full h-32">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={previewSrc(img.url)}
-                          alt={img.description}
-                          className="w-full h-full object-cover select-none pointer-events-none"
-                          draggable={false}
-                        />
+                      <div className="relative w-full h-32 flex items-center justify-center bg-slate-50 border-b border-slate-100">
+                        {isDraftPlaceholder(img.url) ? (
+                          <div className="flex flex-col items-center justify-center p-3 text-center select-none">
+                            <ImageIcon className="w-6 h-6 text-cyan-600 mb-1" />
+                            <span className="text-xs font-bold text-slate-700 truncate max-w-[130px]" title={(img.url as any).name}>
+                              {(img.url as any).name}
+                            </span>
+                            <span className="text-[9px] text-rose-500 font-bold uppercase tracking-wider mt-0.5">
+                              Re-upload image
+                            </span>
+                          </div>
+                        ) : (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
+                            src={previewSrc(img.url)}
+                            alt={img.description}
+                            className="w-full h-full object-cover select-none pointer-events-none"
+                            draggable={false}
+                          />
+                        )}
                         <button
                           className="absolute top-2 right-2 p-1.5 bg-slate-50/80 rounded-lg text-slate-655 hover:text-rose-600 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
                           onClick={(e) => {
