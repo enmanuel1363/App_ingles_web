@@ -34,13 +34,16 @@ export async function deleteClass(classId: string, unitId: string) {
   if (error) throw error;
 }
 
-export async function updateClass(obClass: ClassModel) {
-  const { data, error } = await supabase
-    .from("class")
-    .upsert(obClass)
-    .select()
-    .single();
+export async function updateClass(obClass: ClassModel): Promise<ClassModel> {
+  if (!obClass.id) throw new Error("Class ID is required for update.");
+
+  const { error } = await supabase.rpc("update_class_and_order", {
+    p_class_id: obClass.id,
+    p_name: obClass.name,
+    p_type: obClass.type,
+    p_new_order_index: obClass.order_index,
+  });
 
   if (error) throw error;
-  return data;
+  return obClass;
 }

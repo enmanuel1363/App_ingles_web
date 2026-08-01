@@ -791,6 +791,15 @@ export type Database = {
         Args: { class_id: string; unit_id: string }
         Returns: undefined
       }
+      update_class_and_order: {
+        Args: {
+          p_class_id: string
+          p_name: string
+          p_type: string
+          p_new_order_index: number
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       class_type: "mix" | "write" | "read" | "speak"

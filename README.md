@@ -1,37 +1,82 @@
-# App_ingles — Web (Admin)
+# 🇬🇧 App Inglés - Panel de Administración Web
 
-Conversión de la app móvil (React Native / Expo) a **Next.js** (React puro, CSS normal), solo con las funcionalidades de administrador. El login con Google fue eliminado; el acceso es únicamente por email y contraseña vía Supabase.
+Este repositorio contiene la versión web (panel de administración) de la aplicación educativa **App Inglés**. El proyecto ha sido diseñado para gestionar de manera fluida y centralizada el contenido de aprendizaje, permitiendo a los profesores y administradores configurar cursos, unidades, lecciones y ejercicios interactivos.
 
-## Estado: Fase 4c — Últimos 4 tipos ✅ (Fase 4 completa: 11/11 tipos)
+---
 
-Completado en esta fase:
-- **Video session** — URL de YouTube + nota aclaratoria
-- **Speaking** — respuesta correcta para comparar pronunciación
-- **Reading quiz** — frase, respuesta correcta y respuestas posibles (pastillas)
-- **Story Telling (audio_session)** — imagen de portada, historia y preguntas de opción múltiple con respuesta correcta marcada
-- 🎉 **Los 11 tipos de lección están completos y funcionales**: Type Answer, Complete Word, Vocabulary, Write a word, Say the word, Image gallery, Match the names, Video session, Speaking, Reading quiz, Story Telling
+## 🎯 ¿Por qué este proyecto?
 
-## Pendiente (próximas fases)
+El propósito fundamental de este desarrollo es realizar la **conversión y migración de la aplicación móvil original** (desarrollada en React Native / Expo) a una **plataforma web optimizada utilizando Next.js**.
 
-- Fase 5: Rewards, Games, Profile (administrador)
-- Fase 6: Reactivar autenticación + revisión general y ajustes finales
+### Objetivos Clave:
+* **Administración Centralizada**: Proveer una interfaz limpia y eficiente para la creación y edición de cursos, unidades y lecciones.
+* **Gestión de Ejercicios Interactivos**: Configurar y validar los 11 tipos diferentes de ejercicios interactivos (tales como *Type Answer, Complete Word, Vocabulary, Write a Word, Say the Word, Image Gallery, Match the Names, Video Session, Speaking, Reading Quiz* y *Story Telling*).
+* **Consistencia e Integridad de Datos**: Garantizar la integridad en operaciones críticas de base de datos, como el reordenamiento de lecciones dentro de unidades de forma atómica.
 
-## Configuración
+---
 
-1. `npm install`
-2. Copia `.env.local.example` a `.env.local` y completa tus credenciales de Supabase:
+## 🛠️ Tecnologías y Stack Tecnológico
+
+El proyecto está construido sobre un stack moderno, priorizando la velocidad de carga, la modularidad del código y la interactividad del usuario:
+
+* **Next.js (App Router - React 18)**: Framework principal para el renderizado del lado del cliente (CSR) y servidor (SSR), con enrutamiento dinámico optimizado.
+* **Supabase**: Backend-as-a-Service (BaaS) utilizado para:
+  * **Autenticación**: Acceso seguro a través de correo electrónico y contraseña.
+  * **Base de Datos PostgreSQL**: Almacenamiento relacional rápido y robusto.
+  * **RPC (Remote Procedure Calls)**: Funciones en base de datos escritas en PL/pgSQL para realizar tareas complejas a nivel transaccional (ej: el sistema de ordenamiento atómico de lecciones).
+* **Zustand**: Biblioteca de gestión de estado global ligera y escalable para almacenar los estados de los ejercicios y la autenticación del usuario.
+* **React Query (@tanstack/react-query)**: Para la sincronización, actualización y almacenamiento en caché eficiente del estado del servidor.
+* **TailwindCSS & PostCSS**: Framework de CSS utilitario para maquetar interfaces premium, responsivas y consistentes.
+* **Lucide React**: Biblioteca de iconos vectoriales modernos y limpios.
+* **TypeScript**: Tipado estricto en todo el proyecto para asegurar robustez, autocompletado y minimizar errores en tiempo de ejecución.
+
+---
+
+## 📁 Arquitectura del Proyecto
+
+El código sigue una **Arquitectura Basada en Características (Feature-Based Architecture - FBA)** para asegurar la escalabilidad:
+
+* `src/app/`: Capa de entrega (rutas físicas del App Router de Next.js).
+* `src/features/`: Módulos encapsulados de negocio (e.g., `courses/`, `units/`, `classes/`, `exercises/`), conteniendo sus propios componentes, hooks de React Query, servicios de API y archivos de tipos.
+* `src/components/ui/`: Componentes atómicos de UI transversales y reutilizables.
+* `src/lib/`: Configuraciones de clientes globales compartidos (como el cliente de Supabase).
+
+---
+
+## 🚀 Configuración y Guía de Inicio
+
+### Requisitos Previos
+* Node.js (versión 18 o superior recomendada)
+* npm o yarn
+
+### Pasos para Ejecutar Localmente
+
+1. **Instalar dependencias**:
+   ```bash
+   npm install
    ```
-   NEXT_PUBLIC_SUPABASE_URL=
-   NEXT_PUBLIC_SUPABASE_KEY=
+
+2. **Configurar Variables de Entorno**:
+   Copia el archivo `.env.local.example` a `.env.local` en la raíz del proyecto y completa tus credenciales de Supabase:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=tu_supabase_url
+   NEXT_PUBLIC_SUPABASE_KEY=tu_supabase_anon_key
    ```
-3. `npm run dev`
 
-## Nota importante sobre roles
+3. **Iniciar Servidor de Desarrollo**:
+   ```bash
+   npm run dev
+   ```
+   La aplicación estará disponible en [http://localhost:3000](http://localhost:3000).
 
-⚠️ **La autenticación está temporalmente desactivada** para facilitar el desarrollo. `/` redirige directo a `/dashboard` sin pedir login.
+---
 
-La versión original (login por email/contraseña + validación de rol `admin`) quedó respaldada en:
-- `src/app/page.auth-backup.tsx`
-- `src/app/(admin)/layout.auth-backup.tsx`
+## ⚠️ Nota Importante sobre Autenticación en Desarrollo
 
-Al final del proyecto, para reactivarla: renombra `page.auth-backup.tsx` → `page.tsx` y `layout.auth-backup.tsx` → `layout.tsx` (reemplazando los actuales).
+Para acelerar el desarrollo del panel, **la autenticación del administrador ha sido desactivada temporalmente**. Al acceder a `/`, se redirige directamente al `/dashboard`.
+
+La versión original de inicio de sesión con validación de roles de administrador (`admin`) ha sido respaldada en:
+* `src/app/page.auth-backup.tsx`
+* `src/app/(admin)/layout.auth-backup.tsx`
+
+Para reactivar la seguridad y el inicio de sesión del sistema, simplemente renombra estos archivos quitando el sufijo `.auth-backup` (reemplazando los archivos de producción actuales).
