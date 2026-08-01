@@ -91,6 +91,7 @@ export default function GalleryExerciseForm({ order_index }: Props) {
         placeholder="e.g. Vocabulary: Fruits and vegetables"
         value={exercise.name}
         onChangeText={(text) => updateField("name", text)}
+        onCopy={() => navigator.clipboard.writeText(exercise.name)}
       />
       <FormInput
         label="Description"
@@ -98,6 +99,7 @@ export default function GalleryExerciseForm({ order_index }: Props) {
         value={exercise.description}
         onChangeText={(text) => updateField("description", text)}
         multiline
+        onCopy={() => navigator.clipboard.writeText(exercise.description)}
       />
 
       {items.map((item: any, itemIndex: number) => (

@@ -58,6 +58,7 @@ export default function TypeAnswerExerciseForm({ order_index }: Props) {
         placeholder="e.g. Short Story Analysis"
         value={exercise.name}
         onChangeText={(text) => updateField("name", text)}
+        onCopy={() => navigator.clipboard.writeText(exercise.name)}
       />
 
       {items.map((item: any, itemIndex: number) => (

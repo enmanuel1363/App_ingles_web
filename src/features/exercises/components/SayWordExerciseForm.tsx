@@ -79,6 +79,7 @@ export default function SayWordExerciseForm({ order_index }: Props) {
         placeholder="e.g. What is this?"
         value={exercise.name}
         onChangeText={(text) => updateField("name", text)}
+        onCopy={() => navigator.clipboard.writeText(exercise.name)}
       />
 
       {items.map((item: any, itemIndex: number) => (

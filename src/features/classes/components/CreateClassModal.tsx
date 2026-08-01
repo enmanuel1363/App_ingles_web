@@ -35,20 +35,26 @@ export default function CreateClassModal({
 
   const [name, setName] = useState("");
   const [type, setType] = useState<class_type>("mix");
+  const [orderIndex, setOrderIndex] = useState<number>(1);
   const [error, setError] = useState<string | null>(null);
+
+  const totalClasses = classToEdit ? nextOrderIndex - 1 : nextOrderIndex;
+  const orderOptions = Array.from({ length: totalClasses }, (_, i) => i + 1);
 
   useEffect(() => {
     if (visible) {
       if (classToEdit) {
         setName(classToEdit.name);
         setType(classToEdit.type);
+        setOrderIndex(classToEdit.order_index);
       } else {
         setName("");
         setType("mix");
+        setOrderIndex(nextOrderIndex);
       }
       setError(null);
     }
-  }, [visible, classToEdit]);
+  }, [visible, classToEdit, nextOrderIndex]);
 
   if (!visible) return null;
 
@@ -60,7 +66,12 @@ export default function CreateClassModal({
 
     try {
       if (classToEdit) {
-        await updateClassMutation({ ...classToEdit, name: name.trim(), type });
+        await updateClassMutation({
+          ...classToEdit,
+          name: name.trim(),
+          type,
+          order_index: orderIndex,
+        });
       } else {
         const newClass: CreateClassDTO = {
           id_unit,
@@ -116,7 +127,7 @@ export default function CreateClassModal({
           <div className="space-y-1.5">
             <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-450">Class Type</label>
             <select
-              className="w-full bg-slate-50 border border-slate-200 text-slate-705 rounded-xl p-3 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all duration-200 disabled:opacity-50 text-sm cursor-pointer"
+              className="w-full bg-slate-50 border border-slate-200 text-slate-750 rounded-xl p-3 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all duration-200 disabled:opacity-50 text-sm cursor-pointer"
               value={type}
               onChange={(e) => setType(e.target.value as class_type)}
               disabled={isPending}
@@ -128,6 +139,26 @@ export default function CreateClassModal({
               ))}
             </select>
           </div>
+
+          {classToEdit && (
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-450">
+                Lesson Position
+              </label>
+              <select
+                className="w-full bg-slate-50 border border-slate-200 text-slate-750 rounded-xl p-3 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all duration-200 disabled:opacity-50 text-sm cursor-pointer"
+                value={orderIndex}
+                onChange={(e) => setOrderIndex(Number(e.target.value))}
+                disabled={isPending}
+              >
+                {orderOptions.map((num) => (
+                  <option key={num} value={num} className="text-slate-700">
+                    Position {num}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         {/* Error notification */}

@@ -91,6 +91,7 @@ export default function MatchNamesExerciseForm({ order_index }: Props) {
         placeholder="e.g. Coastal Wildlife Gallery"
         value={exercise.name}
         onChangeText={(text) => updateField("name", text)}
+        onCopy={() => navigator.clipboard.writeText(exercise.name)}
       />
       <FormInput
         label="Descriptive Text"
@@ -98,6 +99,7 @@ export default function MatchNamesExerciseForm({ order_index }: Props) {
         value={exercise.description}
         onChangeText={(text) => updateField("description", text)}
         multiline
+        onCopy={() => navigator.clipboard.writeText(exercise.description)}
       />
 
       {items.map((item: any, itemIndex: number) => {
