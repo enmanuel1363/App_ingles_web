@@ -77,6 +77,7 @@ export default function OverviewExerciseForm({ order_index }: Props) {
         placeholder="e.g. Animals Vocabulary"
         value={exercise.name}
         onChangeText={(text) => updateField("name", text)}
+        onCopy={() => navigator.clipboard.writeText(exercise.name)}
       />
       <FormInput
         label="Description"
@@ -84,6 +85,7 @@ export default function OverviewExerciseForm({ order_index }: Props) {
         value={exercise.description}
         onChangeText={(text) => updateField("description", text)}
         multiline
+        onCopy={() => navigator.clipboard.writeText(exercise.description)}
       />
 
       <div className="mt-4">

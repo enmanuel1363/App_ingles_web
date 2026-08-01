@@ -96,12 +96,14 @@ export default function CompleteWordExerciseForm({ order_index }: Props) {
         placeholder="e.g. Complete the sentence"
         value={exercise.name}
         onChangeText={(text) => updateField("name", text)}
+        onCopy={() => navigator.clipboard.writeText(exercise.name)}
       />
       <FormInput
         label="Description"
         placeholder="e.g. Fill in the blank with the correct word"
         value={exercise.description}
         onChangeText={(text) => updateField("description", text)}
+        onCopy={() => navigator.clipboard.writeText(exercise.description)}
       />
 
       <p className="flex flex-row items-center gap-2 text-sm text-gray-400">

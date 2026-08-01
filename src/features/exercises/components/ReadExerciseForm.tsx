@@ -96,12 +96,14 @@ export default function ReadExerciseForm({ order_index }: Props) {
         placeholder="e.g. Reading Comprehension"
         value={exercise.name}
         onChangeText={(text) => updateField("name", text)}
+        onCopy={() => navigator.clipboard.writeText(exercise.name)}
       />
       <FormInput
         label="Description"
         placeholder="e.g. Read the phrase and choose the correct answer"
         value={exercise.description}
         onChangeText={(text) => updateField("description", text)}
+        onCopy={() => navigator.clipboard.writeText(exercise.description)}
       />
 
       {items.map((item: any, itemIndex: number) => (
