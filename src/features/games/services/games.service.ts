@@ -141,7 +141,7 @@ export async function createGameRoom(
     .single();
 
   if (error) throw error;
-  return data;
+  return data as GameRoom;
 }
 
 /**
@@ -160,7 +160,7 @@ export async function getGameRoomByCode(
     if (error.code === "PGRST116") return null; // No rows found
     throw error;
   }
-  return data;
+  return data as GameRoom | null;
 }
 
 /**
@@ -178,7 +178,7 @@ export async function updateGameRoomStatus(
     .single();
 
   if (error) throw error;
-  return data;
+  return data as GameRoom;
 }
 
 /**
@@ -199,5 +199,5 @@ export async function updateGameRoomQuestionIndex(
     .single();
 
   if (error) throw error;
-  return data;
+  return data as GameRoom;
 }
