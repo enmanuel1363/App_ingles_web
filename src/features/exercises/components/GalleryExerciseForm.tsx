@@ -5,7 +5,7 @@ import Button from "@/components/ui/Button";
 import UploadImageModal from "@/components/ui/UploadImageModal";
 import { useState } from "react";
 import { useExerciseStore } from '../hooks/useExerciseStore';
-import { X, Plus, Image as ImageIcon } from "lucide-react";
+import { X, Plus, Image as ImageIcon, AlertCircle } from "lucide-react";
 import { previewSrc, isDraftPlaceholder } from "../utils/imagePreview";
 
 
@@ -102,8 +102,12 @@ export default function GalleryExerciseForm({ order_index }: Props) {
         onCopy={() => navigator.clipboard.writeText(exercise.description)}
       />
 
-      {items.map((item: any, itemIndex: number) => (
-        <div key={itemIndex} className="mt-4 p-5 bg-slate-50/70 rounded-xl border border-slate-200/80 ">
+      {items.map((item: any, itemIndex: number) => {
+        const isItemInvalid = !item.images || item.images.length === 0;
+        return (
+          <div key={itemIndex} className={`mt-4 p-5 bg-slate-50/70 rounded-xl border transition-colors ${
+            isItemInvalid ? "border-amber-300 bg-amber-50/10" : "border-slate-200/80"
+          }`}>
           <div className="flex justify-between items-center mb-3">
             <span className="font-semibold text-cyan-650 text-sm tracking-wide uppercase">Item {itemIndex + 1}</span>
             {items.length > 1 && (
@@ -210,8 +214,16 @@ export default function GalleryExerciseForm({ order_index }: Props) {
           >
             Add Image
           </Button>
+
+          {isItemInvalid && (
+            <div className="mt-3 flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50/50 p-2 rounded-lg border border-amber-100">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>Se requiere agregar al menos una imagen con su respectiva descripción.</span>
+            </div>
+          )}
         </div>
-      ))}
+      );
+    })}
 
 
 

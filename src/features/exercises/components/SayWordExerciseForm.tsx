@@ -6,7 +6,7 @@ import UploadImageModal from "@/components/ui/UploadImageModal";
 import { useState } from "react";
 import { useExerciseStore } from '../hooks/useExerciseStore';
 import { EXERCISE_DEFAULT_DESCRIPTIONS } from "../exercise-constants";
-import { X, Plus, Camera, Image as ImageIcon } from "lucide-react";
+import { X, Plus, Camera, Image as ImageIcon, AlertCircle } from "lucide-react";
 import { previewSrc, isDraftPlaceholder } from "../utils/imagePreview";
 
 
@@ -82,8 +82,12 @@ export default function SayWordExerciseForm({ order_index }: Props) {
         onCopy={() => navigator.clipboard.writeText(exercise.name)}
       />
 
-      {items.map((item: any, itemIndex: number) => (
-        <div key={itemIndex} className="mt-4 p-5 bg-slate-50/70 rounded-xl border border-slate-200/80 ">
+      {items.map((item: any, itemIndex: number) => {
+        const isItemInvalid = !item.image_url || !item.image_title || item.image_title.trim() === "";
+        return (
+          <div key={itemIndex} className={`mt-4 p-5 bg-slate-50/70 rounded-xl border transition-colors ${
+            isItemInvalid ? "border-amber-300 bg-amber-50/10" : "border-slate-200/80"
+          }`}>
           <div className="flex justify-between items-center mb-3">
             <span className="font-semibold text-cyan-650 text-sm tracking-wide uppercase">Item {itemIndex + 1}</span>
             {items.length > 1 && (
@@ -155,8 +159,16 @@ export default function SayWordExerciseForm({ order_index }: Props) {
               <span className="text-sm font-medium">No hay imagen seleccionada</span>
             </button>
           )}
+
+          {isItemInvalid && (
+            <div className="mt-3 flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50/50 p-2 rounded-lg border border-amber-100">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>Se requiere seleccionar una imagen y especificar la palabra asociada.</span>
+            </div>
+          )}
         </div>
-      ))}
+      );
+    })}
 
       <Button
         variant="outlined"

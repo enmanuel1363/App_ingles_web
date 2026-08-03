@@ -10,6 +10,7 @@ import {
 } from "../exercise-constants";
 import { useCreateExercises, useGetExercises } from "../hooks/useExercises";
 import { useExerciseStore } from "../hooks/useExerciseStore";
+import { sanitizeData } from "../utils/sanitize";
 import {
   deleteExercises,
   processExerciseFiles,
@@ -154,10 +155,100 @@ export default function AddExercisesPage({ classId }: Props) {
   const handleSaveAll = async () => {
     setFormError(null);
 
-    const invalid = data.some((ex) => !ex.name || ex.name.length < 3);
+    const sanitizedData = data.map((ex) => sanitizeData(ex));
+
+    const invalid = sanitizedData.some((ex) => !ex.name || ex.name.length < 3);
     if (invalid) {
       setFormError("Please complete the names of all exercises.");
       return;
+    }
+
+    // Validate that exercises are complete and do not have empty items/fields
+    for (let i = 0; i < sanitizedData.length; i++) {
+      const ex = sanitizedData[i];
+      const items = ex.content?.items || [];
+
+      // If it's a placeholder, skip
+      if (ex.type === "placeholder") continue;
+
+      if (items.length === 0) {
+        setFormError(`El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) no tiene ítems.`);
+        return;
+      }
+
+      for (let j = 0; j < items.length; j++) {
+        const item = items[j];
+
+        if (ex.type === "complete_word" || ex.type === "reading_quiz") {
+          const hasCorrect = item.correct_answer && item.correct_answer.trim() !== "";
+          const hasPossibles = item.possible_answers && item.possible_answers.length > 0;
+          if (!hasCorrect || !hasPossibles) {
+            setFormError(
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener respuesta correcta y posibles respuestas.`
+            );
+            return;
+          }
+        } else if (ex.type === "image_gallery" || ex.type === "match_names") {
+          const hasImages = item.images && item.images.length > 0;
+          if (!hasImages) {
+            setFormError(
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener al menos una imagen.`
+            );
+            return;
+          }
+        } else if (ex.type === "overview_session") {
+          const hasWords = item.words && item.words.length > 0;
+          if (!hasWords) {
+            setFormError(
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene la sección #${j + 1} incompleta. Debe tener al menos una palabra.`
+            );
+            return;
+          }
+        } else if (ex.type === "say_word" || ex.type === "write_word") {
+          const hasUrl = item.image_url && String(item.image_url).trim() !== "";
+          const hasTitle = item.image_title && item.image_title.trim() !== "";
+          if (!hasUrl || !hasTitle) {
+            setFormError(
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener imagen y palabra asociada.`
+            );
+            return;
+          }
+        } else if (ex.type === "speak") {
+          const hasCorrect = item.correct_answer && item.correct_answer.trim() !== "";
+          if (!hasCorrect) {
+            setFormError(
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener la respuesta de comparación.`
+            );
+            return;
+          }
+        } else if (ex.type === "audio_session") {
+          const hasStory = item.story && item.story.trim() !== "";
+          const hasQuestions = item.questions && item.questions.length > 0;
+          if (!hasStory || !hasQuestions) {
+            setFormError(
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener texto de historia y al menos una pregunta.`
+            );
+            return;
+          }
+        } else if (ex.type === "type_answer") {
+          const hasDescriptive = item.descriptive_text && item.descriptive_text.trim() !== "";
+          const hasCorrect = item.correct_answer && item.correct_answer.trim() !== "";
+          if (!hasDescriptive || !hasCorrect) {
+            setFormError(
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener texto descriptivo y respuesta correcta.`
+            );
+            return;
+          }
+        } else if (ex.type === "video_session") {
+          const hasUrl = item.video_url && item.video_url.trim() !== "";
+          if (!hasUrl) {
+            setFormError(
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener la URL del video.`
+            );
+            return;
+          }
+        }
+      }
     }
 
     if (categoryCounts["Introducción"] < 2) {
@@ -168,7 +259,7 @@ export default function AddExercisesPage({ classId }: Props) {
       setFormError("At least 3 exercises of type Validación are required.");
       return;
     }
-    if (data.length > 12) {
+    if (sanitizedData.length > 12) {
       setFormError("Maximum of 12 exercises allowed in total.");
       return;
     }
@@ -178,7 +269,7 @@ export default function AddExercisesPage({ classId }: Props) {
       const existingIds = (existingExercises || [])
         .map((ex) => ex.id)
         .filter((id): id is string => !!id);
-      const currentIds = data
+      const currentIds = sanitizedData
         .map((ex) => (ex as any).id)
         .filter((id): id is string => !!id);
       const removedIds = existingIds.filter((id) => !currentIds.includes(id));
@@ -187,7 +278,7 @@ export default function AddExercisesPage({ classId }: Props) {
       }
 
       const processedExercises = await Promise.all(
-        data.map(async ({ tempId, ...exercise }) => {
+        sanitizedData.map(async ({ tempId, ...exercise }) => {
           const cleanExercise = { ...exercise } as any;
           if (!cleanExercise.id) cleanExercise.id = generateUUID();
           delete cleanExercise.created_at;

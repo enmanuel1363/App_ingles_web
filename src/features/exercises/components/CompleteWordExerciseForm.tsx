@@ -4,7 +4,7 @@ import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
 import { useState } from "react";
 import { useExerciseStore } from "../hooks/useExerciseStore";
-import { X, Plus, Info } from "lucide-react";
+import { X, Plus, Info, AlertCircle } from "lucide-react";
 
 const EMPTY_ITEM = {
   sentence: "",
@@ -111,11 +111,15 @@ export default function CompleteWordExerciseForm({ order_index }: Props) {
         Tip: usa 3 guiones bajos ( _ ) para indicar donde ira la palabra
         faltante en tu frase
       </p>
-      {items.map((item: any, itemIndex: number) => (
-        <div
-          key={itemIndex}
-          className="mt-4 p-5 bg-slate-50/70 rounded-xl border border-slate-200/80 "
-        >
+      {items.map((item: any, itemIndex: number) => {
+        const isItemInvalid = !item.correct_answer?.trim() || !item.possible_answers || item.possible_answers.length === 0;
+        return (
+          <div
+            key={itemIndex}
+            className={`mt-4 p-5 bg-slate-50/70 rounded-xl border transition-colors ${
+              isItemInvalid ? "border-amber-300 bg-amber-50/10" : "border-slate-200/80"
+            }`}
+          >
           <div className="flex justify-between items-center mb-3">
             <span className="font-semibold text-cyan-650 text-sm tracking-wide uppercase">
               Item {itemIndex + 1}
@@ -172,8 +176,16 @@ export default function CompleteWordExerciseForm({ order_index }: Props) {
               multiline
             />
           </div>
+
+          {isItemInvalid && (
+            <div className="mt-3 flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50/50 p-2 rounded-lg border border-amber-100">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>Se requiere asignar una respuesta correcta y al menos una posible respuesta.</span>
+            </div>
+          )}
         </div>
-      ))}
+      );
+    })}
 
       <Button
         variant="outlined"
