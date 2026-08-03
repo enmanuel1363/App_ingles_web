@@ -70,13 +70,3 @@ El código sigue una **Arquitectura Basada en Características (Feature-Based Ar
    La aplicación estará disponible en [http://localhost:3000](http://localhost:3000).
 
 ---
-
-## ⚠️ Nota Importante sobre Autenticación en Desarrollo
-
-Para acelerar el desarrollo del panel, **la autenticación del administrador ha sido desactivada temporalmente**. Al acceder a `/`, se redirige directamente al `/dashboard`.
-
-La versión original de inicio de sesión con validación de roles de administrador (`admin`) ha sido respaldada en:
-* `src/app/page.auth-backup.tsx`
-* `src/app/(admin)/layout.auth-backup.tsx`
-
-Para reactivar la seguridad y el inicio de sesión del sistema, simplemente renombra estos archivos quitando el sufijo `.auth-backup` (reemplazando los archivos de producción actuales).

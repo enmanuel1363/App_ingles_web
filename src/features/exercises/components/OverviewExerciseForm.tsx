@@ -4,7 +4,7 @@ import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
 import { useState } from "react";
 import { useExerciseStore } from '../hooks/useExerciseStore';
-import { BookOpen, Trash2, Plus } from "lucide-react";
+import { BookOpen, Trash2, Plus, AlertCircle } from "lucide-react";
 
 type VocabWord = { word: string; translation: string };
 type Item = { words: VocabWord[] };
@@ -98,8 +98,12 @@ export default function OverviewExerciseForm({ order_index }: Props) {
           </div>
         )}
 
-        {items.map((item, itemIndex) => (
-          <div key={itemIndex} className="mt-4 p-5 bg-slate-50/70 rounded-xl border border-slate-200/80 ">
+        {items.map((item, itemIndex) => {
+          const isItemInvalid = !item.words || item.words.length === 0;
+          return (
+            <div key={itemIndex} className={`mt-4 p-5 bg-slate-50/70 rounded-xl border transition-colors ${
+              isItemInvalid ? "border-amber-300 bg-amber-50/10" : "border-slate-200/80"
+            }`}>
             <div className="flex justify-between items-center mb-3">
               <div className="flex items-center gap-2">
                 <BookOpen size={18} className="text-cyan-650" />
@@ -161,8 +165,16 @@ export default function OverviewExerciseForm({ order_index }: Props) {
                 Add Word
               </Button>
             </div>
+
+            {isItemInvalid && (
+              <div className="mt-3 flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50/50 p-2 rounded-lg border border-amber-100">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>Se requiere agregar al menos una palabra con su respectiva traducción.</span>
+              </div>
+            )}
           </div>
-        ))}
+        );
+      })}
 
         <Button
           variant="outlined"
