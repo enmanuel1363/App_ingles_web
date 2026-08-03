@@ -782,6 +782,190 @@ export type Database = {
           },
         ]
       }
+      games: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          type: Database["public"]["Enums"]["game_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          type: Database["public"]["Enums"]["game_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          type?: Database["public"]["Enums"]["game_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "games_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exercise_game: {
+        Row: {
+          content: Json
+          created_at: string
+          description: string | null
+          id: string
+          id_game: string
+          name: string
+          order_index: number
+          points_reward: number
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          content: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          id_game: string
+          name: string
+          order_index: number
+          points_reward?: number
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          id_game?: string
+          name?: string
+          order_index?: number
+          points_reward?: number
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exercise_game_id_game_fkey"
+            columns: ["id_game"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_student_log: {
+        Row: {
+          answers_summary: Json | null
+          completed_at: string
+          id: string
+          id_game: string
+          id_student_profile: string
+          score: number
+          time_spent: number | null
+        }
+        Insert: {
+          answers_summary?: Json | null
+          completed_at?: string
+          id?: string
+          id_game: string
+          id_student_profile: string
+          score?: number
+          time_spent?: number | null
+        }
+        Update: {
+          answers_summary?: Json | null
+          completed_at?: string
+          id?: string
+          id_game?: string
+          id_student_profile?: string
+          score?: number
+          time_spent?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_student_log_id_game_fkey"
+            columns: ["id_game"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_student_log_id_student_profile_fkey"
+            columns: ["id_student_profile"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_room: {
+        Row: {
+          created_at: string
+          current_question_index: number
+          host_id: string
+          id: string
+          id_game: string
+          room_code: string
+          settings: Json | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_question_index?: number
+          host_id: string
+          id?: string
+          id_game: string
+          room_code: string
+          settings?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_question_index?: number
+          host_id?: string
+          id?: string
+          id_game?: string
+          room_code?: string
+          settings?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_room_id_game_fkey"
+            columns: ["id_game"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_room_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -804,6 +988,7 @@ export type Database = {
     Enums: {
       class_type: "mix" | "write" | "read" | "speak"
       difficulty_levels: "low" | "medium" | "hard"
+      game_type: "write" | "listen" | "speak" | "mix"
       goal_type:
         | "points"
         | "lesson"
@@ -959,6 +1144,7 @@ export const Constants = {
     Enums: {
       class_type: ["mix", "write", "read", "speak"],
       difficulty_levels: ["low", "medium", "hard"],
+      game_type: ["write", "listen", "speak", "mix"],
       goal_type: [
         "points",
         "lesson",
