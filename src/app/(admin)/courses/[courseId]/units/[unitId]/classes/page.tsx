@@ -1,20 +1,24 @@
-"use client";
-
 import ClassesPage from "@/features/classes/components/ClassesPage";
-import { useParams, useSearchParams } from "next/navigation";
 
-export default function ClassesRoute() {
-  const params = useParams<{ courseId: string; unitId: string }>();
-  const searchParams = useSearchParams();
-  const unitName = searchParams.get("unitName") || undefined;
-  const unitOrder = searchParams.get("unitOrder") || undefined;
+type Params = Promise<{ courseId: string; unitId: string }>;
+type SearchParams = Promise<{ unitName?: string; unitOrder?: string }>;
+
+export default async function ClassesRoute({
+  params,
+  searchParams,
+}: {
+  params: Params;
+  searchParams: SearchParams;
+}) {
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
 
   return (
     <ClassesPage
-      courseId={params.courseId}
-      unitId={params.unitId}
-      unitName={unitName}
-      unitOrder={unitOrder}
+      courseId={resolvedParams.courseId}
+      unitId={resolvedParams.unitId}
+      unitName={resolvedSearchParams.unitName}
+      unitOrder={resolvedSearchParams.unitOrder}
     />
   );
 }

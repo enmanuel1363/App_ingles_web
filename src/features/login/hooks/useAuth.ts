@@ -9,36 +9,84 @@ import {
 } from "@/features/login/services/auth.service";
 import type { user_role } from "@/types/global.types";
 import type { Session } from "@supabase/supabase-js";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, createContext, useContext } from "react";
+import useAuthStore from "@/store/useAuthStore";
 
-export function useAuth() {
+type AuthContextType = {
+  session: Session | null;
+  userRole: user_role | "";
+  loading: boolean;
+  authLoading: boolean;
+  handleLogin: (email: string, password: string) => Promise<string | null>;
+  handleGoogleLogin: () => Promise<string | null>;
+};
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [userRole, setUserRole] = useState<user_role | "">("");
   const [loading, setLoading] = useState(true);
   const [authLoading, setAuthLoading] = useState(false);
+  const { setUser, reset } = useAuthStore();
 
   useEffect(() => {
-    getSession().then(async ({ session }) => {
-      setSession(session);
-      if (session?.user) {
-        const role = await fetchUserRole(session.user.id);
-        setUserRole(role);
-      }
-      setLoading(false);
-    });
+    let active = true;
 
-    const sub = onAuthStateChange(async (nextSession) => {
-      setSession(nextSession);
-      if (nextSession?.user) {
-        const role = await fetchUserRole(nextSession.user.id);
-        setUserRole(role);
+    // Obtener la sesión inicial de forma única
+    getSession().then(async ({ session: initialSession }) => {
+      if (!active) return;
+      setSession(initialSession);
+      if (initialSession?.user) {
+        const role = await fetchUserRole(initialSession.user.id);
+        if (active) {
+          setUserRole(role);
+          if (role === "admin") {
+            setUser("admin");
+          } else {
+            reset();
+          }
+        }
       } else {
+        if (active) {
+          setUserRole("");
+          reset();
+        }
+      }
+      if (active) setLoading(false);
+    });
+
+    // Suscribirse a cambios de estado de autenticación de forma única
+    const sub = onAuthStateChange(async (nextSession) => {
+      if (!active) return;
+      
+      // Evitar race condition de sesiones temporales vacías durante refresco
+      if (nextSession === null) {
+        setSession(null);
         setUserRole("");
+        reset();
+        return;
+      }
+
+      setSession(nextSession);
+      if (nextSession.user) {
+        const role = await fetchUserRole(nextSession.user.id);
+        if (active) {
+          setUserRole(role);
+          if (role === "admin") {
+            setUser("admin");
+          } else {
+            reset();
+          }
+        }
       }
     });
 
-    return () => sub.unsubscribe();
-  }, []);
+    return () => {
+      active = false;
+      sub.unsubscribe();
+    };
+  }, [setUser, reset]);
 
   const handlePasswordLogin = useCallback(
     async (email: string, password: string) => {
@@ -53,6 +101,8 @@ export function useAuth() {
           if (role !== "admin") {
             return "Esta cuenta no tiene acceso de administrador";
           }
+          setUser("admin");
+          setUserRole("admin");
         }
         return null;
       } catch (e: any) {
@@ -61,7 +111,7 @@ export function useAuth() {
         setAuthLoading(false);
       }
     },
-    [],
+    [setUser],
   );
 
   const handleGoogleLogin = useCallback(async () => {
@@ -77,12 +127,26 @@ export function useAuth() {
     }
   }, []);
 
-  return {
-    session,
-    userRole,
-    loading,
-    authLoading,
-    handleLogin: handlePasswordLogin,
-    handleGoogleLogin,
-  };
+  return React.createElement(
+    AuthContext.Provider,
+    {
+      value: {
+        session,
+        userRole,
+        loading,
+        authLoading,
+        handleLogin: handlePasswordLogin,
+        handleGoogleLogin,
+      },
+    },
+    children
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 }

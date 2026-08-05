@@ -44,6 +44,9 @@ export default function AddExercisesPage({ classId }: Props) {
   const { showAlert } = useModal();
   const {
     data,
+    collision,
+    resolveCollisionUseDraft,
+    resolveCollisionUseServer,
     addExercise,
     removeExercise,
     initializeExercises,
@@ -343,6 +346,39 @@ export default function AddExercisesPage({ classId }: Props) {
           </p>
         </div>
       </div>
+
+      {/* Collision Warning Banner */}
+      {collision && (
+        <div className="bg-amber-50/70 border border-amber-200 rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm animate-fade-in">
+          <div className="flex items-start space-x-3.5">
+            <AlertCircle className="w-6 h-6 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <h4 className="font-bold text-amber-900">
+                ¡Conflicto de Borrador Detectado!
+              </h4>
+              <p className="text-xs text-amber-800 mt-1 leading-relaxed font-semibold">
+                Los ejercicios de esta lección fueron actualizados en el servidor por otro profesor desde que guardaste tu borrador local en este navegador.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2.5 w-full sm:w-auto self-end sm:self-center shrink-0">
+            <Button
+              variant="outlined"
+              onClick={() => resolveCollisionUseServer()}
+              className="py-2 px-3.5 text-xs bg-white border-amber-200 text-amber-900 hover:bg-amber-100/50"
+            >
+              Cargar del Servidor
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => resolveCollisionUseDraft()}
+              className="py-2 px-3.5 text-xs bg-amber-500 hover:bg-amber-600 text-slate-950 border-none"
+            >
+              Mantener mi Borrador
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Grid Layout: Forms on left, Info panel on right */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
