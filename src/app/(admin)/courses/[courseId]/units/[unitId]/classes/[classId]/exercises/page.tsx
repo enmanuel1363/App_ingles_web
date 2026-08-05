@@ -1,9 +1,12 @@
-"use client";
-
 import AddExercisesPage from "@/features/exercises/components/AddExercisesPage";
-import { useParams } from "next/navigation";
 
-export default function ExercisesRoute() {
-  const params = useParams<{ classId: string }>();
-  return <AddExercisesPage classId={params.classId} />;
+type Params = Promise<{ classId: string }>;
+
+export default async function ExercisesRoute({
+  params,
+}: {
+  params: Params;
+}) {
+  const resolvedParams = await params;
+  return <AddExercisesPage classId={resolvedParams.classId} />;
 }

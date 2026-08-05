@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useMemo } from "react";
 import ConfirmationModal from "./ConfirmationModal";
 import AlertModal, { AlertType } from "./AlertModal";
 
@@ -82,8 +82,10 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const contextValue = useMemo(() => ({ confirm, showAlert }), [confirm, showAlert]);
+
   return (
-    <ModalContext.Provider value={{ confirm, showAlert }}>
+    <ModalContext.Provider value={contextValue}>
       {children}
       {confirmState && (
         <ConfirmationModal

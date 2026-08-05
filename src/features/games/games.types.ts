@@ -4,7 +4,8 @@ export type GameType = "write" | "listen" | "speak" | "mix";
 export type WrittenGameExerciseType =
   | "match_name_to_picture"         // Match the name to the picture
   | "identify_picture_reading_name" // Identify the picture's, Just Reading the name
-  | "timed_typing_challenge";       // Timed typing challenge
+  | "timed_typing_challenge"        // Timed typing challenge
+  | "match_word";                   // Match word challenge
 
 export type ListeningGameExerciseType =
   | "match_audio_to_text"           // Listen and match audio to text

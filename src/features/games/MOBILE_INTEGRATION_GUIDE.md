@@ -54,6 +54,25 @@ Mecanografía pura: el estudiante debe escribir una serie de palabras exactas en
 }
 ```
 
+#### D. Match word challenge (`match_word`)
+Emparejamiento de palabras o números: el estudiante debe emparejar un dato inicial con su correspondiente opción correcta de entre 3 opciones netas en total. Se soporta hasta 6 ítems.
+```json
+{
+  "items": [
+    {
+      "wordToMatch": "Dog",
+      "correctAnswer": "Perro",
+      "options": ["Perro", "Gato", "Loro"]
+    },
+    {
+      "wordToMatch": "5",
+      "correctAnswer": "Five",
+      "options": ["Five", "Four", "Six"]
+    }
+  ]
+}
+```
+
 
 ---
 

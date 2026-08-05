@@ -9,6 +9,7 @@ import FormInput from "@/components/ui/FormInput";
 import MatchNameToPictureForm from "./exercises/MatchNameToPictureForm";
 import IdentifyPictureReadingNameForm from "./exercises/IdentifyPictureReadingNameForm";
 import TimedTypingChallengeForm from "./exercises/TimedTypingChallengeForm";
+import MatchWordChallengeForm from "./exercises/MatchWordChallengeForm";
 import AudioChallengeForm from "./exercises/AudioChallengeForm";
 import SpeakingChallengeForm from "./exercises/SpeakingChallengeForm";
 import GameProgressWidget from "./GameProgressWidget";
@@ -53,6 +54,7 @@ export default function GameCreator({ teacherId, onClose }: GameCreatorProps) {
         label: "Identify picture's by name",
       },
       { value: "timed_typing_challenge", label: "Timed typing challenge" },
+      { value: "match_word", label: "Match word challenge" },
     ];
     const listeningOptions = [
       { value: "match_audio_to_text", label: "Match audio to text" },
@@ -148,6 +150,13 @@ export default function GameCreator({ teacherId, onClose }: GameCreatorProps) {
           { id: "2", url: "", label: "" },
         ],
         correctAnswer: "",
+      };
+    }
+    if (subtype === "match_word") {
+      return {
+        items: [
+          { wordToMatch: "", correctAnswer: "", options: ["", "", ""] }
+        ]
       };
     }
     if (subtype === "timed_typing_challenge") {
@@ -301,6 +310,14 @@ export default function GameCreator({ teacherId, onClose }: GameCreatorProps) {
     if (subtype === "identify_picture_reading_name") {
       return (
         <IdentifyPictureReadingNameForm
+          content={content}
+          onChangeContent={onChangeContent}
+        />
+      );
+    }
+    if (subtype === "match_word") {
+      return (
+        <MatchWordChallengeForm
           content={content}
           onChangeContent={onChangeContent}
         />

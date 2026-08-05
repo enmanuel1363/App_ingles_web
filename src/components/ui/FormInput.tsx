@@ -1,5 +1,3 @@
-"use client";
-
 import { ClipboardIcon } from "lucide-react";
 
 type Props = {
