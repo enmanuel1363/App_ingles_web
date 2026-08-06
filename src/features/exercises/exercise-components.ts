@@ -2,6 +2,7 @@ import { lesson_type } from "@/types/global.types";
 import CompleteWordExerciseForm from "./components/CompleteWordExerciseForm";
 import GalleryExerciseForm from "./components/GalleryExerciseForm";
 import MatchNamesExerciseForm from "./components/MatchNamesExerciseForm";
+import MatchWordsExerciseForm from "./components/MatchWordsExerciseForm";
 import OverviewExerciseForm from "./components/OverviewExerciseForm";
 import ReadExerciseForm from "./components/ReadExerciseForm";
 import SayWordExerciseForm from "./components/SayWordExerciseForm";
@@ -19,6 +20,7 @@ export const EXERCISE_COMPONENTS: Record<lesson_type, React.ComponentType<any>> 
   say_word: SayWordExerciseForm,
   image_gallery: GalleryExerciseForm,
   match_names: MatchNamesExerciseForm,
+  match_words: MatchWordsExerciseForm,
   speak: SpeakingExerciseForm,
   video_session: VideoExerciseForm,
   reading_quiz: ReadExerciseForm,

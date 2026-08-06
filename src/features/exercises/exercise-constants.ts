@@ -43,6 +43,12 @@ export const lessonTypeOptions: {
     color: "#006668",
   },
   {
+    label: "Match the words",
+    value: "match_words",
+    icon: "Columns",
+    color: "#0F766E",
+  },
+  {
     label: "Complete word",
     value: "complete_word",
     icon: "Type",
@@ -76,6 +82,7 @@ export const EXERCISE_CATEGORIES: Record<lesson_type, string> = {
   audio_session: "Desarrollo",
   reading_quiz: "Desarrollo",
   match_names: "Desarrollo",
+  match_words: "Desarrollo",
   complete_word: "Validación",
   write_word: "Validación",
   type_answer: "Validación",
@@ -89,6 +96,7 @@ export const EXERCISE_DEFAULT_CONTENT: Record<lesson_type, any> = {
   },
   image_gallery: { items: [{ images: [] }] },
   match_names: { items: [{ images: [] }] },
+  match_words: { items: [{ pairs: [{ english: "", spanish: "" }] }] },
   overview_session: { items: [{ words: [] }] },
   reading_quiz: {
     items: [{ phrase: "", correct_answer: "", possible_answers: [] }],
@@ -110,6 +118,7 @@ export const EXERCISE_DEFAULT_DESCRIPTIONS: Record<lesson_type, string> = {
   complete_word: "",
   image_gallery: "",
   match_names: "",
+  match_words: "Match the English words with their correct Spanish meanings",
   reading_quiz: "",
   type_answer: "",
   video_session: "",

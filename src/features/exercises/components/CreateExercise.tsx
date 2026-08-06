@@ -27,7 +27,8 @@ import {
   Keyboard, 
   Play, 
   Languages, 
-  PenTool 
+  PenTool,
+  Columns
 } from "lucide-react";
 
 type Props = {
@@ -47,9 +48,10 @@ const LUCIDE_ICONS: Record<string, React.ReactNode> = {
   Mic: <Mic className="w-5 h-5 text-rose-600" />,
   BookOpen: <BookOpen className="w-5 h-5 text-teal-700" />,
   Keyboard: <Keyboard className="w-5 h-5 text-lime-700" />,
-  Play: <Play className="w-5 h-5 text-rose-650" />,
+  Play: <Play className="w-5 h-5 text-rose-655" />,
   Languages: <Languages className="w-5 h-5 text-purple-700" />,
   PenTool: <PenTool className="w-5 h-5 text-indigo-600" />,
+  Columns: <Columns className="w-5 h-5 text-teal-750" />,
 };
 
 export default function CreateExercise({ index, moveUp, moveDown, onRemove }: Props) {
