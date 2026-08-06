@@ -1010,6 +1010,7 @@ export type Database = {
         | "say_word"
         | "audio_session"
         | "match_names"
+        | "match_words"
         | "overview_session"
       plan_status: "active" | "canceled" | "past_due"
       resource_type: "video" | "audio"

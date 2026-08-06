@@ -11,6 +11,7 @@ export type lesson_type =
   | "say_word"
   | "audio_session"
   | "match_names"
+  | "match_words"
   | "overview_session";
 
 export type difficulty_level = "low" | "medium" | "hard";
