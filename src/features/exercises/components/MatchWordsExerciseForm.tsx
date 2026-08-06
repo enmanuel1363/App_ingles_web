@@ -39,9 +39,13 @@ export default function MatchWordsExerciseForm({ order_index }: Props) {
     });
   };
 
-  const updatePair = (pairIndex: number, field: "english" | "spanish", value: string) => {
+  const updatePair = (
+    pairIndex: number,
+    field: "english" | "spanish",
+    value: string,
+  ) => {
     const newPairs = pairs.map((pair: any, i: number) =>
-      i === pairIndex ? { ...pair, [field]: value } : pair
+      i === pairIndex ? { ...pair, [field]: value } : pair,
     );
     const newItems = [{ ...firstItem, pairs: newPairs }];
     updateContent("items", newItems);
@@ -64,7 +68,7 @@ export default function MatchWordsExerciseForm({ order_index }: Props) {
   // Validations
   const isTooFew = pairs.length < 2;
   const hasEmptyFields = pairs.some(
-    (pair: any) => !pair.english?.trim() || !pair.spanish?.trim()
+    (pair: any) => !pair.english?.trim() || !pair.spanish?.trim(),
   );
   const isItemInvalid = isTooFew || hasEmptyFields;
 
@@ -88,7 +92,8 @@ export default function MatchWordsExerciseForm({ order_index }: Props) {
       <div className="flex flex-row items-center gap-2 text-sm text-slate-500 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
         <Info className="w-4 h-4 text-cyan-600 shrink-0" />
         <span className="text-slate-650 font-medium">
-          Define up to 6 word pairs (minimum 2 recommended for a matching challenge).
+          Define up to 6 word pairs (minimum 2 recommended for a matching
+          challenge).
         </span>
       </div>
 
@@ -108,13 +113,17 @@ export default function MatchWordsExerciseForm({ order_index }: Props) {
                   label="English Word"
                   placeholder="e.g. Apple"
                   value={pair.english}
-                  onChangeText={(text) => updatePair(pairIndex, "english", text)}
+                  onChangeText={(text) =>
+                    updatePair(pairIndex, "english", text)
+                  }
                 />
                 <FormInput
                   label="Spanish Meaning"
                   placeholder="e.g. Manzana"
                   value={pair.spanish}
-                  onChangeText={(text) => updatePair(pairIndex, "spanish", text)}
+                  onChangeText={(text) =>
+                    updatePair(pairIndex, "spanish", text)
+                  }
                 />
               </div>
 
@@ -154,7 +163,7 @@ export default function MatchWordsExerciseForm({ order_index }: Props) {
             <AlertCircle className="w-4.5 h-4.5 shrink-0 text-amber-600" />
             <span>
               {isTooFew
-                ? "Se requieren al menos 2 parejas de palabras para crear el juego."
+                ? "Se requieren al menos 2 parejas de palabras para crear la lección."
                 : "Todas las palabras en inglés y traducciones al español deben estar llenas."}
             </span>
           </div>
