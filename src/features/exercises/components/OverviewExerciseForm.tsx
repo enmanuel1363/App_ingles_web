@@ -4,7 +4,7 @@ import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
 import { useState } from "react";
 import { useExerciseStore } from '../hooks/useExerciseStore';
-import { BookOpen, Trash2, Plus, AlertCircle, Copy } from "lucide-react";
+import { BookOpen, Trash2, Plus, AlertCircle, Copy, GripVertical } from "lucide-react";
 
 type VocabWord = { word: string; translation: string };
 type Item = { words: VocabWord[] };
@@ -24,8 +24,36 @@ export default function OverviewExerciseForm({ order_index }: Props) {
   };
 
   const items: Item[] = exercise.content?.items || [];
-  const [newWord, setNewWord] = useState("");
-  const [newTranslation, setNewTranslation] = useState("");
+  const [wordInputs, setWordInputs] = useState<Record<number, { word: string; translation: string }>>({});
+  const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
+  const [dragOverItemIndex, setDragOverItemIndex] = useState<number | null>(null);
+  const [draggableIndex, setDraggableIndex] = useState<number | null>(null);
+
+  const getWordInput = (itemIndex: number) =>
+    wordInputs[itemIndex] || { word: "", translation: "" };
+
+  const setWordInput = (itemIndex: number, field: "word" | "translation", value: string) => {
+    setWordInputs((prev) => ({
+      ...prev,
+      [itemIndex]: { ...getWordInput(itemIndex), [field]: value },
+    }));
+  };
+
+  const clearWordInput = (itemIndex: number) => {
+    setWordInputs((prev) => {
+      const next = { ...prev };
+      delete next[itemIndex];
+      return next;
+    });
+  };
+
+  const reorderItems = (fromIndex: number, toIndex: number) => {
+    const newItems = [...items];
+    const [movedItem] = newItems.splice(fromIndex, 1);
+    newItems.splice(toIndex, 0, movedItem);
+    updateContent("items", newItems);
+    setWordInputs({});
+  };
 
   const updateField = (field: string, value: any) => {
     updateExercise(order_index, { ...exercise, [field]: value });
@@ -49,15 +77,18 @@ export default function OverviewExerciseForm({ order_index }: Props) {
     updateContent("items", [...items, duplicated]);
   };
 
-  const removeItem = (index: number) =>
+  const removeItem = (index: number) => {
     updateContent(
       "items",
       items.filter((_, i) => i !== index),
     );
+    setWordInputs({});
+  };
 
   const addWordToItem = (itemIndex: number) => {
-    const w = newWord.trim();
-    const t = newTranslation.trim();
+    const { word, translation } = getWordInput(itemIndex);
+    const w = word.trim();
+    const t = translation.trim();
     if (!w || !t) return;
 
     const updated = items.map((item, i) =>
@@ -66,8 +97,7 @@ export default function OverviewExerciseForm({ order_index }: Props) {
         : item,
     );
     updateContent("items", updated);
-    setNewWord("");
-    setNewTranslation("");
+    clearWordInput(itemIndex);
   };
 
   const removeWordFromItem = (itemIndex: number, wordIndex: number) => {
@@ -110,11 +140,64 @@ export default function OverviewExerciseForm({ order_index }: Props) {
         {items.map((item, itemIndex) => {
           const isItemInvalid = !item.words || item.words.length === 0;
           return (
-            <div key={itemIndex} className={`mt-4 p-5 bg-slate-50/70 rounded-xl border transition-colors ${
+            <div
+              key={itemIndex}
+              draggable={draggableIndex === itemIndex}
+              onDragStart={(e) => {
+                e.stopPropagation();
+                setDraggedItemIndex(itemIndex);
+                e.dataTransfer.effectAllowed = "move";
+                e.dataTransfer.setData("text/plain", itemIndex.toString());
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (dragOverItemIndex !== itemIndex) {
+                  setDragOverItemIndex(itemIndex);
+                }
+              }}
+              onDragLeave={(e) => {
+                e.stopPropagation();
+                setDragOverItemIndex(null);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const fromIndex = draggedItemIndex;
+                if (fromIndex !== null && fromIndex !== itemIndex) {
+                  reorderItems(fromIndex, itemIndex);
+                }
+                setDraggedItemIndex(null);
+                setDragOverItemIndex(null);
+                setDraggableIndex(null);
+              }}
+              onDragEnd={(e) => {
+                e.stopPropagation();
+                setDraggedItemIndex(null);
+                setDragOverItemIndex(null);
+                setDraggableIndex(null);
+              }}
+              className={`mt-4 p-5 bg-slate-50/70 rounded-xl border transition-all duration-200 ${
               isItemInvalid ? "border-amber-300 bg-amber-50/10" : "border-slate-200/80"
+            } ${
+              draggedItemIndex === itemIndex ? "opacity-35 scale-[0.98]" : ""
+            } ${
+              dragOverItemIndex === itemIndex && draggedItemIndex !== itemIndex
+                ? "ring-2 ring-cyan-500 ring-offset-2 rounded-xl scale-[1.01]"
+                : ""
             }`}>
             <div className="flex justify-between items-center mb-3">
               <div className="flex items-center gap-2">
+                {items.length > 1 && (
+                  <div
+                    className="text-slate-400 hover:text-slate-655 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/50 transition-colors"
+                    onMouseDown={() => setDraggableIndex(itemIndex)}
+                    onMouseUp={() => setDraggableIndex(null)}
+                    title="Arrastrar para reordenar"
+                  >
+                    <GripVertical size={18} />
+                  </div>
+                )}
                 <BookOpen size={18} className="text-cyan-650" />
                 <span className="font-semibold text-cyan-650 text-sm tracking-wide uppercase">Section {itemIndex + 1}</span>
               </div>
@@ -151,23 +234,23 @@ export default function OverviewExerciseForm({ order_index }: Props) {
                   <FormInput
                     label="English Word"
                     placeholder="e.g. Dog"
-                    value={newWord}
-                    onChangeText={setNewWord}
+                    value={getWordInput(itemIndex).word}
+                    onChangeText={(text) => setWordInput(itemIndex, "word", text)}
                   />
                 </div>
                 <div className="flex-1">
                   <FormInput
                     label="Translation"
                     placeholder="e.g. Perro"
-                    value={newTranslation}
-                    onChangeText={setNewTranslation}
+                    value={getWordInput(itemIndex).translation}
+                    onChangeText={(text) => setWordInput(itemIndex, "translation", text)}
                   />
                 </div>
               </div>
               <Button
                 variant="outlined"
                 onClick={() => addWordToItem(itemIndex)}
-                disabled={!newWord.trim() || !newTranslation.trim()}
+                disabled={!getWordInput(itemIndex).word.trim() || !getWordInput(itemIndex).translation.trim()}
                 leftIcon={<Plus size={18} />}
                 className="mt-4 w-full"
               >
