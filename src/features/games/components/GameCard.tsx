@@ -3,20 +3,22 @@
 import React from "react";
 import { Game } from "../games.types";
 import Button from "@/components/ui/Button";
-import { PenTool, Volume2, Mic, Gamepad2, Users, Play } from "lucide-react";
+import { PenTool, Volume2, Mic, Gamepad2, Users, Play, Edit2, Trash2 } from "lucide-react";
 
 interface GameCardProps {
   game: Game;
   onPlay: (gameId: string) => void;
   onCreateRoom?: (gameId: string) => void;
-  showAdminActions?: boolean;
+  onEdit?: (game: Game) => void;
+  onDelete?: (gameId: string) => void;
 }
 
 export default function GameCard({
   game,
   onPlay,
   onCreateRoom,
-  showAdminActions = false,
+  onEdit,
+  onDelete,
 }: GameCardProps) {
   // Select matching icon and background color for the game type
   const getTypeConfig = (type: string) => {
@@ -95,6 +97,31 @@ export default function GameCard({
           >
             Create Competition Room
           </Button>
+        )}
+
+        {(onEdit || onDelete) && (
+          <div className="flex gap-2 pt-2 border-t border-slate-100 mt-2">
+            {onEdit && (
+              <Button
+                variant="outlined"
+                leftIcon={<Edit2 className="w-4 h-4" />}
+                onClick={() => game.id && onEdit(game)}
+                className="flex-1 font-semibold text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-50 py-2 px-3 h-10 rounded-xl"
+              >
+                Edit
+              </Button>
+            )}
+            {onDelete && (
+              <Button
+                variant="danger"
+                leftIcon={<Trash2 className="w-4 h-4" />}
+                onClick={() => game.id && onDelete(game.id)}
+                className="flex-1 font-semibold bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-100 hover:border-rose-250 py-2 px-3 h-10 rounded-xl"
+              >
+                Delete
+              </Button>
+            )}
+          </div>
         )}
       </div>
     </div>

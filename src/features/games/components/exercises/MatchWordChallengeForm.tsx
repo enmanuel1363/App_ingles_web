@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Button from "@/components/ui/Button";
+import AlertModal from "@/components/ui/AlertModal";
 import { Plus, Trash2, HelpCircle, CheckCircle2, XCircle } from "lucide-react";
 
 interface MatchWordItem {
@@ -24,6 +25,13 @@ export default function MatchWordChallengeForm({
   const items = content.items || [
     { wordToMatch: "", correctAnswer: "", options: ["", "", ""] },
   ];
+
+  const [alertConfig, setAlertConfig] = useState<{
+    visible: boolean;
+    title?: string;
+    message: string;
+    type?: "success" | "error" | "info";
+  }>({ visible: false, message: "" });
 
   const handleItemFieldChange = (
     itemIdx: number,
@@ -65,7 +73,12 @@ export default function MatchWordChallengeForm({
 
   const handleAddItem = () => {
     if (items.length >= 6) {
-      alert("A match word challenge can have a maximum of 6 items!");
+      setAlertConfig({
+        visible: true,
+        title: "Limit Reached",
+        message: "A match word challenge can have a maximum of 6 items!",
+        type: "info",
+      });
       return;
     }
     const newItem: MatchWordItem = {
@@ -78,7 +91,12 @@ export default function MatchWordChallengeForm({
 
   const handleRemoveItem = (idx: number) => {
     if (items.length <= 1) {
-      alert("You must include at least 1 item for the challenge!");
+      setAlertConfig({
+        visible: true,
+        title: "Validation Error",
+        message: "You must include at least 1 item for the challenge!",
+        type: "info",
+      });
       return;
     }
     const updated = items.filter((_, i) => i !== idx);
@@ -213,6 +231,14 @@ export default function MatchWordChallengeForm({
           );
         })}
       </div>
+
+      <AlertModal
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onClose={() => setAlertConfig((prev) => ({ ...prev, visible: false }))}
+      />
     </div>
   );
 }
