@@ -4,7 +4,7 @@ import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
 import { useState } from "react";
 import { useExerciseStore } from '../hooks/useExerciseStore';
-import { BookOpen, Trash2, Plus, AlertCircle } from "lucide-react";
+import { BookOpen, Trash2, Plus, AlertCircle, Copy } from "lucide-react";
 
 type VocabWord = { word: string; translation: string };
 type Item = { words: VocabWord[] };
@@ -39,6 +39,15 @@ export default function OverviewExerciseForm({ order_index }: Props) {
   };
 
   const addItem = () => updateContent("items", [...items, { words: [] }]);
+
+  const copyLastSection = () => {
+    if (items.length === 0) return;
+    const lastItem = items[items.length - 1];
+    const duplicated: Item = {
+      words: lastItem.words.map((w) => ({ ...w })),
+    };
+    updateContent("items", [...items, duplicated]);
+  };
 
   const removeItem = (index: number) =>
     updateContent(
@@ -183,6 +192,16 @@ export default function OverviewExerciseForm({ order_index }: Props) {
           className="w-full mt-4 border-dashed hover:border-cyan-500/30 text-cyan-650 hover:bg-cyan-500/5"
         >
           Add section
+        </Button>
+
+        <Button
+          variant="outlined"
+          onClick={copyLastSection}
+          disabled={items.length === 0}
+          leftIcon={<Copy size={18} />}
+          className="w-full mt-2 border-dashed hover:border-emerald-500/30 text-emerald-650 hover:bg-emerald-500/5"
+        >
+          Copy lesson
         </Button>
       </div>
     </div>
