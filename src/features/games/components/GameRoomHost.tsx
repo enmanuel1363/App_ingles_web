@@ -5,7 +5,6 @@ import { useGameRoom } from "../hooks/useGameRoom";
 import { useGetExercisesByGame } from "../hooks/useGames";
 import Button from "@/components/ui/Button";
 import { Users, Play, Trophy, ArrowRight, ShieldAlert, Sparkles, Clock } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
 interface GameRoomHostProps {
   roomCode: string;
@@ -13,10 +12,9 @@ interface GameRoomHostProps {
 }
 
 export default function GameRoomHost({ roomCode, onClose }: GameRoomHostProps) {
-  const { room, loading, error, changeStatus, changeQuestionIndex } = useGameRoom(roomCode);
+  const { room, loading, error, changeStatus, changeQuestionIndex, players } = useGameRoom(roomCode);
   const { data: exercises = [], isLoading: loadingExercises } = useGetExercisesByGame(room?.id_game || "");
 
-  const [players, setPlayers] = useState<string[]>([]);
   const [activeQuestion, setActiveQuestion] = useState<any>(null);
 
   // Sync active question details when the room index updates
@@ -25,41 +23,6 @@ export default function GameRoomHost({ roomCode, onClose }: GameRoomHostProps) {
       setActiveQuestion(exercises[room.current_question_index]);
     }
   }, [exercises, room?.current_question_index]);
-
-  // Track players using Supabase Presence (Realtime)
-  useEffect(() => {
-    if (!room?.id) return;
-
-    // Join room channel to track online presence of students
-    const channel = supabase.channel(`game_room_presence:${room.id}`);
-
-    channel
-      .on("presence", { event: "sync" }, () => {
-        const state = channel.presenceState();
-        const joinedPlayers: string[] = [];
-        
-        // Extract usernames/nicknames from presence state
-        Object.keys(state).forEach((key) => {
-          const presences = state[key] as any[];
-          presences.forEach((p) => {
-            if (p.username) {
-              joinedPlayers.push(p.username);
-            }
-          });
-        });
-        setPlayers(joinedPlayers);
-      })
-      .subscribe(async (status) => {
-        if (status === "SUBSCRIBED") {
-          // Host tracks, but doesn't necessarily need to track themselves as a player
-          await channel.track({ role: "host", username: "Teacher (Host)" });
-        }
-      });
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [room?.id]);
 
   if (loading || loadingExercises) {
     return (
