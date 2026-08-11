@@ -201,3 +201,70 @@ export async function updateGameRoomQuestionIndex(
   if (error) throw error;
   return data as GameRoom;
 }
+
+/**
+ * Update an existing game and replace its exercises.
+ */
+export async function updateGameWithExercises(
+  gameId: string,
+  game: Partial<CreateGameDTO>,
+  exercises: Omit<CreateExerciseGameDTO, "id_game">[]
+): Promise<{ game: Game; exercises: ExerciseGame[] }> {
+  // 1. Update the game header
+  const { data: gameData, error: gameError } = await supabase
+    .from("games")
+    .update({
+      ...game,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", gameId)
+    .select()
+    .single();
+
+  if (gameError) throw gameError;
+  const updatedGame = gameData as Game;
+
+  // 2. Delete all old exercises for this game
+  const { error: deleteError } = await supabase
+    .from("exercise_game")
+    .delete()
+    .eq("id_game", gameId);
+
+  if (deleteError) throw deleteError;
+
+  // 3. Prepare exercises with the game's ID
+  const exercisesWithGameId: CreateExerciseGameDTO[] = exercises.map(
+    (exercise) => ({
+      ...exercise,
+      id_game: gameId,
+    })
+  );
+
+  // 4. Insert new/updated exercises
+  const { data: exercisesData, error: exercisesError } = await supabase
+    .from("exercise_game")
+    .insert(exercisesWithGameId)
+    .select();
+
+  if (exercisesError) {
+    throw exercisesError;
+  }
+
+  return {
+    game: updatedGame,
+    exercises: exercisesData as ExerciseGame[],
+  };
+}
+
+/**
+ * Delete a game and its exercises/rooms (via cascade).
+ */
+export async function deleteGame(gameId: string): Promise<void> {
+  const { error } = await supabase
+    .from("games")
+    .delete()
+    .eq("id", gameId);
+
+  if (error) throw error;
+}
+

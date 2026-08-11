@@ -14,6 +14,7 @@ export const useGameRoom = (roomCode?: string) => {
   const [room, setRoom] = useState<GameRoom | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
+  const [players, setPlayers] = useState<string[]>([]);
 
   // Fetch room initially
   const fetchRoom = useCallback(async () => {
@@ -39,12 +40,46 @@ export const useGameRoom = (roomCode?: string) => {
     fetchRoom();
   }, [fetchRoom]);
 
-  // Subscribe to changes in realtime
+  // Subscribe to changes in realtime (Postgres changes AND Presence on dual channels)
   useEffect(() => {
     if (!room?.id) return;
 
-    const channel = supabase
-      .channel(`game_room:${room.id}`)
+    // We subscribe to both channels to support mobile apps using either format:
+    // 1. game_room_presence:${room.id}
+    // 2. game_room:${room.id}
+    const dbChannel = supabase.channel(`game_room:${room.id}`);
+    const presenceChannel = supabase.channel(`game_room_presence:${room.id}`);
+
+    const updateCombinedPlayers = () => {
+      const joinedPlayers = new Set<string>();
+
+      // Extract from dbChannel presence state
+      const dbState = dbChannel.presenceState();
+      Object.keys(dbState).forEach((key) => {
+        const presences = dbState[key] as any[];
+        presences.forEach((p) => {
+          if (p.username && p.role !== "host") {
+            joinedPlayers.add(p.username);
+          }
+        });
+      });
+
+      // Extract from presenceChannel presence state
+      const presenceState = presenceChannel.presenceState();
+      Object.keys(presenceState).forEach((key) => {
+        const presences = presenceState[key] as any[];
+        presences.forEach((p) => {
+          if (p.username && p.role !== "host") {
+            joinedPlayers.add(p.username);
+          }
+        });
+      });
+
+      setPlayers(Array.from(joinedPlayers));
+    };
+
+    // Sub to postgres changes and presence on dbChannel
+    dbChannel
       .on(
         "postgres_changes",
         {
@@ -57,10 +92,31 @@ export const useGameRoom = (roomCode?: string) => {
           setRoom(payload.new as GameRoom);
         }
       )
-      .subscribe();
+      .on("presence", { event: "sync" }, () => {
+        updateCombinedPlayers();
+      });
+
+    // Sub to presence on presenceChannel
+    presenceChannel.on("presence", { event: "sync" }, () => {
+      updateCombinedPlayers();
+    });
+
+    // Subscribe to both
+    dbChannel.subscribe(async (status) => {
+      if (status === "SUBSCRIBED") {
+        await dbChannel.track({ role: "host", username: "Teacher (Host)" });
+      }
+    });
+
+    presenceChannel.subscribe(async (status) => {
+      if (status === "SUBSCRIBED") {
+        await presenceChannel.track({ role: "host", username: "Teacher (Host)" });
+      }
+    });
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(dbChannel);
+      supabase.removeChannel(presenceChannel);
     };
   }, [room?.id]);
 
@@ -92,6 +148,7 @@ export const useGameRoom = (roomCode?: string) => {
     room,
     loading,
     error,
+    players,
     refreshRoom: fetchRoom,
     changeStatus,
     changeQuestionIndex,

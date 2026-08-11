@@ -1,12 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { useGetGames } from "../hooks/useGames";
+import { useGetGames, useDeleteGame } from "../hooks/useGames";
 import { useCreateRoom } from "../hooks/useGameRoom";
+import { Game } from "../games.types";
 import GameCard from "./GameCard";
 import GameRoomHost from "./GameRoomHost";
 import GameCreator from "./GameCreator";
 import Button from "@/components/ui/Button";
+import AlertModal from "@/components/ui/AlertModal";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { Gamepad2, Plus, Sparkles, X, ChevronRight, HelpCircle } from "lucide-react";
 
 interface GameManagerProps {
@@ -16,9 +19,34 @@ interface GameManagerProps {
 export default function GameManager({ currentTeacherProfileId }: GameManagerProps) {
   const { data: games = [], isLoading, error, refetch } = useGetGames();
   const { initializeRoom, loading: startingRoom } = useCreateRoom();
+  const deleteGameMutation = useDeleteGame();
   const [activeRoomCode, setActiveRoomCode] = useState<string | null>(null);
   const [activeSoloGameId, setActiveSoloGameId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [editingGameId, setEditingGameId] = useState<string | null>(null);
+
+  // Modal states
+  const [alertConfig, setAlertConfig] = useState<{
+    visible: boolean;
+    title?: string;
+    message: string;
+    type?: "success" | "error" | "info";
+  }>({ visible: false, message: "" });
+
+  const [confirmConfig, setConfirmConfig] = useState<{
+    visible: boolean;
+    title: string;
+    description: string;
+    confirmText?: string;
+    cancelText?: string;
+    variant?: "danger" | "primary" | "secondary";
+    onConfirm: () => void;
+  }>({
+    visible: false,
+    title: "",
+    description: "",
+    onConfirm: () => {},
+  });
 
   const handleCreateRoom = async (gameId: string) => {
     try {
@@ -27,12 +55,52 @@ export default function GameManager({ currentTeacherProfileId }: GameManagerProp
         setActiveRoomCode(room.room_code);
       }
     } catch (err) {
-      alert("Error generating multiplayer game room lobby. Please check connection.");
+      setAlertConfig({
+        visible: true,
+        title: "Lobby Error",
+        message: "Error generating multiplayer game room lobby. Please check connection.",
+        type: "error",
+      });
     }
   };
 
   const handlePlaySolo = (gameId: string) => {
     setActiveSoloGameId(gameId);
+  };
+
+  const handleEditGame = (game: Game) => {
+    if (game.id) {
+      setEditingGameId(game.id);
+    }
+  };
+
+  const handleDeleteGame = (gameId: string) => {
+    setConfirmConfig({
+      visible: true,
+      title: "Delete Game",
+      description: "Are you sure you want to permanently delete this game? This action cannot be undone.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      variant: "danger",
+      onConfirm: async () => {
+        try {
+          await deleteGameMutation.mutateAsync(gameId);
+          setAlertConfig({
+            visible: true,
+            title: "Success",
+            message: "Game successfully deleted.",
+            type: "success",
+          });
+        } catch (err) {
+          setAlertConfig({
+            visible: true,
+            title: "Error",
+            message: "Failed to delete game. Please check your connection.",
+            type: "error",
+          });
+        }
+      },
+    });
   };
 
   if (activeRoomCode) {
@@ -49,12 +117,14 @@ export default function GameManager({ currentTeacherProfileId }: GameManagerProp
     );
   }
 
-  if (isCreating) {
+  if (isCreating || editingGameId) {
     return (
       <GameCreator
         teacherId={currentTeacherProfileId}
+        editingGameId={editingGameId || undefined}
         onClose={() => {
           setIsCreating(false);
+          setEditingGameId(null);
           refetch();
         }}
       />
@@ -128,6 +198,8 @@ export default function GameManager({ currentTeacherProfileId }: GameManagerProp
               game={game}
               onPlay={handlePlaySolo}
               onCreateRoom={handleCreateRoom}
+              onEdit={handleEditGame}
+              onDelete={handleDeleteGame}
             />
           ))}
         </div>
@@ -162,6 +234,29 @@ export default function GameManager({ currentTeacherProfileId }: GameManagerProp
           </div>
         </div>
       )}
+
+      {/* Custom Alert & Confirmation Modals */}
+      <AlertModal
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onClose={() => setAlertConfig((prev) => ({ ...prev, visible: false }))}
+      />
+
+      <ConfirmationModal
+        visible={confirmConfig.visible}
+        title={confirmConfig.title}
+        description={confirmConfig.description}
+        confirmText={confirmConfig.confirmText}
+        cancelText={confirmConfig.cancelText}
+        variant={confirmConfig.variant}
+        onConfirm={() => {
+          setConfirmConfig((prev) => ({ ...prev, visible: false }));
+          confirmConfig.onConfirm();
+        }}
+        onClose={() => setConfirmConfig((prev) => ({ ...prev, visible: false }))}
+      />
     </div>
   );
 }

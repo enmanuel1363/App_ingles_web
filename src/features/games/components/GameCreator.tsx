@@ -1,11 +1,18 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useCreateGameWithExercises } from "../hooks/useGames";
+import {
+  useCreateGameWithExercises,
+  useGetGameById,
+  useGetExercisesByGame,
+  useUpdateGameWithExercises,
+} from "../hooks/useGames";
 import { GameType } from "../games.types";
 import { uploadFile } from "@/features/exercises/services/storage.service";
 import Button from "@/components/ui/Button";
 import FormInput from "@/components/ui/FormInput";
+import AlertModal from "@/components/ui/AlertModal";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import MatchNameToPictureForm from "./exercises/MatchNameToPictureForm";
 import IdentifyPictureReadingNameForm from "./exercises/IdentifyPictureReadingNameForm";
 import TimedTypingChallengeForm from "./exercises/TimedTypingChallengeForm";
@@ -18,6 +25,7 @@ import { ArrowLeft, Save, Sparkles, Plus, Trash2 } from "lucide-react";
 interface GameCreatorProps {
   teacherId: string;
   onClose: () => void;
+  editingGameId?: string;
 }
 
 interface TempExercise {
@@ -28,8 +36,13 @@ interface TempExercise {
   content: any;
 }
 
-export default function GameCreator({ teacherId, onClose }: GameCreatorProps) {
+export default function GameCreator({ teacherId, onClose, editingGameId }: GameCreatorProps) {
   const createGameMutation = useCreateGameWithExercises();
+  const updateGameMutation = useUpdateGameWithExercises();
+
+  // Fetch existing game & exercises if editingGameId is present
+  const { data: existingGame, isLoading: isLoadingGame } = useGetGameById(editingGameId || "");
+  const { data: existingExercises, isLoading: isLoadingExercises } = useGetExercisesByGame(editingGameId || "");
 
   // Form State: Game Header
   const [name, setName] = useState("");
@@ -42,6 +55,53 @@ export default function GameCreator({ teacherId, onClose }: GameCreatorProps) {
     null,
   );
   const [isUploading, setIsUploading] = useState(false);
+
+  // Modal states
+  const [alertConfig, setAlertConfig] = useState<{
+    visible: boolean;
+    title?: string;
+    message: string;
+    type?: "success" | "error" | "info";
+    onClose?: () => void;
+  }>({ visible: false, message: "" });
+
+  const [confirmConfig, setConfirmConfig] = useState<{
+    visible: boolean;
+    title: string;
+    description: string;
+    confirmText?: string;
+    cancelText?: string;
+    variant?: "danger" | "primary" | "secondary";
+    onConfirm: () => void;
+  }>({
+    visible: false,
+    title: "",
+    description: "",
+    onConfirm: () => {},
+  });
+
+  // Load data for editing
+  useEffect(() => {
+    if (editingGameId && existingGame) {
+      setName(existingGame.name);
+      setDescription(existingGame.description || "");
+      setType(existingGame.type);
+    }
+  }, [editingGameId, existingGame]);
+
+  useEffect(() => {
+    if (editingGameId && existingExercises && existingExercises.length > 0) {
+      const mappedExercises = existingExercises.map((ex) => ({
+        name: ex.name,
+        description: ex.description || "",
+        type: ex.type,
+        points_reward: ex.points_reward,
+        content: ex.content,
+      }));
+      setExercises(mappedExercises);
+      setActiveExerciseIndex(0);
+    }
+  }, [editingGameId, existingExercises]);
 
   // Available Subtypes per Game Type
   const getSubtypes = (
@@ -84,15 +144,15 @@ export default function GameCreator({ teacherId, onClose }: GameCreatorProps) {
     }
   };
 
-  // Reset exercise list when main game type changes
-  useEffect(() => {
-    setExercises([]);
-    setActiveExerciseIndex(null);
-  }, [type]);
 
   const handleAddExercise = () => {
     if (exercises.length >= 8) {
-      alert("A game can have a maximum of 8 exercises!");
+      setAlertConfig({
+        visible: true,
+        title: "Limit Reached",
+        message: "A game can have a maximum of 8 exercises!",
+        type: "info",
+      });
       return;
     }
 
@@ -237,11 +297,21 @@ export default function GameCreator({ teacherId, onClose }: GameCreatorProps) {
 
   const handleSaveGame = async () => {
     if (!name.trim()) {
-      alert("Please enter a name for the game.");
+      setAlertConfig({
+        visible: true,
+        title: "Validation Error",
+        message: "Please enter a name for the game.",
+        type: "info",
+      });
       return;
     }
     if (exercises.length === 0) {
-      alert("Please add at least one exercise to the game.");
+      setAlertConfig({
+        visible: true,
+        title: "Validation Error",
+        message: "Please add at least one exercise to the game.",
+        type: "info",
+      });
       return;
     }
 
@@ -262,7 +332,7 @@ export default function GameCreator({ teacherId, onClose }: GameCreatorProps) {
         }),
       );
 
-      // 2. Submit schema insertion
+      // 2. Submit schema insertion or update
       const gameDTO = {
         name,
         description: description || null,
@@ -271,23 +341,51 @@ export default function GameCreator({ teacherId, onClose }: GameCreatorProps) {
         is_active: true,
       };
 
-      createGameMutation.mutate(
-        { game: gameDTO, exercises: processedExercises },
-        {
-          onSuccess: () => {
-            alert("Game successfully created and published!");
-            onClose();
-          },
-          onError: () => {
-            setIsUploading(false);
-          },
-        },
-      );
+      if (editingGameId) {
+        updateGameMutation.mutate(
+          { gameId: editingGameId, game: gameDTO, exercises: processedExercises },
+          {
+            onSuccess: () => {
+              setAlertConfig({
+                visible: true,
+                title: "Success",
+                message: "Game successfully updated!",
+                type: "success",
+                onClose: onClose,
+              });
+            },
+            onError: () => {
+              setIsUploading(false);
+            },
+          }
+        );
+      } else {
+        createGameMutation.mutate(
+          { game: gameDTO, exercises: processedExercises },
+          {
+            onSuccess: () => {
+              setAlertConfig({
+                visible: true,
+                title: "Success",
+                message: "Game successfully created and published!",
+                type: "success",
+                onClose: onClose,
+              });
+            },
+            onError: () => {
+              setIsUploading(false);
+            },
+          }
+        );
+      }
     } catch (err) {
       console.error("Asset upload failure:", err);
-      alert(
-        "Failed to upload local images/audio to storage. Check connections.",
-      );
+      setAlertConfig({
+        visible: true,
+        title: "Upload Error",
+        message: "Failed to upload local images/audio to storage. Check connections.",
+        type: "error",
+      });
       setIsUploading(false);
     }
   };
@@ -355,6 +453,17 @@ export default function GameCreator({ teacherId, onClose }: GameCreatorProps) {
     );
   }
 
+  if (editingGameId && (isLoadingGame || isLoadingExercises)) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#fffcf2]">
+        <div className="text-center space-y-4">
+          <div className="w-10 h-10 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-slate-500 text-sm font-semibold">Loading game details...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto py-6 px-4 space-y-8 bg-[#fffcf2] min-h-screen">
       {/* Header */}
@@ -370,8 +479,8 @@ export default function GameCreator({ teacherId, onClose }: GameCreatorProps) {
             <span className="text-[10px] font-black text-[#24DFE2] uppercase tracking-widest">
               Builder Arena
             </span>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-              Create Interactive Game
+             <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+              {editingGameId ? "Edit Interactive Game" : "Create Interactive Game"}
             </h1>
           </div>
         </div>
@@ -379,11 +488,11 @@ export default function GameCreator({ teacherId, onClose }: GameCreatorProps) {
         <Button
           variant="primary"
           leftIcon={<Save className="w-4 h-4" />}
-          isLoading={createGameMutation.isPending || isUploading}
+          isLoading={createGameMutation.isPending || updateGameMutation.isPending || isUploading}
           onClick={handleSaveGame}
           className="text-slate-950 font-black px-6"
         >
-          {isUploading ? "Uploading Assets..." : "Publish Game"}
+          {isUploading ? "Uploading Assets..." : editingGameId ? "Save Game" : "Publish Game"}
         </Button>
       </div>
 
@@ -416,7 +525,28 @@ export default function GameCreator({ teacherId, onClose }: GameCreatorProps) {
             </label>
             <select
               value={type}
-              onChange={(e) => setType(e.target.value as GameType)}
+              onChange={(e) => {
+                const newType = e.target.value as GameType;
+                if (newType !== type) {
+                  if (exercises.length > 0) {
+                    setConfirmConfig({
+                      visible: true,
+                      title: "Change Challenge Type",
+                      description: "Changing the main challenge type will clear all current exercises. Do you want to proceed?",
+                      confirmText: "Change",
+                      cancelText: "Cancel",
+                      variant: "danger",
+                      onConfirm: () => {
+                        setType(newType);
+                        setExercises([]);
+                        setActiveExerciseIndex(null);
+                      },
+                    });
+                  } else {
+                    setType(newType);
+                  }
+                }
+              }}
               className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl p-3 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all text-xs font-semibold"
             >
               <option value="write">Written Challenges (Writing)</option>
@@ -567,6 +697,32 @@ export default function GameCreator({ teacherId, onClose }: GameCreatorProps) {
           <GameProgressWidget exercisesCount={exercises.length} />
         </div>
       </div>
+
+      {/* Custom Alert & Confirmation Modals */}
+      <AlertModal
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onClose={() => {
+          setAlertConfig((prev) => ({ ...prev, visible: false }));
+          if (alertConfig.onClose) alertConfig.onClose();
+        }}
+      />
+
+      <ConfirmationModal
+        visible={confirmConfig.visible}
+        title={confirmConfig.title}
+        description={confirmConfig.description}
+        confirmText={confirmConfig.confirmText}
+        cancelText={confirmConfig.cancelText}
+        variant={confirmConfig.variant}
+        onConfirm={() => {
+          setConfirmConfig((prev) => ({ ...prev, visible: false }));
+          confirmConfig.onConfirm();
+        }}
+        onClose={() => setConfirmConfig((prev) => ({ ...prev, visible: false }))}
+      />
     </div>
   );
 }

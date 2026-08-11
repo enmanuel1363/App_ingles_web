@@ -8,6 +8,8 @@ import {
   createGameWithExercises,
   createStudentGameLog,
   getStudentGameLogs,
+  updateGameWithExercises,
+  deleteGame,
 } from "../services/games.service";
 import { CreateGameDTO, CreateExerciseGameDTO, CreateGameStudentLogDTO } from "../games.types";
 
@@ -95,3 +97,48 @@ export const useGetStudentGameLogs = (studentProfileId: string) => {
     enabled: !!studentProfileId,
   });
 };
+
+/**
+ * Hook to update an existing game with its exercises in a batch.
+ */
+export const useUpdateGameWithExercises = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      gameId,
+      game,
+      exercises,
+    }: {
+      gameId: string;
+      game: Partial<CreateGameDTO>;
+      exercises: Omit<CreateExerciseGameDTO, "id_game">[];
+    }) => updateGameWithExercises(gameId, game, exercises),
+    onSuccess: (_, { gameId }) => {
+      queryClient.invalidateQueries({ queryKey: ["games"] });
+      queryClient.invalidateQueries({ queryKey: ["games", gameId] });
+      queryClient.invalidateQueries({ queryKey: ["exercises", "by-game", gameId] });
+    },
+    onError: (error) => {
+      console.error("Error updating game with exercises:", error);
+    },
+  });
+};
+
+/**
+ * Hook to delete a game by ID.
+ */
+export const useDeleteGame = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (gameId: string) => deleteGame(gameId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["games"] });
+    },
+    onError: (error) => {
+      console.error("Error deleting game:", error);
+    },
+  });
+};
+

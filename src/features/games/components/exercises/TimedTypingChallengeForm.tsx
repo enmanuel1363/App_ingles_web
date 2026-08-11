@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Button from "@/components/ui/Button";
+import AlertModal from "@/components/ui/AlertModal";
 import { Plus, Trash2, Keyboard } from "lucide-react";
 
 interface TimedTypingChallengeFormProps {
@@ -19,6 +20,13 @@ export default function TimedTypingChallengeForm({
   const words = content.words || [""];
   const timeLimitSeconds = content.timeLimitSeconds || 30;
 
+  const [alertConfig, setAlertConfig] = useState<{
+    visible: boolean;
+    title?: string;
+    message: string;
+    type?: "success" | "error" | "info";
+  }>({ visible: false, message: "" });
+
   const handleWordChange = (idx: number, val: string) => {
     const updated = [...words];
     updated[idx] = val;
@@ -27,7 +35,12 @@ export default function TimedTypingChallengeForm({
 
   const handleAddWord = () => {
     if (words.length >= 6) {
-      alert("A typing challenge can have a maximum of 6 words!");
+      setAlertConfig({
+        visible: true,
+        title: "Limit Reached",
+        message: "A typing challenge can have a maximum of 6 words!",
+        type: "info",
+      });
       return;
     }
     onChangeContent({ ...content, words: [...words, ""] });
@@ -35,7 +48,12 @@ export default function TimedTypingChallengeForm({
 
   const handleRemoveWord = (idx: number) => {
     if (words.length <= 1) {
-      alert("You must include at least 1 word for the challenge!");
+      setAlertConfig({
+        visible: true,
+        title: "Validation Error",
+        message: "You must include at least 1 word for the challenge!",
+        type: "info",
+      });
       return;
     }
     const updated = words.filter((_, i) => i !== idx);
@@ -106,6 +124,14 @@ export default function TimedTypingChallengeForm({
           className="w-1/3 bg-white border border-slate-200 text-slate-900 rounded-xl p-2.5 focus:border-cyan-500 text-xs font-semibold outline-none"
         />
       </div>
+
+      <AlertModal
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onClose={() => setAlertConfig((prev) => ({ ...prev, visible: false }))}
+      />
     </div>
   );
 }
