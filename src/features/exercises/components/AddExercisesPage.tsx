@@ -63,22 +63,64 @@ export default function AddExercisesPage({ classId }: Props) {
   useEffect(() => {
     if (draggedIndex === null) return;
 
-    const handleWindowDragOver = (e: DragEvent) => {
-      const threshold = 120; // px desde el borde
-      const speed = 12; // velocidad de desplazamiento
-      const clientY = e.clientY;
-      const windowHeight = window.innerHeight;
+    let latestClientY: number | null = null;
+    let rafId: number;
 
-      if (clientY < threshold) {
-        window.scrollBy(0, -speed);
-      } else if (clientY > windowHeight - threshold) {
-        window.scrollBy(0, speed);
+    const findScrollContainer = (): HTMLElement | Window => {
+      const main = document.querySelector("main");
+      if (main && main.scrollHeight > main.clientHeight) return main;
+      return window;
+    };
+
+    const getScrollBounds = (container: HTMLElement | Window) => {
+      if (container === window) {
+        return { top: 0, bottom: window.innerHeight };
+      }
+      const rect = (container as HTMLElement).getBoundingClientRect();
+      return { top: rect.top, bottom: rect.bottom };
+    };
+
+    const doScroll = (container: HTMLElement | Window, amount: number) => {
+      if (container === window) {
+        window.scrollBy(0, amount);
+      } else {
+        (container as HTMLElement).scrollTop += amount;
       }
     };
 
+    const threshold = 140; // px desde el borde donde empieza a desplazarse
+    const maxSpeed = 18; // velocidad máxima, al borde mismo
+
+    const tick = () => {
+      if (latestClientY !== null) {
+        const container = findScrollContainer();
+        const { top, bottom } = getScrollBounds(container);
+
+        const distanceFromTop = latestClientY - top;
+        const distanceFromBottom = bottom - latestClientY;
+
+        if (distanceFromTop >= 0 && distanceFromTop < threshold) {
+          // Entre más cerca del borde, más rápido (aceleración suave)
+          const intensity = 1 - distanceFromTop / threshold;
+          doScroll(container, -maxSpeed * intensity);
+        } else if (distanceFromBottom >= 0 && distanceFromBottom < threshold) {
+          const intensity = 1 - distanceFromBottom / threshold;
+          doScroll(container, maxSpeed * intensity);
+        }
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+
+    const handleWindowDragOver = (e: DragEvent) => {
+      latestClientY = e.clientY;
+    };
+
     window.addEventListener("dragover", handleWindowDragOver);
+    rafId = requestAnimationFrame(tick);
+
     return () => {
       window.removeEventListener("dragover", handleWindowDragOver);
+      cancelAnimationFrame(rafId);
     };
   }, [draggedIndex]);
 
