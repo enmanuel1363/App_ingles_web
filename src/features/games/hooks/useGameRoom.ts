@@ -10,11 +10,18 @@ import {
   createGameRoom,
 } from "../services/games.service";
 
+export interface PlayerPresence {
+  username: string;
+  score: number;
+  avatar_url?: string;
+  joined_at?: string;
+}
+
 export const useGameRoom = (roomCode?: string) => {
   const [room, setRoom] = useState<GameRoom | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
-  const [players, setPlayers] = useState<string[]>([]);
+  const [players, setPlayers] = useState<PlayerPresence[]>([]);
 
   // Fetch room initially
   const fetchRoom = useCallback(async () => {
@@ -40,46 +47,41 @@ export const useGameRoom = (roomCode?: string) => {
     fetchRoom();
   }, [fetchRoom]);
 
-  // Subscribe to changes in realtime (Postgres changes AND Presence on dual channels)
+  // Subscribe to changes in realtime (Postgres changes AND Presence on a single channel)
   useEffect(() => {
     if (!room?.id) return;
 
-    // We subscribe to both channels to support mobile apps using either format:
-    // 1. game_room_presence:${room.id}
-    // 2. game_room:${room.id}
-    const dbChannel = supabase.channel(`game_room:${room.id}`);
-    const presenceChannel = supabase.channel(`game_room_presence:${room.id}`);
+    // Single channel for both Presence and Postgres database changes
+    const roomChannel = supabase.channel(`game_room:${room.id}`);
 
-    const updateCombinedPlayers = () => {
-      const joinedPlayers = new Set<string>();
-
-      // Extract from dbChannel presence state
-      const dbState = dbChannel.presenceState();
-      Object.keys(dbState).forEach((key) => {
-        const presences = dbState[key] as any[];
-        presences.forEach((p) => {
-          if (p.username && p.role !== "host") {
-            joinedPlayers.add(p.username);
-          }
-        });
-      });
-
-      // Extract from presenceChannel presence state
-      const presenceState = presenceChannel.presenceState();
+    const updatePlayers = () => {
+      const joinedPlayersMap = new Map<string, PlayerPresence>();
+      const presenceState = roomChannel.presenceState();
+      
       Object.keys(presenceState).forEach((key) => {
         const presences = presenceState[key] as any[];
         presences.forEach((p) => {
           if (p.username && p.role !== "host") {
-            joinedPlayers.add(p.username);
+            joinedPlayersMap.set(p.username, {
+              username: p.username,
+              score: p.score || 0,
+              avatar_url: p.avatar_url,
+              joined_at: p.joined_at,
+            });
           }
         });
       });
 
-      setPlayers(Array.from(joinedPlayers));
+      // Sort descending by score
+      const sortedPlayers = Array.from(joinedPlayersMap.values()).sort(
+        (a, b) => b.score - a.score
+      );
+
+      setPlayers(sortedPlayers);
     };
 
-    // Sub to postgres changes and presence on dbChannel
-    dbChannel
+    // Subscribe to database changes and presence events on the same channel
+    roomChannel
       .on(
         "postgres_changes",
         {
@@ -93,30 +95,18 @@ export const useGameRoom = (roomCode?: string) => {
         }
       )
       .on("presence", { event: "sync" }, () => {
-        updateCombinedPlayers();
+        updatePlayers();
       });
 
-    // Sub to presence on presenceChannel
-    presenceChannel.on("presence", { event: "sync" }, () => {
-      updateCombinedPlayers();
-    });
-
-    // Subscribe to both
-    dbChannel.subscribe(async (status) => {
+    // Subscribe and track the host (teacher) presence
+    roomChannel.subscribe(async (status) => {
       if (status === "SUBSCRIBED") {
-        await dbChannel.track({ role: "host", username: "Teacher (Host)" });
-      }
-    });
-
-    presenceChannel.subscribe(async (status) => {
-      if (status === "SUBSCRIBED") {
-        await presenceChannel.track({ role: "host", username: "Teacher (Host)" });
+        await roomChannel.track({ role: "host", username: "Teacher (Host)" });
       }
     });
 
     return () => {
-      supabase.removeChannel(dbChannel);
-      supabase.removeChannel(presenceChannel);
+      supabase.removeChannel(roomChannel);
     };
   }, [room?.id]);
 

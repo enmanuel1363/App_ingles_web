@@ -80,7 +80,7 @@ export default function GameRoomHost({ roomCode, onClose }: GameRoomHostProps) {
                   className="bg-[#fffcf2] border border-slate-200/60 rounded-xl py-2 px-3 text-xs font-extrabold text-slate-850 truncate shadow-sm flex items-center justify-center space-x-1"
                 >
                   <div className="w-2 h-2 rounded-full bg-[#B4FF2B]"></div>
-                  <span>{player}</span>
+                  <span>{player.username}</span>
                 </div>
               ))}
             </div>
@@ -185,35 +185,30 @@ export default function GameRoomHost({ roomCode, onClose }: GameRoomHostProps) {
         The challenge is complete! Top players are updated in the database logs.
       </p>
 
-      {/* Leaderboard skeleton (derived from student logs) */}
+      {/* Real leaderboard rankings derived from student presence state */}
       <div className="bg-[#fffcf2] border border-slate-200/60 rounded-2xl p-6 max-w-md mx-auto text-left space-y-4">
         <h3 className="text-sm font-extrabold text-slate-800 border-b border-slate-200/60 pb-2">
-          Final Results
+          Final Rankings
         </h3>
         
-        {/* Placeholder: Real rankings would be queried from logs */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-xs font-extrabold text-slate-700">
-            <span className="flex items-center space-x-2">
-              <span className="w-5 h-5 rounded-full bg-[#FF9400] text-white flex items-center justify-center text-[10px]">1</span>
-              <span>Student A</span>
-            </span>
-            <span>850 pts</span>
-          </div>
-          <div className="flex items-center justify-between text-xs font-extrabold text-slate-700">
-            <span className="flex items-center space-x-2">
-              <span className="w-5 h-5 rounded-full bg-slate-350 text-slate-800 flex items-center justify-center text-[10px]">2</span>
-              <span>Student B</span>
-            </span>
-            <span>720 pts</span>
-          </div>
-          <div className="flex items-center justify-between text-xs font-extrabold text-slate-700">
-            <span className="flex items-center space-x-2">
-              <span className="w-5 h-5 rounded-full bg-amber-700 text-white flex items-center justify-center text-[10px]">3</span>
-              <span>Student C</span>
-            </span>
-            <span>690 pts</span>
-          </div>
+          {players.length === 0 ? (
+            <p className="text-slate-400 text-xs italic text-center py-4">No student performance logs received yet.</p>
+          ) : (
+            players.slice(0, 5).map((player, idx) => (
+              <div key={player.username} className="flex items-center justify-between text-xs font-extrabold text-slate-700">
+                <span className="flex items-center space-x-2">
+                  <span className={`w-5 h-5 rounded-full text-white flex items-center justify-center text-[10px] ${
+                    idx === 0 ? "bg-[#FF9400]" : idx === 1 ? "bg-slate-400" : idx === 2 ? "bg-amber-700" : "bg-slate-300"
+                  }`}>
+                    {idx + 1}
+                  </span>
+                  <span>{player.username}</span>
+                </span>
+                <span className="text-slate-800">{player.score} pts</span>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
