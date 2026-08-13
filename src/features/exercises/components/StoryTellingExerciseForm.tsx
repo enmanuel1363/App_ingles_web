@@ -3,10 +3,17 @@
 import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
 import { useRef, useState } from "react";
-import { useExerciseStore } from '../hooks/useExerciseStore';
-import { X, Plus, Trash2, Image as ImageIcon, CheckCircle2, Circle, AlertCircle } from "lucide-react";
+import { useExerciseStore } from "../hooks/useExerciseStore";
+import {
+  X,
+  Plus,
+  Trash2,
+  Image as ImageIcon,
+  CheckCircle2,
+  Circle,
+  AlertCircle,
+} from "lucide-react";
 import { previewSrc, isDraftPlaceholder } from "../utils/imagePreview";
-
 
 type AnswerOption = { text: string; isCorrect: boolean };
 type QA = { question: string; options: AnswerOption[] };
@@ -32,7 +39,9 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
   const fileInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
 
   const [newQuestions, setNewQuestions] = useState<Record<number, string>>({});
-  const [newOptionsMap, setNewOptionsMap] = useState<Record<number, AnswerOption[]>>({});
+  const [newOptionsMap, setNewOptionsMap] = useState<
+    Record<number, AnswerOption[]>
+  >({});
 
   const updateField = (field: string, value: any) => {
     updateExercise(order_index, { ...exercise, [field]: value });
@@ -86,11 +95,13 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
     }));
   };
 
-  const handleCoverChange = (itemIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCoverChange = (
+    itemIndex: number,
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = e.target.files?.[0];
     if (file) updateItem(itemIndex, "cover_image", file);
   };
-
 
   const handleOptionText = (itemIndex: number, index: number, text: string) => {
     const opts = getNewOptions(itemIndex);
@@ -109,7 +120,10 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
   };
 
   const addOption = (itemIndex: number) =>
-    setNewOptions(itemIndex, [...getNewOptions(itemIndex), { text: "", isCorrect: false }]);
+    setNewOptions(itemIndex, [
+      ...getNewOptions(itemIndex),
+      { text: "", isCorrect: false },
+    ]);
 
   const removeOption = (itemIndex: number, index: number) => {
     const opts = getNewOptions(itemIndex);
@@ -118,7 +132,9 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
     const hasCorrect = updated.some((o) => o.isCorrect);
     setNewOptions(
       itemIndex,
-      hasCorrect ? updated : updated.map((o, i) => ({ ...o, isCorrect: i === 0 })),
+      hasCorrect
+        ? updated
+        : updated.map((o, i) => ({ ...o, isCorrect: i === 0 })),
     );
   };
 
@@ -127,7 +143,9 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
     if (!question.trim()) return false;
     const filled = getNewOptions(itemIndex).filter((o) => o.text.trim() !== "");
     if (filled.length < 2) return false;
-    return getNewOptions(itemIndex).some((o) => o.isCorrect && o.text.trim() !== "");
+    return getNewOptions(itemIndex).some(
+      (o) => o.isCorrect && o.text.trim() !== "",
+    );
   };
 
   const addQA = (itemIndex: number) => {
@@ -176,11 +194,18 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
         const questions = item.questions || [];
         const isItemInvalid = !item.story?.trim() || questions.length === 0;
         return (
-          <div key={itemIndex} className={`mt-4 p-5 bg-slate-50/70 rounded-xl border transition-colors ${
-            isItemInvalid ? "border-amber-300 bg-amber-50/10" : "border-slate-200/80"
-          }`}>
+          <div
+            key={itemIndex}
+            className={`mt-4 p-5 bg-slate-50/70 rounded-xl border transition-colors ${
+              isItemInvalid
+                ? "border-amber-300 bg-amber-50/10"
+                : "border-slate-200/80"
+            }`}
+          >
             <div className="flex justify-between items-center mb-3">
-              <span className="font-semibold text-cyan-650 text-sm tracking-wide uppercase">Item {itemIndex + 1}</span>
+              <span className="font-semibold text-cyan-650 text-sm tracking-wide uppercase">
+                Item {itemIndex + 1}
+              </span>
               {items.length > 1 && (
                 <button
                   className="text-slate-500 hover:text-rose-600 transition-colors p-1 rounded-lg hover:bg-rose-500/5"
@@ -192,15 +217,22 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
             </div>
 
             <div className="mt-4 mb-4">
-              <label className="text-sm font-medium text-slate-650 mb-2 block">Cover Image</label>
-              <p className="text-xs text-slate-500 mb-2">Shown above the story text (16:9 recommended)</p>
+              <label className="text-sm font-medium text-slate-650 mb-2 block">
+                Cover Image
+              </label>
+              <p className="text-xs text-slate-500 mb-2">
+                Shown above the story text (16:9 recommended)
+              </p>
 
               {item.cover_image ? (
                 <div className="relative w-full h-40 overflow-hidden rounded-xl border border-slate-200 flex items-center justify-center bg-slate-50 border-b border-slate-100">
                   {isDraftPlaceholder(item.cover_image) ? (
                     <div className="flex flex-col items-center justify-center p-3 text-center select-none">
                       <ImageIcon className="w-8 h-8 text-cyan-600 mb-1" />
-                      <span className="text-xs font-bold text-slate-700 truncate max-w-[200px]" title={(item.cover_image as any).name}>
+                      <span
+                        className="text-xs font-bold text-slate-700 truncate max-w-50"
+                        title={(item.cover_image as any).name}
+                      >
                         {(item.cover_image as any).name}
                       </span>
                       <span className="text-[9px] text-rose-500 font-bold uppercase tracking-wider mt-0.5">
@@ -253,21 +285,35 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
             />
 
             <div className="mt-4">
-              <label className="text-sm font-medium text-slate-650 mb-2 block">Questions & Answers</label>
+              <label className="text-sm font-medium text-slate-650 mb-2 block">
+                Questions & Answers
+              </label>
 
               {questions.map((qa, qIndex) => (
-                <div key={qIndex} className="mt-4 p-4 bg-slate-50/50 border border-slate-200/50 rounded-xl flex items-start justify-between gap-4">
+                <div
+                  key={qIndex}
+                  className="mt-4 p-4 bg-slate-50/50 border border-slate-200/50 rounded-xl flex items-start justify-between gap-4"
+                >
                   <div style={{ flex: 1 }}>
-                    <p className="font-medium text-slate-700 mb-3">Q: {qa.question}</p>
+                    <p className="font-medium text-slate-700 mb-3">
+                      Q: {qa.question}
+                    </p>
                     <div className="flex flex-col gap-2">
                       {(qa.options || []).map((opt, oIndex) => (
                         <span
                           key={oIndex}
                           className={`px-3 py-2 rounded-lg text-sm border flex items-center gap-2 ${
-                            opt.isCorrect ? "bg-emerald-500/5 border-emerald-500/30 text-emerald-600" : "bg-slate-50/70 border-slate-200 text-slate-650"
+                            opt.isCorrect
+                              ? "bg-emerald-500/5 border-emerald-500/30 text-emerald-600"
+                              : "bg-slate-50/70 border-slate-200 text-slate-650"
                           }`}
                         >
-                          {opt.isCorrect ? <CheckCircle2 size={16} /> : <Circle size={16} />} {opt.text}
+                          {opt.isCorrect ? (
+                            <CheckCircle2 size={16} />
+                          ) : (
+                            <Circle size={16} />
+                          )}{" "}
+                          {opt.text}
                         </span>
                       ))}
                     </div>
@@ -289,7 +335,9 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
                   onChangeText={(text) => setNewQuestion(itemIndex, text)}
                 />
 
-                <label className="text-sm font-medium text-slate-650 mt-4 block">Answer Options</label>
+                <label className="text-sm font-medium text-slate-650 mt-4 block">
+                  Answer Options
+                </label>
                 <p className="text-xs text-slate-500 mb-4">
                   Click the circle to mark the correct answer
                 </p>
@@ -302,13 +350,17 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
                       }`}
                       onClick={() => handleSetCorrect(itemIndex, i)}
                     >
-                      {opt.isCorrect && <div className="w-2.5 h-2.5 rounded-full bg-cyan-400" />}
+                      {opt.isCorrect && (
+                        <div className="w-2.5 h-2.5 rounded-full bg-cyan-400" />
+                      )}
                     </button>
                     <div className="flex-1">
                       <FormInput
                         placeholder={`Option ${i + 1}${opt.isCorrect ? " (correct)" : ""}`}
                         value={opt.text}
-                        onChangeText={(text) => handleOptionText(itemIndex, i, text)}
+                        onChangeText={(text) =>
+                          handleOptionText(itemIndex, i, text)
+                        }
                       />
                     </div>
                     {getNewOptions(itemIndex).length > 2 && (
@@ -322,7 +374,10 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
                   </div>
                 ))}
 
-                <button className="text-cyan-650 hover:text-cyan-300 text-sm font-medium flex items-center gap-1 mt-2" onClick={() => addOption(itemIndex)}>
+                <button
+                  className="text-cyan-650 hover:text-cyan-300 text-sm font-medium flex items-center gap-1 mt-2"
+                  onClick={() => addOption(itemIndex)}
+                >
                   <Plus size={16} /> Add another option
                 </button>
 
@@ -339,7 +394,10 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
             {isItemInvalid && (
               <div className="mt-3 flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50/50 p-2 rounded-lg border border-amber-100">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>Se requiere escribir el texto de la historia y agregar al menos una pregunta con sus opciones.</span>
+                <span>
+                  Se requiere escribir el texto de la historia y agregar al
+                  menos una pregunta con sus opciones.
+                </span>
               </div>
             )}
           </div>

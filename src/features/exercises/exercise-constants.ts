@@ -99,7 +99,7 @@ export const EXERCISE_DEFAULT_CONTENT: Record<lesson_type, any> = {
   match_words: { items: [{ pairs: [{ english: "", spanish: "" }] }] },
   overview_session: { items: [{ words: [] }] },
   reading_quiz: {
-    items: [{ phrase: "", correct_answer: "", possible_answers: [] }],
+    items: [{ phrase: "", questions: [] }],
   },
   say_word: { items: [{ image_url: "", image_title: "" }] },
   type_answer: {
