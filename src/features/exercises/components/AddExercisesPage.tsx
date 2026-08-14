@@ -224,7 +224,7 @@ export default function AddExercisesPage({ classId }: Props) {
       for (let j = 0; j < items.length; j++) {
         const item = items[j];
 
-        if (ex.type === "complete_word" || ex.type === "reading_quiz") {
+        if (ex.type === "complete_word") {
           const hasCorrect = item.correct_answer && item.correct_answer.trim() !== "";
           const hasPossibles = item.possible_answers && item.possible_answers.length > 0;
           if (!hasCorrect || !hasPossibles) {
@@ -232,6 +232,33 @@ export default function AddExercisesPage({ classId }: Props) {
               `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener respuesta correcta y posibles respuestas.`
             );
             return;
+          }
+        } else if (ex.type === "reading_quiz") {
+          const hasPhrase = item.phrase && item.phrase.trim() !== "";
+          const hasQuestions = item.questions && item.questions.length > 0;
+          if (!hasPhrase) {
+            setFormError(
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) debe tener una frase o texto de lectura.`
+            );
+            return;
+          }
+          if (!hasQuestions) {
+            setFormError(
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) debe tener al menos una pregunta.`
+            );
+            return;
+          }
+          for (let q = 0; q < item.questions.length; q++) {
+            const qItem = item.questions[q];
+            const hasQText = qItem.question && qItem.question.trim() !== "";
+            const hasCorrect = qItem.correct_answer && qItem.correct_answer.trim() !== "";
+            const hasPossibles = qItem.possible_answers && qItem.possible_answers.length > 0;
+            if (!hasQText || !hasCorrect || !hasPossibles) {
+              setFormError(
+                `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene la pregunta #${q + 1} incompleta. Debe tener pregunta, respuesta correcta y al menos una posible respuesta.`
+              );
+              return;
+            }
           }
         } else if (ex.type === "image_gallery" || ex.type === "match_names") {
           const hasImages = item.images && item.images.length > 0;
