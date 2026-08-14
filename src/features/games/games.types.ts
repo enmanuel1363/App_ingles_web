@@ -9,9 +9,8 @@ export type WrittenGameExerciseType =
 
 export type ListeningGameExerciseType =
   | "match_audio_to_text"           // Listen and match audio to text
-  | "fast_audio_mode"               // Fast audio mode
-  | "accent_recognition_challenge"  // Accent recognition challenge
-  | "male_or_female_voice";         // Male or female voice
+  | "identify_audio"                // Listen to audio and identify correct option (with distractors)
+  | "fast_audio_mode";              // Fast audio mode
 
 export type SpeakingGameExerciseType =
   | "fluency_challenge"             // Terminar una frase con pronunciación perfecta en X tiempo

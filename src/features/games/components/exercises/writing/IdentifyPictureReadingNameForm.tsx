@@ -62,7 +62,7 @@ export default function IdentifyPictureReadingNameForm({
         onChangeText={handleWordChange}
       />
       <div className="space-y-3">
-        <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+        <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-450">
           Image Options (Minimum 2)
         </label>
         {[0, 1].map((cardIdx) => (
@@ -78,7 +78,7 @@ export default function IdentifyPictureReadingNameForm({
                   const file = e.target.files?.[0];
                   if (file) handleFileChange(cardIdx, file);
                 }}
-                className="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-black file:bg-slate-100 file:text-slate-800 hover:file:bg-slate-200 cursor-pointer file:cursor-pointer w-full"
+                className="text-xs text-slate-550 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-black file:bg-slate-100 file:text-slate-800 hover:file:bg-slate-200 cursor-pointer file:cursor-pointer w-full"
               />
               {imageOptions[cardIdx]?.url && (
                 <div className="w-8 h-8 rounded border border-slate-100 bg-slate-50 shrink-0">
