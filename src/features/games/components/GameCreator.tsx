@@ -8,15 +8,16 @@ import {
   useUpdateGameWithExercises,
 } from "../hooks/useGames";
 import { GameType } from "../games.types";
+import { getDefaultContentSchema, getSubtypes } from "../games.constants";
 import { uploadFile } from "@/features/exercises/services/storage.service";
 import Button from "@/components/ui/Button";
 import FormInput from "@/components/ui/FormInput";
 import AlertModal from "@/components/ui/AlertModal";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
-import MatchNameToPictureForm from "./exercises/MatchNameToPictureForm";
-import IdentifyPictureReadingNameForm from "./exercises/IdentifyPictureReadingNameForm";
-import TimedTypingChallengeForm from "./exercises/TimedTypingChallengeForm";
-import MatchWordChallengeForm from "./exercises/MatchWordChallengeForm";
+import MatchNameToPictureForm from "./exercises/writing/MatchNameToPictureForm";
+import IdentifyPictureReadingNameForm from "./exercises/writing/IdentifyPictureReadingNameForm";
+import TimedTypingChallengeForm from "./exercises/writing/TimedTypingChallengeForm";
+import MatchWordChallengeForm from "./exercises/writing/MatchWordChallengeForm";
 import AudioChallengeForm from "./exercises/AudioChallengeForm";
 import SpeakingChallengeForm from "./exercises/SpeakingChallengeForm";
 import GameProgressWidget from "./GameProgressWidget";
@@ -36,13 +37,20 @@ interface TempExercise {
   content: any;
 }
 
-export default function GameCreator({ teacherId, onClose, editingGameId }: GameCreatorProps) {
+export default function GameCreator({
+  teacherId,
+  onClose,
+  editingGameId,
+}: GameCreatorProps) {
   const createGameMutation = useCreateGameWithExercises();
   const updateGameMutation = useUpdateGameWithExercises();
 
   // Fetch existing game & exercises if editingGameId is present
-  const { data: existingGame, isLoading: isLoadingGame } = useGetGameById(editingGameId || "");
-  const { data: existingExercises, isLoading: isLoadingExercises } = useGetExercisesByGame(editingGameId || "");
+  const { data: existingGame, isLoading: isLoadingGame } = useGetGameById(
+    editingGameId || "",
+  );
+  const { data: existingExercises, isLoading: isLoadingExercises } =
+    useGetExercisesByGame(editingGameId || "");
 
   // Form State: Game Header
   const [name, setName] = useState("");
@@ -103,48 +111,6 @@ export default function GameCreator({ teacherId, onClose, editingGameId }: GameC
     }
   }, [editingGameId, existingExercises]);
 
-  // Available Subtypes per Game Type
-  const getSubtypes = (
-    gameType: GameType,
-  ): { value: string; label: string }[] => {
-    const writtenOptions = [
-      { value: "match_name_to_picture", label: "Match name to picture" },
-      {
-        value: "identify_picture_reading_name",
-        label: "Identify picture's by name",
-      },
-      { value: "timed_typing_challenge", label: "Timed typing challenge" },
-      { value: "match_word", label: "Match word challenge" },
-    ];
-    const listeningOptions = [
-      { value: "match_audio_to_text", label: "Match audio to text" },
-      { value: "fast_audio_mode", label: "Fast audio mode" },
-      {
-        value: "accent_recognition_challenge",
-        label: "Accent recognition challenge",
-      },
-      { value: "male_or_female_voice", label: "Identify Male/Female voice" },
-    ];
-    const speakingOptions = [
-      { value: "fluency_challenge", label: "Fluency challenge" },
-      { value: "speak_before_timer", label: "Speak before timer ends" },
-      { value: "say_5_words_quickly", label: "Say 5 words quickly" },
-      { value: "tongue_twister_challenge", label: "Tongue twister challenge" },
-    ];
-
-    switch (gameType) {
-      case "write":
-        return writtenOptions;
-      case "listen":
-        return listeningOptions;
-      case "speak":
-        return speakingOptions;
-      default:
-        return [...writtenOptions, ...listeningOptions, ...speakingOptions];
-    }
-  };
-
-
   const handleAddExercise = () => {
     if (exercises.length >= 8) {
       setAlertConfig({
@@ -198,59 +164,6 @@ export default function GameCreator({ teacherId, onClose, editingGameId }: GameC
     setExercises(updated);
   };
 
-  const getDefaultContentSchema = (subtype: string) => {
-    if (subtype === "match_name_to_picture") {
-      return { imageUrl: "", options: ["", "", "", ""], correctAnswer: "" };
-    }
-    if (subtype === "identify_picture_reading_name") {
-      return {
-        wordToRead: "",
-        imageOptions: [
-          { id: "1", url: "", label: "" },
-          { id: "2", url: "", label: "" },
-        ],
-        correctAnswer: "",
-      };
-    }
-    if (subtype === "match_word") {
-      return {
-        items: [
-          { wordToMatch: "", correctAnswer: "", options: ["", "", ""] }
-        ]
-      };
-    }
-    if (subtype === "timed_typing_challenge") {
-      return { words: [""], timeLimitSeconds: 30 };
-    }
-    if (
-      subtype === "match_audio_to_text" ||
-      subtype === "fast_audio_mode" ||
-      subtype === "accent_recognition_challenge" ||
-      subtype === "male_or_female_voice"
-    ) {
-      return {
-        audioUrl: "",
-        options:
-          subtype === "male_or_female_voice"
-            ? ["Male", "Female"]
-            : ["", "", "", ""],
-        correctAnswer: "",
-        playbackRate: subtype === "fast_audio_mode" ? 1.6 : 1.0,
-      };
-    }
-    if (subtype === "fluency_challenge") {
-      return { phraseToComplete: "", targetPhrase: "", durationSeconds: 15 };
-    }
-    if (subtype === "speak_before_timer") {
-      return { phraseToSpeak: "", durationSeconds: 15 };
-    }
-    if (subtype === "say_5_words_quickly") {
-      return { words: ["", "", "", "", ""], durationSeconds: 10 };
-    }
-    // tongue_twister_challenge and fallback schemas
-    return { tongueTwister: "", durationSeconds: 20, maxAttempts: 3 };
-  };
-
   // Upload local File assets to Supabase Storage and get public URLs
   const uploadExerciseAssets = async (tempEx: TempExercise): Promise<any> => {
     const content = { ...tempEx.content };
@@ -282,15 +195,14 @@ export default function GameCreator({ teacherId, onClose, editingGameId }: GameC
 
     // 3. Audio URLs for listening challenges
     if (
-      (tempEx.type === "match_audio_to_text" ||
-        tempEx.type === "fast_audio_mode" ||
-        tempEx.type === "accent_recognition_challenge" ||
-        tempEx.type === "male_or_female_voice") &&
+      (tempEx.type === "fast_audio_mode" || tempEx.type === "identify_audio") &&
       content.audioUrl &&
       typeof content.audioUrl !== "string"
     ) {
-      content.audioUrl = await uploadFile(content.audioUrl, "exercise-assets");
+      content.audioUrl = await uploadFile(content.audioUrl, "exercise-audios");
     }
+
+
 
     return content;
   };
@@ -343,7 +255,11 @@ export default function GameCreator({ teacherId, onClose, editingGameId }: GameC
 
       if (editingGameId) {
         updateGameMutation.mutate(
-          { gameId: editingGameId, game: gameDTO, exercises: processedExercises },
+          {
+            gameId: editingGameId,
+            game: gameDTO,
+            exercises: processedExercises,
+          },
           {
             onSuccess: () => {
               setAlertConfig({
@@ -357,7 +273,7 @@ export default function GameCreator({ teacherId, onClose, editingGameId }: GameC
             onError: () => {
               setIsUploading(false);
             },
-          }
+          },
         );
       } else {
         createGameMutation.mutate(
@@ -375,7 +291,7 @@ export default function GameCreator({ teacherId, onClose, editingGameId }: GameC
             onError: () => {
               setIsUploading(false);
             },
-          }
+          },
         );
       }
     } catch (err) {
@@ -383,7 +299,8 @@ export default function GameCreator({ teacherId, onClose, editingGameId }: GameC
       setAlertConfig({
         visible: true,
         title: "Upload Error",
-        message: "Failed to upload local images/audio to storage. Check connections.",
+        message:
+          "Failed to upload local images/audio to storage. Check connections.",
         type: "error",
       });
       setIsUploading(false);
@@ -431,9 +348,8 @@ export default function GameCreator({ teacherId, onClose, editingGameId }: GameC
     }
     if (
       subtype === "match_audio_to_text" ||
-      subtype === "fast_audio_mode" ||
-      subtype === "accent_recognition_challenge" ||
-      subtype === "male_or_female_voice"
+      subtype === "identify_audio" ||
+      subtype === "fast_audio_mode"
     ) {
       return (
         <AudioChallengeForm
@@ -458,7 +374,9 @@ export default function GameCreator({ teacherId, onClose, editingGameId }: GameC
       <div className="flex items-center justify-center min-h-screen bg-[#fffcf2]">
         <div className="text-center space-y-4">
           <div className="w-10 h-10 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-slate-500 text-sm font-semibold">Loading game details...</p>
+          <p className="text-slate-500 text-sm font-semibold">
+            Loading game details...
+          </p>
         </div>
       </div>
     );
@@ -479,8 +397,10 @@ export default function GameCreator({ teacherId, onClose, editingGameId }: GameC
             <span className="text-[10px] font-black text-[#24DFE2] uppercase tracking-widest">
               Builder Arena
             </span>
-             <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-              {editingGameId ? "Edit Interactive Game" : "Create Interactive Game"}
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+              {editingGameId
+                ? "Edit Interactive Game"
+                : "Create Interactive Game"}
             </h1>
           </div>
         </div>
@@ -488,11 +408,19 @@ export default function GameCreator({ teacherId, onClose, editingGameId }: GameC
         <Button
           variant="primary"
           leftIcon={<Save className="w-4 h-4" />}
-          isLoading={createGameMutation.isPending || updateGameMutation.isPending || isUploading}
+          isLoading={
+            createGameMutation.isPending ||
+            updateGameMutation.isPending ||
+            isUploading
+          }
           onClick={handleSaveGame}
           className="text-slate-950 font-black px-6"
         >
-          {isUploading ? "Uploading Assets..." : editingGameId ? "Save Game" : "Publish Game"}
+          {isUploading
+            ? "Uploading Assets..."
+            : editingGameId
+              ? "Save Game"
+              : "Publish Game"}
         </Button>
       </div>
 
@@ -532,7 +460,8 @@ export default function GameCreator({ teacherId, onClose, editingGameId }: GameC
                     setConfirmConfig({
                       visible: true,
                       title: "Change Challenge Type",
-                      description: "Changing the main challenge type will clear all current exercises. Do you want to proceed?",
+                      description:
+                        "Changing the main challenge type will clear all current exercises. Do you want to proceed?",
                       confirmText: "Change",
                       cancelText: "Cancel",
                       variant: "danger",
@@ -721,7 +650,9 @@ export default function GameCreator({ teacherId, onClose, editingGameId }: GameC
           setConfirmConfig((prev) => ({ ...prev, visible: false }));
           confirmConfig.onConfirm();
         }}
-        onClose={() => setConfirmConfig((prev) => ({ ...prev, visible: false }))}
+        onClose={() =>
+          setConfirmConfig((prev) => ({ ...prev, visible: false }))
+        }
       />
     </div>
   );

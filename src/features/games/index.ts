@@ -15,3 +15,6 @@ export * from "./hooks/useGameRoom";
 
 // Types
 export * from "./games.types";
+
+// Constants
+export * from "./games.constants";

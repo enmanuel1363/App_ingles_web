@@ -48,7 +48,7 @@ export default function MatchNameToPictureForm({
             type="file"
             accept="image/*"
             onChange={handleFileChange}
-            className="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-[#24DFE2]/15 file:text-slate-900 hover:file:bg-[#24DFE2]/25 cursor-pointer file:cursor-pointer w-full"
+            className="text-xs text-slate-550 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-[#24DFE2]/15 file:text-slate-900 hover:file:bg-[#24DFE2]/25 cursor-pointer file:cursor-pointer w-full"
           />
           {content.imageUrl && (
             <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-100 bg-slate-50 shrink-0">
@@ -77,7 +77,7 @@ export default function MatchNameToPictureForm({
               type="text"
               value={options[optIdx] || ""}
               onChange={(e) => handleOptionChange(optIdx, e.target.value)}
-              placeholder={`e.g. Option {optIdx + 1}`}
+              placeholder={`e.g. Option ${optIdx + 1}`}
               className="w-full bg-white border border-slate-200 text-slate-900 rounded-xl p-2.5 outline-none focus:border-cyan-500 text-xs font-bold"
             />
           </div>
