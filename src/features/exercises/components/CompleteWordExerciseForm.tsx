@@ -47,6 +47,34 @@ export default function CompleteWordExerciseForm({ order_index }: Props) {
     updateContent("items", newItems);
   };
 
+  const updateCorrectAnswer = (itemIndex: number, newCorrectVal: string) => {
+    const item = items[itemIndex] || {};
+    const oldCorrectVal = item.correct_answer || "";
+    let newPossibles = [...(item.possible_answers || [])];
+
+    const oldIdx = newPossibles.indexOf(oldCorrectVal);
+    if (oldIdx !== -1) {
+      if (newCorrectVal.trim() === "") {
+        newPossibles.splice(oldIdx, 1);
+      } else {
+        newPossibles[oldIdx] = newCorrectVal;
+      }
+    } else if (newCorrectVal.trim() !== "") {
+      if (!newPossibles.includes(newCorrectVal)) {
+        newPossibles.push(newCorrectVal);
+      }
+    }
+
+    newPossibles = Array.from(new Set(newPossibles)).filter((p) => p.trim() !== "");
+
+    const newItems = items.map((it: any, i: number) =>
+      i === itemIndex
+        ? { ...it, correct_answer: newCorrectVal, possible_answers: newPossibles }
+        : it
+    );
+    updateContent("items", newItems);
+  };
+
   const addItem = () => updateContent("items", [...items, { ...EMPTY_ITEM }]);
 
   const removeItem = (itemIndex: number) => {
@@ -145,7 +173,7 @@ export default function CompleteWordExerciseForm({ order_index }: Props) {
             placeholder="e.g. went"
             value={item.correct_answer}
             onChangeText={(text) =>
-              updateItem(itemIndex, "correct_answer", text)
+              updateCorrectAnswer(itemIndex, text)
             }
           />
 
