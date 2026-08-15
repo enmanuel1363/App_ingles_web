@@ -2,11 +2,14 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { CreateExerciseDTO, Exercise } from '../exercise.types';
+import { CreateExerciseDTO, Exercise } from "../exercise.types";
 
 // Helper to replace File/Blob objects with serializable placeholders before storing in localStorage
 function replaceFilesWithPlaceholders(val: any): any {
-  if (typeof window !== "undefined" && (val instanceof File || val instanceof Blob)) {
+  if (
+    typeof window !== "undefined" &&
+    (val instanceof File || val instanceof Blob)
+  ) {
     return {
       __isDraftPlaceholder: true,
       name: (val as any).name || "archivo_temporal",
@@ -29,6 +32,7 @@ function replaceFilesWithPlaceholders(val: any): any {
   return val;
 }
 
+const DRAFT_MAX_AGE = 1 * 24 * 60 * 60 * 1000; // 1 day in milliseconds
 
 export type StoreExercise = (CreateExerciseDTO | Exercise) & { tempId: string };
 
@@ -53,16 +57,23 @@ type StoreTypes = {
   resolveCollisionUseDraft: () => void;
   resolveCollisionUseServer: () => void;
   addExercise: (exercise: CreateExerciseDTO) => void;
-  updateExercise: (index: number, exercise: CreateExerciseDTO | Exercise) => void;
+  updateExercise: (
+    index: number,
+    exercise: CreateExerciseDTO | Exercise,
+  ) => void;
   removeExercise: (index: number) => void;
   moveUp: (index: number) => void;
   moveDown: (index: number) => void;
   reorderExercises: (fromIndex: number, toIndex: number) => void;
   clearDraft: (classId: string) => void;
+  discardDraft: (classId: string, dbExercises: Exercise[]) => void;
+  clearAllDrafts: () => void;
   reset: () => void;
 };
 
-function getDraftInfo(draft: DraftInfo | StoreExercise[] | undefined): DraftInfo | null {
+function getDraftInfo(
+  draft: DraftInfo | StoreExercise[] | undefined,
+): DraftInfo | null {
   if (!draft) return null;
   if (Array.isArray(draft)) {
     return {
@@ -89,7 +100,7 @@ function getLatestUpdatedAt(exercises: Exercise[]): string | null {
 function updateDraftHelper(
   classId: string | null,
   newData: StoreExercise[],
-  drafts: Record<string, DraftInfo | StoreExercise[]>
+  drafts: Record<string, DraftInfo | StoreExercise[]>,
 ): Record<string, DraftInfo | StoreExercise[]> {
   if (!classId) return drafts;
   const rawDraft = drafts[classId];
@@ -114,12 +125,33 @@ export const useExerciseStore = create<StoreTypes>()(
 
       initializeExercises: (classId, dbExercises) =>
         set((state) => {
-          const rawDraft = state.drafts[classId];
+          const now = Date.now();
+          const cleanedDrafts = { ...state.drafts };
+          let draftsChanged = false;
+
+          // Purgar borradores expirados
+          Object.keys(cleanedDrafts).forEach((id) => {
+            const rawDraft = cleanedDrafts[id];
+            const draft = getDraftInfo(rawDraft);
+            if (draft && now - draft.updatedAt > DRAFT_MAX_AGE) {
+              delete cleanedDrafts[id];
+              draftsChanged = true;
+            }
+          });
+
+          const rawDraft = cleanedDrafts[classId];
           const draft = getDraftInfo(rawDraft);
           const latestDbUpdate = getLatestUpdatedAt(dbExercises);
 
           // 1. Si ya existe un borrador persistido para esta clase, lo cargamos en memoria
           if (draft && draft.exercises.length > 0) {
+            // Actualizar updatedAt para evitar que expire mientras se trabaja activamente
+            const updatedDraft: DraftInfo = {
+              ...draft,
+              updatedAt: now,
+            };
+            cleanedDrafts[classId] = updatedDraft;
+
             // Validar colisión: Si el servidor tiene una actualización más reciente que la base del borrador
             if (
               latestDbUpdate &&
@@ -134,6 +166,7 @@ export const useExerciseStore = create<StoreTypes>()(
                   draftExercises: draft.exercises,
                 },
                 data: draft.exercises,
+                drafts: cleanedDrafts,
               };
             }
 
@@ -141,6 +174,7 @@ export const useExerciseStore = create<StoreTypes>()(
               classId,
               data: draft.exercises,
               collision: null,
+              drafts: cleanedDrafts,
             };
           }
 
@@ -172,7 +206,7 @@ export const useExerciseStore = create<StoreTypes>()(
           const newDraft: DraftInfo = {
             exercises: finalData,
             baseDbUpdatedAt: latestDbUpdate,
-            updatedAt: Date.now(),
+            updatedAt: now,
           };
 
           return {
@@ -180,7 +214,7 @@ export const useExerciseStore = create<StoreTypes>()(
             data: finalData,
             collision: null,
             drafts: {
-              ...state.drafts,
+              ...cleanedDrafts,
               [classId]: newDraft,
             },
           };
@@ -191,7 +225,9 @@ export const useExerciseStore = create<StoreTypes>()(
           const classId = state.classId;
           if (!classId || !state.collision) return {};
 
-          const latestDbUpdate = getLatestUpdatedAt(state.collision.dbExercises);
+          const latestDbUpdate = getLatestUpdatedAt(
+            state.collision.dbExercises,
+          );
           const rawDraft = state.drafts[classId];
           const draft = getDraftInfo(rawDraft);
 
@@ -276,7 +312,9 @@ export const useExerciseStore = create<StoreTypes>()(
           const newData = [...state.data];
           newData[index] = {
             ...exercise,
-            tempId: state.data[index]?.tempId || Math.random().toString(36).slice(2, 9),
+            tempId:
+              state.data[index]?.tempId ||
+              Math.random().toString(36).slice(2, 9),
           };
           return {
             data: newData,
@@ -287,7 +325,10 @@ export const useExerciseStore = create<StoreTypes>()(
       removeExercise: (index) =>
         set((state) => {
           const filtered = state.data.filter((_, i) => i !== index);
-          const reindexed = filtered.map((ex, i) => ({ ...ex, order_index: i }));
+          const reindexed = filtered.map((ex, i) => ({
+            ...ex,
+            order_index: i,
+          }));
           return {
             data: reindexed,
             drafts: updateDraftHelper(state.classId, reindexed, state.drafts),
@@ -298,7 +339,10 @@ export const useExerciseStore = create<StoreTypes>()(
         set((state) => {
           if (index <= 0 || index >= state.data.length) return {};
           const newData = [...state.data];
-          [newData[index - 1], newData[index]] = [newData[index], newData[index - 1]];
+          [newData[index - 1], newData[index]] = [
+            newData[index],
+            newData[index - 1],
+          ];
           const reindexed = newData.map((ex, i) => ({ ...ex, order_index: i }));
           return {
             data: reindexed,
@@ -310,7 +354,10 @@ export const useExerciseStore = create<StoreTypes>()(
         set((state) => {
           if (index < 0 || index >= state.data.length - 1) return {};
           const newData = [...state.data];
-          [newData[index], newData[index + 1]] = [newData[index + 1], newData[index]];
+          [newData[index], newData[index + 1]] = [
+            newData[index + 1],
+            newData[index],
+          ];
           const reindexed = newData.map((ex, i) => ({ ...ex, order_index: i }));
           return {
             data: reindexed,
@@ -349,6 +396,47 @@ export const useExerciseStore = create<StoreTypes>()(
           };
         }),
 
+      discardDraft: (classId, dbExercises) =>
+        set((state) => {
+          const newDrafts = { ...state.drafts };
+          delete newDrafts[classId];
+
+          const initialData = dbExercises.map((ex) => ({
+            ...ex,
+            tempId: ex.id || Math.random().toString(36).slice(2, 9),
+          }));
+
+          const finalData =
+            initialData.length > 0
+              ? initialData
+              : [
+                  {
+                    id_class: classId,
+                    name: "",
+                    description: "Completa la palabra con las letras correctas",
+                    type: "complete_word",
+                    content: {
+                      word: "",
+                      letters: [],
+                    },
+                    order_index: 0,
+                    tempId: Math.random().toString(36).slice(2, 9),
+                  } as unknown as StoreExercise,
+                ];
+
+          return {
+            classId,
+            data: finalData,
+            collision: null,
+            drafts: newDrafts,
+          };
+        }),
+
+      clearAllDrafts: () =>
+        set(() => ({
+          drafts: {},
+        })),
+
       reset: () => set({ data: [], classId: null, collision: null }),
     }),
     {
@@ -356,6 +444,6 @@ export const useExerciseStore = create<StoreTypes>()(
       partialize: (state) => ({
         drafts: replaceFilesWithPlaceholders(state.drafts),
       }),
-    }
-  )
+    },
+  ),
 );

@@ -41,16 +41,18 @@ function generateUUID() {
 
 export default function AddExercisesPage({ classId }: Props) {
   const router = useRouter();
-  const { showAlert } = useModal();
+  const { showAlert, confirm } = useModal();
   const {
     data,
     collision,
+    drafts,
     resolveCollisionUseDraft,
     resolveCollisionUseServer,
     addExercise,
     removeExercise,
     initializeExercises,
     clearDraft,
+    discardDraft,
     moveUp,
     moveDown,
     reorderExercises,
@@ -149,6 +151,7 @@ export default function AddExercisesPage({ classId }: Props) {
   const introValid = categoryCounts["Introducción"] >= 2;
   const valValid = categoryCounts["Validación"] >= 3;
   const totalValid = data.length <= 12;
+  const hasDraft = drafts && !!drafts[classId];
 
   const handleAddAnother = () => {
     if (data.length >= 12) {
@@ -194,6 +197,25 @@ export default function AddExercisesPage({ classId }: Props) {
       );
     } else {
       setFormError(null);
+    }
+  };
+
+  const handleDiscardDraft = async () => {
+    const isConfirmed = await confirm({
+      title: "¿Descartar borrador local?",
+      description: "Esta acción eliminará de forma permanente tus cambios locales no guardados y cargará la configuración del servidor. ¿Deseas continuar?",
+      confirmText: "Sí, descartar",
+      cancelText: "Cancelar",
+      variant: "danger",
+    });
+
+    if (isConfirmed) {
+      discardDraft(classId, existingExercises || []);
+      await showAlert({
+        title: "Borrador descartado",
+        message: "El borrador ha sido eliminado y se ha cargado el contenido del servidor.",
+        type: "success",
+      });
     }
   };
 
@@ -614,6 +636,27 @@ export default function AddExercisesPage({ classId }: Props) {
                 </div>
               </div>
             </div>
+
+            {/* Borrador Local */}
+            {hasDraft && (
+              <div className="p-3.5 bg-amber-50/50 border border-amber-200/60 rounded-xl space-y-2.5 shadow-sm">
+                <div className="flex items-center space-x-2 text-amber-800 text-[10px] font-extrabold uppercase tracking-wide">
+                  <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>Borrador Local Activo</span>
+                </div>
+                <p className="text-[10px] text-amber-700 leading-relaxed font-semibold">
+                  Tienes cambios locales guardados en este navegador que no se han guardado en el servidor.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleDiscardDraft}
+                  disabled={isSaving}
+                  className="w-full text-center text-[10px] font-bold text-rose-600 hover:text-rose-700 bg-rose-50/50 hover:bg-rose-50 border border-rose-100/80 py-1.5 px-3 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Descartar borrador local
+                </button>
+              </div>
+            )}
 
             {/* Quick Helper Banner */}
             <div className="p-3 bg-slate-55 rounded-xl border border-slate-150 text-[10px] leading-relaxed text-slate-600 font-semibold">
