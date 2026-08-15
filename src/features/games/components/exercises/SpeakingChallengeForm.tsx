@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import FluencyChallengeForm from "./speaking/FluencyChallengeForm";
 import SpeakBeforeTimerForm from "./speaking/SpeakBeforeTimerForm";
 import Say5WordsQuicklyForm from "./speaking/Say5WordsQuicklyForm";
 import TongueTwisterChallengeForm from "./speaking/TongueTwisterChallengeForm";
@@ -18,14 +17,6 @@ export default function SpeakingChallengeForm({
   onChangeContent,
 }: SpeakingChallengeFormProps) {
   switch (subtype) {
-    case "fluency_challenge":
-      return (
-        <FluencyChallengeForm
-          content={content}
-          onChangeContent={onChangeContent}
-        />
-      );
-
     case "speak_before_timer":
       return (
         <SpeakBeforeTimerForm

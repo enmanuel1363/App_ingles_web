@@ -32,11 +32,6 @@ export const GAME_EXERCISE_DEFAULT_CONTENT: Record<GameExerciseType, any> = {
     correctAnswer: "",
     playbackRate: 1.6,
   },
-  fluency_challenge: {
-    phraseToComplete: "",
-    targetPhrase: "",
-    durationSeconds: 15,
-  },
   speak_before_timer: { phraseToSpeak: "", durationSeconds: 15 },
   say_5_words_quickly: { words: ["", "", "", "", ""], durationSeconds: 10 },
   tongue_twister_challenge: {
@@ -73,7 +68,6 @@ export const LISTENING_GAME_OPTIONS = [
 ];
 
 export const SPEAKING_GAME_OPTIONS = [
-  { value: "fluency_challenge", label: "Fluency challenge" },
   { value: "speak_before_timer", label: "Speak before timer ends" },
   { value: "say_5_words_quickly", label: "Say 5 words quickly" },
   { value: "tongue_twister_challenge", label: "Tongue twister challenge" },
