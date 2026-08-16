@@ -203,7 +203,8 @@ export default function AddExercisesPage({ classId }: Props) {
   const handleDiscardDraft = async () => {
     const isConfirmed = await confirm({
       title: "¿Descartar borrador local?",
-      description: "Esta acción eliminará de forma permanente tus cambios locales no guardados y cargará la configuración del servidor. ¿Deseas continuar?",
+      description:
+        "Esta acción eliminará de forma permanente tus cambios locales no guardados y cargará la configuración del servidor. ¿Deseas continuar?",
       confirmText: "Sí, descartar",
       cancelText: "Cancelar",
       variant: "danger",
@@ -213,7 +214,8 @@ export default function AddExercisesPage({ classId }: Props) {
       discardDraft(classId, existingExercises || []);
       await showAlert({
         title: "Borrador descartado",
-        message: "El borrador ha sido eliminado y se ha cargado el contenido del servidor.",
+        message:
+          "El borrador ha sido eliminado y se ha cargado el contenido del servidor.",
         type: "success",
       });
     }
@@ -239,7 +241,9 @@ export default function AddExercisesPage({ classId }: Props) {
       if (ex.type === "placeholder") continue;
 
       if (items.length === 0) {
-        setFormError(`El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) no tiene ítems.`);
+        setFormError(
+          `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) no tiene ítems.`,
+        );
         return;
       }
 
@@ -247,11 +251,13 @@ export default function AddExercisesPage({ classId }: Props) {
         const item = items[j];
 
         if (ex.type === "complete_word") {
-          const hasCorrect = item.correct_answer && item.correct_answer.trim() !== "";
-          const hasPossibles = item.possible_answers && item.possible_answers.length > 0;
+          const hasCorrect =
+            item.correct_answer && item.correct_answer.trim() !== "";
+          const hasPossibles =
+            item.possible_answers && item.possible_answers.length > 0;
           if (!hasCorrect || !hasPossibles) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener respuesta correcta y posibles respuestas.`
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener respuesta correcta y posibles respuestas.`,
             );
             return;
           }
@@ -260,24 +266,26 @@ export default function AddExercisesPage({ classId }: Props) {
           const hasQuestions = item.questions && item.questions.length > 0;
           if (!hasPhrase) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) debe tener una frase o texto de lectura.`
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) debe tener una frase o texto de lectura.`,
             );
             return;
           }
           if (!hasQuestions) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) debe tener al menos una pregunta.`
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) debe tener al menos una pregunta.`,
             );
             return;
           }
           for (let q = 0; q < item.questions.length; q++) {
             const qItem = item.questions[q];
             const hasQText = qItem.question && qItem.question.trim() !== "";
-            const hasCorrect = qItem.correct_answer && qItem.correct_answer.trim() !== "";
-            const hasPossibles = qItem.possible_answers && qItem.possible_answers.length > 0;
+            const hasCorrect =
+              qItem.correct_answer && qItem.correct_answer.trim() !== "";
+            const hasPossibles =
+              qItem.possible_answers && qItem.possible_answers.length > 0;
             if (!hasQText || !hasCorrect || !hasPossibles) {
               setFormError(
-                `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene la pregunta #${q + 1} incompleta. Debe tener pregunta, respuesta correcta y al menos una posible respuesta.`
+                `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene la pregunta #${q + 1} incompleta. Debe tener pregunta, respuesta correcta y al menos una posible respuesta.`,
               );
               return;
             }
@@ -286,7 +294,7 @@ export default function AddExercisesPage({ classId }: Props) {
           const hasImages = item.images && item.images.length > 0;
           if (!hasImages) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener al menos una imagen.`
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener al menos una imagen.`,
             );
             return;
           }
@@ -294,7 +302,7 @@ export default function AddExercisesPage({ classId }: Props) {
           const hasWords = item.words && item.words.length > 0;
           if (!hasWords) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene la sección #${j + 1} incompleta. Debe tener al menos una palabra.`
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene la sección #${j + 1} incompleta. Debe tener al menos una palabra.`,
             );
             return;
           }
@@ -303,15 +311,16 @@ export default function AddExercisesPage({ classId }: Props) {
           const hasTitle = item.image_title && item.image_title.trim() !== "";
           if (!hasUrl || !hasTitle) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener imagen y palabra asociada.`
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener imagen y palabra asociada.`,
             );
             return;
           }
         } else if (ex.type === "speak") {
-          const hasCorrect = item.correct_answer && item.correct_answer.trim() !== "";
+          const hasCorrect =
+            item.correct_answer && item.correct_answer.trim() !== "";
           if (!hasCorrect) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener la respuesta de comparación.`
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener la respuesta de comparación.`,
             );
             return;
           }
@@ -320,16 +329,18 @@ export default function AddExercisesPage({ classId }: Props) {
           const hasQuestions = item.questions && item.questions.length > 0;
           if (!hasStory || !hasQuestions) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener texto de historia y al menos una pregunta.`
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener texto de historia y al menos una pregunta.`,
             );
             return;
           }
         } else if (ex.type === "type_answer") {
-          const hasDescriptive = item.descriptive_text && item.descriptive_text.trim() !== "";
-          const hasCorrect = item.correct_answer && item.correct_answer.trim() !== "";
+          const hasDescriptive =
+            item.descriptive_text && item.descriptive_text.trim() !== "";
+          const hasCorrect =
+            item.correct_answer && item.correct_answer.trim() !== "";
           if (!hasDescriptive || !hasCorrect) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener texto descriptivo y respuesta correcta.`
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener texto descriptivo y respuesta correcta.`,
             );
             return;
           }
@@ -337,7 +348,7 @@ export default function AddExercisesPage({ classId }: Props) {
           const hasUrl = item.video_url && item.video_url.trim() !== "";
           if (!hasUrl) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener la URL del video.`
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener la URL del video.`,
             );
             return;
           }
@@ -448,7 +459,9 @@ export default function AddExercisesPage({ classId }: Props) {
                 ¡Conflicto de Borrador Detectado!
               </h4>
               <p className="text-xs text-amber-800 mt-1 leading-relaxed font-semibold">
-                Los ejercicios de esta lección fueron actualizados en el servidor por otro profesor desde que guardaste tu borrador local en este navegador.
+                Los ejercicios de esta lección fueron actualizados en el
+                servidor por otro profesor desde que guardaste tu borrador local
+                en este navegador.
               </p>
             </div>
           </div>
@@ -645,7 +658,8 @@ export default function AddExercisesPage({ classId }: Props) {
                   <span>Borrador Local Activo</span>
                 </div>
                 <p className="text-[10px] text-amber-700 leading-relaxed font-semibold">
-                  Tienes cambios locales guardados en este navegador que no se han guardado en el servidor.
+                  Tienes cambios locales guardados en este navegador que no se
+                  han guardado en el servidor.
                 </p>
                 <button
                   type="button"
@@ -661,9 +675,8 @@ export default function AddExercisesPage({ classId }: Props) {
             {/* Quick Helper Banner */}
             <div className="p-3 bg-slate-55 rounded-xl border border-slate-150 text-[10px] leading-relaxed text-slate-600 font-semibold">
               💡 <span className="text-cyan-700 font-extrabold">Tip:</span>{" "}
-              Puedes arrastrar las tarjetas de los ejercicios directamente para
-              reordenarlos, o usar las flechas de ordenación (↑, ↓) en cada
-              formulario.
+              Puedes arrastrar y soltar, o usar las flechas (↑, ↓) para ordenar
+              los formularios.
             </div>
           </div>
 

@@ -4,7 +4,7 @@ import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
 import { useState } from "react";
 import { useExerciseStore } from "../hooks/useExerciseStore";
-import { X, Plus, AlertCircle, Trash2 } from "lucide-react";
+import { X, Plus, AlertCircle, Trash2, Edit3, CheckCircle2, Circle } from "lucide-react";
 
 type Props = {
   id_class: string;
@@ -42,6 +42,7 @@ export default function ReadExerciseForm({ order_index }: Props) {
   }
 
   const [inputValues, setInputValues] = useState<Record<number, string>>({});
+  const [editingQIndex, setEditingQIndex] = useState<number | null>(null);
 
   const updateField = (field: string, value: any) => {
     updateExercise(order_index, { ...exercise, [field]: value });
@@ -115,6 +116,7 @@ export default function ReadExerciseForm({ order_index }: Props) {
       questions: updatedQuestions,
     };
     updateContent("items", [updatedItem]);
+    setEditingQIndex(updatedQuestions.length - 1);
   };
 
   const removeQuestion = (qIndex: number) => {
@@ -203,20 +205,92 @@ export default function ReadExerciseForm({ order_index }: Props) {
               !q.possible_answers ||
               q.possible_answers.length === 0;
 
+            const isEditing = editingQIndex === qIndex;
+
+            if (!isEditing) {
+              return (
+                <div
+                  key={qIndex}
+                  className={`p-4 bg-slate-50/40 rounded-xl border transition-colors ${
+                    isQInvalid ? "border-amber-300 bg-amber-50/5" : "border-slate-200/80"
+                  }`}
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-650 block mb-1">
+                        Pregunta {qIndex + 1}
+                      </span>
+                      <p className="font-semibold text-slate-800 text-sm">
+                        Q: {q.question || <span className="text-slate-400 italic">Pregunta no formulada</span>}
+                      </p>
+                    </div>
+                    <div className="flex gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        className="p-1.5 text-slate-500 hover:text-cyan-600 hover:bg-cyan-500/5 rounded-lg transition-colors cursor-pointer"
+                        onClick={() => setEditingQIndex(qIndex)}
+                        title="Editar pregunta"
+                      >
+                        <Edit3 size={16} />
+                      </button>
+                      <button
+                        type="button"
+                        className="text-slate-400 hover:text-rose-600 transition-colors p-1.5 rounded-lg hover:bg-rose-500/5 cursor-pointer"
+                        onClick={() => removeQuestion(qIndex)}
+                        title="Eliminar pregunta"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mt-3.5">
+                    {(q.possible_answers || []).map((answer: string, idx: number) => {
+                      const isCorrect = answer === q.correct_answer;
+                      return (
+                        <span
+                          key={idx}
+                          className={`px-3 py-1.5 rounded-full text-xs border flex items-center gap-1.5 ${
+                            isCorrect
+                              ? "bg-emerald-500/5 border-emerald-500/30 text-emerald-600 font-semibold"
+                              : "bg-white border-slate-200/80 text-slate-650"
+                          }`}
+                        >
+                          {isCorrect ? (
+                            <CheckCircle2 size={14} className="text-emerald-600" />
+                          ) : (
+                            <Circle size={14} className="text-slate-400" />
+                          )}{" "}
+                          {answer}
+                        </span>
+                      );
+                    })}
+                  </div>
+
+                  {isQInvalid && (
+                    <div className="flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50/50 p-2 rounded-lg border border-amber-100 mt-3.5">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span>
+                        Se requiere una pregunta, respuesta correcta y al menos una posible respuesta.
+                      </span>
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
             return (
               <div
                 key={qIndex}
-                className={`p-4 bg-white rounded-xl border transition-colors ${
-                  isQInvalid ? "border-amber-300 bg-amber-50/5" : "border-slate-200"
-                }`}
+                className="p-4 bg-white rounded-xl border border-cyan-200 bg-cyan-50/5 shadow-sm"
               >
-                <div className="flex justify-between items-center mb-3">
+                <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
                   <span className="text-xs font-extrabold uppercase tracking-wider text-cyan-650">
-                    Pregunta {qIndex + 1}
+                    Editando Pregunta {qIndex + 1}
                   </span>
                   <button
                     type="button"
-                    className="text-slate-400 hover:text-rose-600 transition-colors p-1.5 rounded-lg hover:bg-rose-500/5"
+                    className="text-slate-400 hover:text-rose-600 transition-colors p-1.5 rounded-lg hover:bg-rose-500/5 cursor-pointer"
                     onClick={() => removeQuestion(qIndex)}
                     title="Eliminar pregunta"
                   >
@@ -247,12 +321,12 @@ export default function ReadExerciseForm({ order_index }: Props) {
                       {q.possible_answers?.map((answer: string, idx: number) => (
                         <div
                           key={idx}
-                          className="bg-slate-100 px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-slate-200 text-xs text-slate-700"
+                          className="bg-slate-100 px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-slate-200 text-xs text-slate-700 font-medium"
                         >
                           <span>{answer}</span>
                           <button
                             type="button"
-                            className="text-slate-400 hover:text-rose-600 transition-colors"
+                            className="text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
                             onClick={() => removeAnswer(qIndex, idx)}
                           >
                             <X size={12} />
@@ -275,6 +349,17 @@ export default function ReadExerciseForm({ order_index }: Props) {
                       </span>
                     </div>
                   )}
+
+                  <div className="flex justify-end mt-4 pt-3 border-t border-slate-100">
+                    <Button
+                      type="button"
+                      variant="primary"
+                      onClick={() => setEditingQIndex(null)}
+                      className="py-1.5 px-4 text-xs bg-cyan-500 hover:bg-cyan-600 text-slate-900 border-none"
+                    >
+                      Listo
+                    </Button>
+                  </div>
                 </div>
               </div>
             );
