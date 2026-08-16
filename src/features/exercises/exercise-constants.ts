@@ -96,7 +96,7 @@ export const EXERCISE_DEFAULT_CONTENT: Record<lesson_type, any> = {
   },
   image_gallery: { items: [{ images: [] }] },
   match_names: { items: [{ images: [] }] },
-  match_words: { items: [{ pairs: [{ english: "", spanish: "" }] }] },
+  match_words: { type: "translation", items: [{ pairs: [{ english: "", spanish: "" }] }] },
   overview_session: { items: [{ words: [] }] },
   reading_quiz: {
     items: [{ phrase: "", questions: [] }],
