@@ -1,5 +1,21 @@
 import { GameExerciseType, GameType } from "./games.types";
 
+export interface Point {
+  x: number;
+  y: number;
+}
+
+export interface CaracterPoint {
+  caracter: string;
+  points: Point;
+}
+
+export interface CluePoint {
+  text: string;
+  color: string;
+  points: Point;
+}
+
 export const GAME_EXERCISE_DEFAULT_CONTENT: Record<GameExerciseType, any> = {
   match_name_to_picture: {
     imageUrl: "",
@@ -16,6 +32,12 @@ export const GAME_EXERCISE_DEFAULT_CONTENT: Record<GameExerciseType, any> = {
   },
   match_word: {
     items: [{ wordToMatch: "", correctAnswer: "", options: ["", "", ""] }],
+  },
+  crossword: {
+    positions: [], // Point[]
+    caracter: [], // CaracterPoint[]
+    clue: [], // CluePoint[]
+    backgroundUrl: "",
   },
   timed_typing_challenge: { words: [""], timeLimitSeconds: 30 },
   match_audio_to_text: {
@@ -59,6 +81,7 @@ export const WRITTEN_GAME_OPTIONS = [
   },
   { value: "timed_typing_challenge", label: "Timed typing challenge" },
   { value: "match_word", label: "Match word challenge" },
+  { value: "crossword", label: "Crossword challenge" },
 ];
 
 export const LISTENING_GAME_OPTIONS = [

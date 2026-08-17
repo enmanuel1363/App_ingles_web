@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   Circle,
   AlertCircle,
+  Edit3,
 } from "lucide-react";
 import { previewSrc, isDraftPlaceholder } from "../utils/imagePreview";
 
@@ -42,6 +43,98 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
   const [newOptionsMap, setNewOptionsMap] = useState<
     Record<number, AnswerOption[]>
   >({});
+
+  const [editingQA, setEditingQA] = useState<{
+    itemIndex: number;
+    qIndex: number;
+    question: string;
+    options: AnswerOption[];
+  } | null>(null);
+
+  const startEditingQA = (itemIndex: number, qIndex: number, qa: QA) => {
+    setEditingQA({
+      itemIndex,
+      qIndex,
+      question: qa.question,
+      options: qa.options.map((opt) => ({ ...opt })),
+    });
+  };
+
+  const handleEditOptionText = (index: number, text: string) => {
+    if (!editingQA) return;
+    setEditingQA({
+      ...editingQA,
+      options: editingQA.options.map((opt, i) =>
+        i === index ? { ...opt, text } : opt,
+      ),
+    });
+  };
+
+  const handleEditSetCorrect = (index: number) => {
+    if (!editingQA) return;
+    setEditingQA({
+      ...editingQA,
+      options: editingQA.options.map((opt, i) => ({
+        ...opt,
+        isCorrect: i === index,
+      })),
+    });
+  };
+
+  const addEditOption = () => {
+    if (!editingQA) return;
+    setEditingQA({
+      ...editingQA,
+      options: [...editingQA.options, { text: "", isCorrect: false }],
+    });
+  };
+
+  const removeEditOption = (index: number) => {
+    if (!editingQA) return;
+    const opts = editingQA.options;
+    if (opts.length <= 2) return;
+    const updated = opts.filter((_, i) => i !== index);
+    const hasCorrect = updated.some((o) => o.isCorrect);
+    setEditingQA({
+      ...editingQA,
+      options: hasCorrect
+        ? updated
+        : updated.map((o, i) => ({ ...o, isCorrect: i === 0 })),
+    });
+  };
+
+  const canSaveEdit = () => {
+    if (!editingQA) return false;
+    if (!editingQA.question.trim()) return false;
+    const filled = editingQA.options.filter((o) => o.text.trim() !== "");
+    if (filled.length < 2) return false;
+    return editingQA.options.some((o) => o.isCorrect && o.text.trim() !== "");
+  };
+
+  const saveEditingQA = () => {
+    if (!editingQA) return;
+    const { itemIndex, qIndex, question, options } = editingQA;
+    if (!question.trim()) return;
+    const filledOptions = options
+      .filter((o) => o.text.trim() !== "")
+      .map((o) => ({ text: o.text.trim(), isCorrect: o.isCorrect }));
+
+    if (filledOptions.length < 2) return;
+    if (!filledOptions.some((o) => o.isCorrect)) return;
+
+    const currentQA = [...(items[itemIndex]?.questions || [])];
+    currentQA[qIndex] = {
+      question: question.trim(),
+      options: filledOptions,
+    };
+
+    updateItem(itemIndex, "questions", currentQA);
+    setEditingQA(null);
+  };
+
+  const cancelEditingQA = () => {
+    setEditingQA(null);
+  };
 
   const updateField = (field: string, value: any) => {
     updateExercise(order_index, { ...exercise, [field]: value });
@@ -289,43 +382,147 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
                 Questions & Answers
               </label>
 
-              {questions.map((qa, qIndex) => (
-                <div
-                  key={qIndex}
-                  className="mt-4 p-4 bg-slate-50/50 border border-slate-200/50 rounded-xl flex items-start justify-between gap-4"
-                >
-                  <div style={{ flex: 1 }}>
-                    <p className="font-medium text-slate-700 mb-3">
-                      Q: {qa.question}
-                    </p>
-                    <div className="flex flex-col gap-2">
-                      {(qa.options || []).map((opt, oIndex) => (
-                        <span
-                          key={oIndex}
-                          className={`px-3 py-2 rounded-lg text-sm border flex items-center gap-2 ${
-                            opt.isCorrect
-                              ? "bg-emerald-500/5 border-emerald-500/30 text-emerald-600"
-                              : "bg-slate-50/70 border-slate-200 text-slate-650"
-                          }`}
-                        >
-                          {opt.isCorrect ? (
-                            <CheckCircle2 size={16} />
-                          ) : (
-                            <Circle size={16} />
-                          )}{" "}
-                          {opt.text}
-                        </span>
+              {questions.map((qa, qIndex) => {
+                const isEditingThis =
+                  editingQA &&
+                  editingQA.itemIndex === itemIndex &&
+                  editingQA.qIndex === qIndex;
+
+                if (isEditingThis && editingQA) {
+                  return (
+                    <div
+                      key={qIndex}
+                      className="mt-4 p-5 bg-cyan-50/10 border border-cyan-200/80 rounded-xl space-y-4 shadow-sm animate-fade-in"
+                    >
+                      <FormInput
+                        label="Question"
+                        placeholder="e.g. Where does the dog live?"
+                        value={editingQA.question}
+                        onChangeText={(text) =>
+                          setEditingQA({ ...editingQA, question: text })
+                        }
+                      />
+
+                      <label className="text-xs font-semibold text-slate-650 mt-3 block">
+                        Answer Options
+                      </label>
+                      <p className="text-[10px] text-slate-450 mb-3 font-medium">
+                        Click the circle to mark the correct answer
+                      </p>
+
+                      {editingQA.options.map((opt, i) => (
+                        <div key={i} className="flex items-center gap-3 mb-2.5">
+                          <button
+                            type="button"
+                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center cursor-pointer transition-colors border-slate-500 hover:border-cyan-405 ${
+                              opt.isCorrect ? "border-cyan-405 text-cyan-405" : ""
+                            }`}
+                            onClick={() => handleEditSetCorrect(i)}
+                          >
+                            {opt.isCorrect && (
+                              <div className="w-2.5 h-2.5 rounded-full bg-cyan-405" />
+                            )}
+                          </button>
+                          <div className="flex-1">
+                            <FormInput
+                              placeholder={`Option ${i + 1}${opt.isCorrect ? " (correct)" : ""}`}
+                              value={opt.text}
+                              onChangeText={(text) =>
+                                handleEditOptionText(i, text)
+                              }
+                            />
+                          </div>
+                          {editingQA.options.length > 2 && (
+                            <button
+                              type="button"
+                              className="p-2 text-slate-500 hover:text-rose-600 transition-colors cursor-pointer"
+                              onClick={() => removeEditOption(i)}
+                            >
+                              <X size={18} />
+                            </button>
+                          )}
+                        </div>
                       ))}
+
+                      <div className="flex justify-between items-center mt-2.5">
+                        <button
+                          type="button"
+                          className="text-cyan-650 hover:text-cyan-300 text-xs font-bold flex items-center gap-1 cursor-pointer"
+                          onClick={addEditOption}
+                        >
+                          <Plus size={14} /> Add another option
+                        </button>
+                      </div>
+
+                      <div className="flex gap-2.5 justify-end mt-4 border-t border-slate-100 pt-3">
+                        <Button
+                          variant="outlined"
+                          onClick={cancelEditingQA}
+                          className="py-1.5 px-3 text-xs border-slate-200 text-slate-600 hover:bg-slate-50/50"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="primary"
+                          onClick={saveEditingQA}
+                          disabled={!canSaveEdit()}
+                          className="py-1.5 px-3.5 text-xs bg-cyan-500 hover:bg-cyan-600 text-slate-900 border-none"
+                        >
+                          Save Changes
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div
+                    key={qIndex}
+                    className="mt-4 p-4 bg-slate-50/50 border border-slate-200/50 rounded-xl flex items-start justify-between gap-4"
+                  >
+                    <div style={{ flex: 1 }}>
+                      <p className="font-semibold text-slate-800 mb-3 text-sm">
+                        Q: {qa.question}
+                      </p>
+                      <div className="flex flex-col gap-2">
+                        {(qa.options || []).map((opt, oIndex) => (
+                          <span
+                            key={oIndex}
+                            className={`px-3 py-2 rounded-lg text-sm border flex items-center gap-2 ${
+                              opt.isCorrect
+                                ? "bg-emerald-500/5 border-emerald-500/30 text-emerald-600 font-medium"
+                                : "bg-white border-slate-200/80 text-slate-650"
+                            }`}
+                          >
+                            {opt.isCorrect ? (
+                              <CheckCircle2 size={16} className="text-emerald-600" />
+                            ) : (
+                              <Circle size={16} className="text-slate-400" />
+                            )}{" "}
+                            {opt.text}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex gap-1.5 shrink-0 self-start">
+                      <button
+                        type="button"
+                        className="p-2 text-slate-500 hover:text-cyan-600 hover:bg-cyan-500/5 rounded-lg transition-colors cursor-pointer"
+                        onClick={() => startEditingQA(itemIndex, qIndex, qa)}
+                      >
+                        <Edit3 size={18} />
+                      </button>
+                      <button
+                        type="button"
+                        className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-500/5 rounded-lg transition-colors cursor-pointer"
+                        onClick={() => removeQA(itemIndex, qIndex)}
+                      >
+                        <Trash2 size={18} />
+                      </button>
                     </div>
                   </div>
-                  <button
-                    className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-500/5 rounded-lg transition-colors"
-                    onClick={() => removeQA(itemIndex, qIndex)}
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              ))}
+                );
+              })}
 
               <div className="mt-6 p-5 bg-slate-50 border border-slate-200 rounded-xl">
                 <FormInput

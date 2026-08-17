@@ -3,7 +3,14 @@
 import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
 import { useExerciseStore } from "../hooks/useExerciseStore";
-import { X, Plus, AlertCircle, Info } from "lucide-react";
+import {
+  X,
+  Plus,
+  AlertCircle,
+  Info,
+  Languages,
+  ArrowRightLeft,
+} from "lucide-react";
 
 const EMPTY_PAIR = {
   english: "",
@@ -21,9 +28,10 @@ export default function MatchWordsExerciseForm({ order_index }: Props) {
   const exercise = data[order_index] || {
     name: "",
     description: "",
-    content: { items: [{ pairs: [{ ...EMPTY_PAIR }] }] },
+    content: { type: "translation", items: [{ pairs: [{ ...EMPTY_PAIR }] }] },
   };
 
+  const type = exercise.content?.type || "translation";
   const items = exercise.content?.items || [{ pairs: [{ ...EMPTY_PAIR }] }];
   const firstItem = items[0] || { pairs: [] };
   const pairs = firstItem.pairs || [];
@@ -36,6 +44,34 @@ export default function MatchWordsExerciseForm({ order_index }: Props) {
     updateExercise(order_index, {
       ...exercise,
       content: { ...exercise.content, [field]: value },
+    });
+  };
+
+  const handleTypeChange = (newType: "translation" | "completion") => {
+    const currentDefaultTranslation =
+      "Match the English words with their correct Spanish meanings";
+    const currentDefaultCompletion =
+      "Match the corresponding English words or phrase fragments";
+
+    let newDescription = exercise.description;
+    if (
+      !exercise.description ||
+      exercise.description === currentDefaultTranslation ||
+      exercise.description === currentDefaultCompletion
+    ) {
+      newDescription =
+        newType === "translation"
+          ? currentDefaultTranslation
+          : currentDefaultCompletion;
+    }
+
+    updateExercise(order_index, {
+      ...exercise,
+      description: newDescription,
+      content: {
+        ...exercise.content,
+        type: newType,
+      },
     });
   };
 
@@ -83,17 +119,55 @@ export default function MatchWordsExerciseForm({ order_index }: Props) {
       />
       <FormInput
         label="Descriptive Text / Instructions"
-        placeholder="e.g. Match the English words with their correct Spanish meanings"
+        placeholder={
+          type === "translation"
+            ? "e.g. Match the English words with their correct Spanish meanings"
+            : "e.g. Match the corresponding English words or phrase fragments"
+        }
         value={exercise.description}
         onChangeText={(text) => updateField("description", text)}
         onCopy={() => navigator.clipboard.writeText(exercise.description)}
       />
 
+      {/* Mode Selector */}
+      <div className="space-y-2">
+        <label className="text-[10px] font-bold text-slate-700 tracking-wide uppercase">
+          Exercise Mode
+        </label>
+        <div className="bg-slate-100/60 border border-slate-200/80 p-1 rounded-2xl flex gap-1.5 w-full sm:w-fit">
+          <button
+            type="button"
+            onClick={() => handleTypeChange("translation")}
+            className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
+              type === "translation"
+                ? "bg-white text-cyan-650 border border-slate-200/60 shadow-sm"
+                : "text-slate-500 hover:text-slate-800 hover:bg-white/40 border border-transparent"
+            }`}
+          >
+            <Languages size={15} />
+            Translation (EN - ES)
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTypeChange("completion")}
+            className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
+              type === "completion"
+                ? "bg-white text-cyan-650 border border-slate-200/60 shadow-sm"
+                : "text-slate-500 hover:text-slate-800 hover:bg-white/40 border border-transparent"
+            }`}
+          >
+            <ArrowRightLeft size={15} />
+            Completion (EN - EN)
+          </button>
+        </div>
+      </div>
+
       <div className="flex flex-row items-center gap-2 text-sm text-slate-500 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
         <Info className="w-4 h-4 text-cyan-600 shrink-0" />
         <span className="text-slate-650 font-medium">
-          Define up to 6 word pairs (minimum 2 recommended for a matching
-          challenge).
+          {type === "translation"
+            ? "Define up to 6 word pairs (minimum 2 recommended for a matching challenge)."
+            : "Define up to 6 matching English word/phrase pairs (minimum 2 recommended)."}
         </span>
       </div>
 
@@ -110,16 +184,28 @@ export default function MatchWordsExerciseForm({ order_index }: Props) {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
                 <FormInput
-                  label="English Word"
-                  placeholder="e.g. Apple"
+                  label={
+                    type === "translation"
+                      ? "English Word"
+                      : "English Word (Part 1)"
+                  }
+                  placeholder={
+                    type === "translation" ? "e.g. Apple" : "e.g. Good"
+                  }
                   value={pair.english}
                   onChangeText={(text) =>
                     updatePair(pairIndex, "english", text)
                   }
                 />
                 <FormInput
-                  label="Spanish Meaning"
-                  placeholder="e.g. Manzana"
+                  label={
+                    type === "translation"
+                      ? "Spanish Meaning"
+                      : "English Word (Part 2)"
+                  }
+                  placeholder={
+                    type === "translation" ? "e.g. Manzana" : "e.g. Morning"
+                  }
                   value={pair.spanish}
                   onChangeText={(text) =>
                     updatePair(pairIndex, "spanish", text)
@@ -164,7 +250,9 @@ export default function MatchWordsExerciseForm({ order_index }: Props) {
             <span>
               {isTooFew
                 ? "Se requieren al menos 2 parejas de palabras para crear la lección."
-                : "Todas las palabras en inglés y traducciones al español deben estar llenas."}
+                : type === "translation"
+                  ? "Todas las palabras en inglés y traducciones al español deben estar llenas."
+                  : "Todas las palabras en inglés de ambas columnas deben estar llenas."}
             </span>
           </div>
         )}

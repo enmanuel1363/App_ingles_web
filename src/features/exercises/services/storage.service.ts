@@ -100,6 +100,47 @@ export async function processExerciseFiles<T extends { type: string; content: an
         }
         break;
 
+      case "identify_picture":
+        if (Array.isArray(newContent.items)) {
+          newContent.items = await Promise.all(
+            newContent.items.map(async (item: any) => {
+              let audio_url = item.audio_url;
+
+              // Si es un audio temporal local, lo recuperamos del registro en memoria para subirlo
+              if (typeof audio_url === "string" && audio_url.startsWith("local-audio://")) {
+                const audioId = audio_url.replace("local-audio://", "");
+                const { getAudioFile, removeAudioFile } = await import("../utils/audioRegistry");
+                const localFile = getAudioFile(audioId);
+                if (localFile) {
+                  audio_url = await uploadFile(localFile, "exercise-assets");
+                  removeAudioFile(audioId); // Limpiar del registro tras subir con éxito
+                }
+              } else if (audio_url && typeof audio_url !== "string") {
+                // Fallback por si acaso algún File se filtró directamente
+                audio_url = await uploadFile(audio_url, "exercise-assets");
+              }
+
+              const images = item.images
+                ? await Promise.all(
+                    item.images.map(async (img: any) => ({
+                      ...img,
+                      image_url: img.image_url
+                        ? await uploadFile(img.image_url, "exercise-assets")
+                        : img.image_url,
+                    })),
+                  )
+                : [];
+
+              return {
+                ...item,
+                audio_url,
+                images,
+              };
+            }),
+          );
+        }
+        break;
+
       default:
         break;
     }

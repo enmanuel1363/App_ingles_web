@@ -5,6 +5,7 @@ export type WrittenGameExerciseType =
   | "match_name_to_picture" // Match the name to the picture
   | "identify_picture_reading_name" // Identify the picture's, Just Reading the name
   | "timed_typing_challenge" // Timed typing challenge
+  | "crossword"
   | "match_word"; // Match word challenge
 
 export type ListeningGameExerciseType =

@@ -73,6 +73,12 @@ export const lessonTypeOptions: {
     icon: "PenTool",
     color: "#6366F1",
   },
+  {
+    label: "Identify picture",
+    value: "identify_picture",
+    icon: "Volume2",
+    color: "#0EA5E9",
+  },
 ];
 
 export const EXERCISE_CATEGORIES: Record<lesson_type, string> = {
@@ -88,6 +94,7 @@ export const EXERCISE_CATEGORIES: Record<lesson_type, string> = {
   type_answer: "Validación",
   say_word: "Validación",
   speak: "Validación",
+  identify_picture: "Validación",
 };
 
 export const EXERCISE_DEFAULT_CONTENT: Record<lesson_type, any> = {
@@ -96,7 +103,7 @@ export const EXERCISE_DEFAULT_CONTENT: Record<lesson_type, any> = {
   },
   image_gallery: { items: [{ images: [] }] },
   match_names: { items: [{ images: [] }] },
-  match_words: { items: [{ pairs: [{ english: "", spanish: "" }] }] },
+  match_words: { type: "translation", items: [{ pairs: [{ english: "", spanish: "" }] }] },
   overview_session: { items: [{ words: [] }] },
   reading_quiz: {
     items: [{ phrase: "", questions: [] }],
@@ -109,6 +116,7 @@ export const EXERCISE_DEFAULT_CONTENT: Record<lesson_type, any> = {
   write_word: { items: [{ image_url: "", image_title: "" }] },
   audio_session: { items: [{ cover_image: "", story: "", questions: [] }] },
   speak: { items: [{ correct_answer: "" }] },
+  identify_picture: { items: [{ audio_url: "", images: [] }] },
 };
 
 export const EXERCISE_DEFAULT_DESCRIPTIONS: Record<lesson_type, string> = {
@@ -124,4 +132,5 @@ export const EXERCISE_DEFAULT_DESCRIPTIONS: Record<lesson_type, string> = {
   video_session: "",
   write_word: "",
   speak: "",
+  identify_picture: "Escucha el audio y selecciona la imagen correcta",
 };

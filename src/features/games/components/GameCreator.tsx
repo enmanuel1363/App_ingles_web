@@ -18,6 +18,7 @@ import MatchNameToPictureForm from "./exercises/writing/MatchNameToPictureForm";
 import IdentifyPictureReadingNameForm from "./exercises/writing/IdentifyPictureReadingNameForm";
 import TimedTypingChallengeForm from "./exercises/writing/TimedTypingChallengeForm";
 import MatchWordChallengeForm from "./exercises/writing/MatchWordChallengeForm";
+import CrosswordChallengeForm from "./exercises/writing/CrosswordChallengeForm";
 import AudioChallengeForm from "./exercises/AudioChallengeForm";
 import SpeakingChallengeForm from "./exercises/SpeakingChallengeForm";
 import GameProgressWidget from "./GameProgressWidget";
@@ -202,7 +203,17 @@ export default function GameCreator({
       content.audioUrl = await uploadFile(content.audioUrl, "exercise-audios");
     }
 
-
+    // 4. Crossword background image
+    if (
+      tempEx.type === "crossword" &&
+      content.backgroundUrl &&
+      typeof content.backgroundUrl !== "string"
+    ) {
+      content.backgroundUrl = await uploadFile(
+        content.backgroundUrl,
+        "exercise-assets",
+      );
+    }
 
     return content;
   };
@@ -346,6 +357,14 @@ export default function GameCreator({
         />
       );
     }
+    if (subtype === "crossword") {
+      return (
+        <CrosswordChallengeForm
+          content={content}
+          onChangeContent={onChangeContent}
+        />
+      );
+    }
     if (
       subtype === "match_audio_to_text" ||
       subtype === "identify_audio" ||
@@ -428,7 +447,7 @@ export default function GameCreator({
         {/* Column 1: Game details (3/12 width) */}
         <div className="col-span-1 lg:col-span-3 bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-6 self-start">
           <h3 className="text-sm font-black text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-1.5">
-            <Sparkles className="w-4 h-4 text-[#FF9400]" />
+            <Sparkles className="w-4 h-4 text-tertiary" />
             Game Configuration
           </h3>
 
@@ -484,10 +503,12 @@ export default function GameCreator({
               <option value="mix">Mixed Arena (All combined)</option>
             </select>
           </div>
+
+          <GameProgressWidget exercisesCount={exercises.length} />
         </div>
 
         {/* Column 2: Exercises Manager (6/12 width) */}
-        <div className="col-span-1 lg:col-span-6 space-y-6">
+        <div className="col-span-1 lg:col-span-9 space-y-6">
           <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-sm font-black text-slate-800">
@@ -619,11 +640,6 @@ export default function GameCreator({
               </div>
             )}
           </div>
-        </div>
-
-        {/* Column 3: Progress Tracker Widget (3/12 width) - Pinned/Sticky */}
-        <div className="col-span-1 lg:col-span-3 lg:sticky lg:top-6 self-start">
-          <GameProgressWidget exercisesCount={exercises.length} />
         </div>
       </div>
 
