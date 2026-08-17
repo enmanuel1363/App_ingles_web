@@ -1012,6 +1012,7 @@ export type Database = {
         | "match_names"
         | "match_words"
         | "overview_session"
+        | "identify_picture"
       plan_status: "active" | "canceled" | "past_due"
       resource_type: "video" | "audio"
       reward_type: "gif" | "sticker"
@@ -1168,7 +1169,9 @@ export const Constants = {
         "say_word",
         "audio_session",
         "match_names",
+        "match_words",
         "overview_session",
+        "identify_picture",
       ],
       plan_status: ["active", "canceled", "past_due"],
       resource_type: ["video", "audio"],

@@ -352,6 +352,40 @@ export default function AddExercisesPage({ classId }: Props) {
             );
             return;
           }
+        } else if (ex.type === "identify_picture") {
+          const hasAudio = item.audio_url && String(item.audio_url).trim() !== "";
+          const hasImages = item.images && item.images.length >= 2 && item.images.length <= 6;
+          if (!hasAudio) {
+            setFormError(
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener un audio seleccionado.`,
+            );
+            return;
+          }
+          if (!hasImages) {
+            setFormError(
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener entre 2 y 6 imágenes de opción.`,
+            );
+            return;
+          }
+          let correctCount = 0;
+          for (let imgIdx = 0; imgIdx < item.images.length; imgIdx++) {
+            const img = item.images[imgIdx];
+            if (!img.image_url) {
+              setFormError(
+                `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. La opción #${imgIdx + 1} no tiene una imagen seleccionada.`,
+              );
+              return;
+            }
+            if (img.is_correct) {
+              correctCount++;
+            }
+          }
+          if (correctCount !== 1) {
+            setFormError(
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe marcar exactamente una opción como la correcta (se marcaron ${correctCount}).`,
+            );
+            return;
+          }
         }
       }
     }

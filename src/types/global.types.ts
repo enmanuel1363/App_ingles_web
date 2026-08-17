@@ -12,7 +12,8 @@ export type lesson_type =
   | "audio_session"
   | "match_names"
   | "match_words"
-  | "overview_session";
+  | "overview_session"
+  | "identify_picture";
 
 export type difficulty_level = "low" | "medium" | "hard";
 

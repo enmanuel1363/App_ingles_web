@@ -11,6 +11,7 @@ import StoryTellingExerciseForm from "./components/StoryTellingExerciseForm";
 import TypeAnswerExerciseForm from "./components/TypeAnswerExerciseForm";
 import VideoExerciseForm from "./components/VideoExerciseForm";
 import WriteWordExerciseForm from "./components/WriteWordExerciseForm";
+import IdentifyPictureExerciseForm from "./components/IdentifyPictureExerciseForm";
 
 export const EXERCISE_COMPONENTS: Record<lesson_type, React.ComponentType<any>> = {
   type_answer: TypeAnswerExerciseForm,
@@ -25,4 +26,5 @@ export const EXERCISE_COMPONENTS: Record<lesson_type, React.ComponentType<any>> 
   video_session: VideoExerciseForm,
   reading_quiz: ReadExerciseForm,
   audio_session: StoryTellingExerciseForm,
+  identify_picture: IdentifyPictureExerciseForm,
 };
