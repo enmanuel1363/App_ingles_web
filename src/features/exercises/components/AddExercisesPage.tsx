@@ -325,13 +325,47 @@ export default function AddExercisesPage({ classId }: Props) {
             return;
           }
         } else if (ex.type === "audio_session") {
-          const hasStory = item.story && item.story.trim() !== "";
+          const hasFragments = item.fragments && item.fragments.length > 0;
           const hasQuestions = item.questions && item.questions.length > 0;
-          if (!hasStory || !hasQuestions) {
+          if (!hasFragments || !hasQuestions) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener texto de historia y al menos una pregunta.`,
+              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener al menos un fragmento de historia y al menos una pregunta.`,
             );
             return;
+          }
+          for (let f = 0; f < item.fragments.length; f++) {
+            const frag = item.fragments[f];
+            if (!frag.story || !frag.story.trim()) {
+              setFormError(
+                `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el fragmento #${f + 1} incompleto. Debe tener texto de historia.`,
+              );
+              return;
+            }
+          }
+          for (let q = 0; q < item.questions.length; q++) {
+            const qItem = item.questions[q];
+            if (!qItem.question || !qItem.question.trim()) {
+              setFormError(
+                `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene la pregunta #${q + 1} incompleta. Debe tener texto de pregunta.`,
+              );
+              return;
+            }
+            if (!qItem.options || qItem.options.length < 2) {
+              setFormError(
+                `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene la pregunta #${q + 1} incompleta. Debe tener al menos 2 opciones de respuesta.`,
+              );
+              return;
+            }
+            if (
+              qItem.fragment_index === undefined ||
+              qItem.fragment_index < 0 ||
+              qItem.fragment_index >= item.fragments.length
+            ) {
+              setFormError(
+                `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene la pregunta #${q + 1} asociada a un fragmento inválido o inexistente.`,
+              );
+              return;
+            }
           }
         } else if (ex.type === "type_answer") {
           const hasDescriptive =
