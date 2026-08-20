@@ -36,7 +36,7 @@ export default function GoalsPage() {
 
   const handleSaveGoal = async (
     goalData: CreateGoalDTO,
-    rewardId?: string
+    rewardId?: string,
   ): Promise<boolean> => {
     if (selectedGoal) {
       // Editar
@@ -97,14 +97,14 @@ export default function GoalsPage() {
   return (
     <div className="space-y-8 animate-fade-in text-slate-800">
       {/* Top Header Card */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl p-6 md:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
+      <div className="border-b border-slate-200/80 p-2 md:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="space-y-1">
           <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-            <Target className="w-8 h-8 text-primary-dark" />
             Objetivos de Aprendizaje
           </h1>
           <p className="text-sm font-semibold text-slate-500">
-            Define los hitos y metas que motivarán el progreso diario de tus estudiantes.
+            Define los hitos y metas que motivarán el progreso diario de tus
+            estudiantes.
           </p>
         </div>
 
@@ -116,7 +116,9 @@ export default function GoalsPage() {
             className="p-3"
             aria-label="Refrescar lista"
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
+            />
           </Button>
 
           <Button
@@ -169,9 +171,12 @@ export default function GoalsPage() {
             <Target className="w-8 h-8 text-slate-400 stroke-[1.5]" />
           </div>
           <div className="space-y-1.5">
-            <h3 className="text-lg font-bold text-slate-800">No hay objetivos</h3>
+            <h3 className="text-lg font-bold text-slate-800">
+              No hay objetivos
+            </h3>
             <p className="text-sm font-semibold text-slate-400 max-w-xs mx-auto">
-              Define tu primer objetivo académico para asociarle recompensas y motivar a tus alumnos.
+              Define tu primer objetivo académico para asociarle recompensas y
+              motivar a tus alumnos.
             </p>
           </div>
           <Button

@@ -4,11 +4,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClass, deleteClass, fetchClasses, updateClass } from '../services/class.service';
 import { ClassModel } from '../class.types';
 
-export const useClasses = (id_unit: string) => {
+export const useClasses = (id_unit: string, initialClasses?: ClassModel[]) => {
   return useQuery<ClassModel[]>({
     queryKey: ["classes", id_unit],
     queryFn: () => fetchClasses(id_unit),
     enabled: !!id_unit,
+    initialData: initialClasses,
   });
 };
 

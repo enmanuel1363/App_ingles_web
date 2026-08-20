@@ -4,11 +4,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createUnit, fetchUnits, updateUnit, deleteUnit } from '../services/unit.service';
 import { Unit } from '../unit.types';
 
-export const useUnits = (courseId: string) => {
+export const useUnits = (courseId: string, initialUnits?: Unit[]) => {
   return useQuery<Unit[]>({
     queryKey: ["units", courseId],
     queryFn: () => fetchUnits(courseId),
     enabled: !!courseId,
+    initialData: initialUnits,
   });
 };
 

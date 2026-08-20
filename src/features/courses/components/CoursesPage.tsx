@@ -10,8 +10,8 @@ import { Loader2, AlertCircle, BookOpen } from "lucide-react";
 import { CourseWithGrade } from "../course.types";
 import { useModal } from "@/components/ui/ModalProvider";
 
-export default function CoursesPage() {
-  const { courses, isLoading, error, deleteCourse } = useCourses();
+export default function CoursesPage({ initialCourses }: { initialCourses?: CourseWithGrade[] }) {
+  const { courses, isLoading, error, deleteCourse } = useCourses(initialCourses);
   const { showAlert } = useModal();
   
   const [selectedCourse, setSelectedCourse] = useState<CourseWithGrade | null>(null);

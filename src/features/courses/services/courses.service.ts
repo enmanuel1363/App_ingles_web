@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { Course, CourseWithGrade, Grade } from '../course.types';
+import { createCourseAction, updateCourseAction, deleteCourseAction } from '../courses.actions';
 
 export const coursesService = {
   async getGrades(): Promise<Grade[]> {
@@ -35,37 +36,29 @@ export const coursesService = {
   async createCourse(
     course: Omit<Course, "id" | "created_at" | "updated_at">,
   ): Promise<Course> {
-    const { data, error } = await supabase
-      .from("course")
-      .insert(course)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+    const result = await createCourseAction(course);
+    if (!result.success) {
+      throw new Error(result.error);
+    }
+    return result.data!;
   },
 
   async updateCourse(
     id: string,
     course: Partial<Omit<Course, "id" | "created_at" | "updated_at">>,
   ): Promise<Course> {
-    const { data, error } = await supabase
-      .from("course")
-      .update(course)
-      .eq("id", id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+    const result = await updateCourseAction(id, course);
+    if (!result.success) {
+      throw new Error(result.error);
+    }
+    return result.data!;
   },
 
   async deleteCourse(id: string): Promise<void> {
-    const { error } = await supabase
-      .from("course")
-      .delete()
-      .eq("id", id);
-
-    if (error) throw error;
+    const result = await deleteCourseAction(id);
+    if (!result.success) {
+      throw new Error(result.error);
+    }
   },
 };
+

@@ -3,45 +3,43 @@ import { DashboardStats, RecentActivity, TopStreak } from "../dashboard.types";
 
 export const dashboardService = {
   async getStats(): Promise<DashboardStats> {
-    // 1. Estudiantes Activos (Conteo en profiles con role = student)
-    const { count: studentsCount, error: studentsError } = await supabase
-      .from("profiles")
-      .select("*", { count: "exact", head: true })
-      .eq("role", "student");
+    // Ejecutar todas las consultas en paralelo para evitar cascadas de red (waterfalls)
+    const [studentsRes, classesRes, rewardsRes, scoresRes] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("*", { count: "exact", head: true })
+        .eq("role", "student"),
+      supabase
+        .from("class")
+        .select("*", { count: "exact", head: true }),
+      supabase
+        .from("reward_student")
+        .select("*", { count: "exact", head: true }),
+      supabase
+        .from("exercise_student")
+        .select("score")
+    ]);
 
-    if (studentsError) throw studentsError;
+    if (studentsRes.error) throw studentsRes.error;
+    if (classesRes.error) throw classesRes.error;
+    if (rewardsRes.error) throw rewardsRes.error;
+    if (scoresRes.error) throw scoresRes.error;
 
-    // 2. Lecciones/Clases Creadas
-    const { count: classesCount, error: classesError } = await supabase
-      .from("class")
-      .select("*", { count: "exact", head: true });
-
-    if (classesError) throw classesError;
-
-    // 3. Recompensas reclamadas por los estudiantes
-    const { count: rewardsCount, error: rewardsError } = await supabase
-      .from("reward_student")
-      .select("*", { count: "exact", head: true });
-
-    if (rewardsError) throw rewardsError;
-
-    // 4. Rendimiento promedio (Promedio de score en exercise_student)
-    const { data: scoresData, error: scoresError } = await supabase
-      .from("exercise_student")
-      .select("score");
-
-    if (scoresError) throw scoresError;
+    const studentsCount = studentsRes.count || 0;
+    const classesCount = classesRes.count || 0;
+    const rewardsCount = rewardsRes.count || 0;
+    const scoresData = scoresRes.data || [];
 
     let averageScore = 0;
-    if (scoresData && scoresData.length > 0) {
+    if (scoresData.length > 0) {
       const sum = scoresData.reduce((acc, curr) => acc + (curr.score || 0), 0);
       averageScore = parseFloat((sum / scoresData.length).toFixed(1));
     }
 
     return {
-      activeStudents: studentsCount || 0,
-      totalClasses: classesCount || 0,
-      claimedRewards: rewardsCount || 0,
+      activeStudents: studentsCount,
+      totalClasses: classesCount,
+      claimedRewards: rewardsCount,
       averageScore,
     };
   },

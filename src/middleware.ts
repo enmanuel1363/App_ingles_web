@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) =>
-            request.cookies.set({ name, value, ...options })
+            request.cookies.set({ name, value, ...options }),
           );
           response = NextResponse.next({
             request: {
@@ -26,18 +26,18 @@ export async function middleware(request: NextRequest) {
             },
           });
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set({ name, value, ...options })
+            response.cookies.set({ name, value, ...options }),
           );
         },
       },
-    }
+    },
   );
 
+  // 1. Validar la sesión de manera segura utilizando getUser (verificación criptográfica de la firma del JWT)
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const isRoot = request.nextUrl.pathname === "/";
   const isAdminRoute =
     request.nextUrl.pathname.startsWith("/dashboard") ||
     request.nextUrl.pathname.startsWith("/courses") ||
@@ -46,33 +46,8 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/rewards");
 
   if (isAdminRoute) {
-    if (!session) {
+    if (!user) {
       return NextResponse.redirect(new URL("/", request.url));
-    }
-
-    // Obtener rol del perfil en base de datos
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", session.user.id)
-      .maybeSingle();
-
-    if (profile?.role !== "admin") {
-      // Si tiene sesión pero no es admin, redirigir
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-  }
-
-  if (isRoot && session) {
-    // Si está en el login pero ya tiene sesión de administrador, redirigir al dashboard
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", session.user.id)
-      .maybeSingle();
-
-    if (profile?.role === "admin") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }
 
