@@ -90,12 +90,22 @@ export async function processExerciseFiles<T extends { type: string; content: an
       case "audio_session":
         if (Array.isArray(newContent.items)) {
           newContent.items = await Promise.all(
-            newContent.items.map(async (item: any) => ({
-              ...item,
-              cover_image: item.cover_image
-                ? await uploadFile(item.cover_image, "exercise-assets")
-                : item.cover_image,
-            })),
+            newContent.items.map(async (item: any) => {
+              const updatedFragments = item.fragments
+                ? await Promise.all(
+                    item.fragments.map(async (frag: any) => ({
+                      ...frag,
+                      cover_image: frag.cover_image
+                        ? await uploadFile(frag.cover_image, "exercise-assets")
+                        : frag.cover_image,
+                    })),
+                  )
+                : [];
+              return {
+                ...item,
+                fragments: updatedFragments,
+              };
+            }),
           );
         }
         break;

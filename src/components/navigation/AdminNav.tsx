@@ -1,14 +1,9 @@
 "use client";
 
-import {
-  signOut,
-  getSession,
-  onAuthStateChange,
-} from "@/features/login/services/auth.service";
-import useAuthStore from "@/store/useAuthStore";
+import { signOut } from "@/features/login/services/auth.service";
+import { useAuth } from "@/features/login/hooks/useAuth";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   BookOpen,
@@ -30,58 +25,19 @@ const NAV_ITEMS = [
 export default function AdminNav({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { reset } = useAuthStore();
+  const { session } = useAuth();
 
-  const [currentUser, setCurrentUser] = useState<{
-    name: string;
-    email: string;
-    avatarUrl?: string;
-  } | null>(null);
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadUser() {
-      try {
-        const { session } = await getSession();
-        if (session?.user && active) {
-          const metadata = session.user.user_metadata;
-          setCurrentUser({
-            name: metadata?.full_name || metadata?.name || "Usuario",
-            email: session.user.email || "",
-            avatarUrl: metadata?.avatar_url || undefined,
-          });
-        }
-      } catch (e) {
-        console.error("Failed to load session user info in nav", e);
+  const userMetadata = session?.user?.user_metadata;
+  const currentUser = session?.user
+    ? {
+        name: userMetadata?.full_name || userMetadata?.name || "Usuario",
+        email: session.user.email || "",
+        avatarUrl: userMetadata?.avatar_url || undefined,
       }
-    }
-
-    loadUser();
-
-    // Subscribe to real-time auth state updates
-    const subscription = onAuthStateChange((session) => {
-      if (session?.user && active) {
-        const metadata = session.user.user_metadata;
-        setCurrentUser({
-          name: metadata?.full_name || metadata?.name || "Usuario",
-          email: session.user.email || "",
-          avatarUrl: metadata?.avatar_url || undefined,
-        });
-      } else if (!session && active) {
-        setCurrentUser(null);
-      }
-    });
-
-    return () => {
-      active = false;
-      subscription.unsubscribe();
-    };
-  }, []);
+    : null;
 
   const handleLogout = async () => {
     await signOut();
-    reset();
     router.replace("/");
   };
 

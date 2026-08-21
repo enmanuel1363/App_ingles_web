@@ -10,7 +10,6 @@ import {
 import type { user_role } from "@/types/global.types";
 import type { Session } from "@supabase/supabase-js";
 import React, { useCallback, useEffect, useState, createContext, useContext } from "react";
-import useAuthStore from "@/store/useAuthStore";
 
 type AuthContextType = {
   session: Session | null;
@@ -28,7 +27,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userRole, setUserRole] = useState<user_role | "">("");
   const [loading, setLoading] = useState(true);
   const [authLoading, setAuthLoading] = useState(false);
-  const { setUser, reset } = useAuthStore();
 
   useEffect(() => {
     let active = true;
@@ -41,16 +39,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const role = await fetchUserRole(initialSession.user.id);
         if (active) {
           setUserRole(role);
-          if (role === "admin") {
-            setUser("admin");
-          } else {
-            reset();
-          }
         }
       } else {
         if (active) {
           setUserRole("");
-          reset();
         }
       }
       if (active) setLoading(false);
@@ -64,7 +56,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (nextSession === null) {
         setSession(null);
         setUserRole("");
-        reset();
         return;
       }
 
@@ -73,11 +64,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const role = await fetchUserRole(nextSession.user.id);
         if (active) {
           setUserRole(role);
-          if (role === "admin") {
-            setUser("admin");
-          } else {
-            reset();
-          }
         }
       }
     });
@@ -86,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       active = false;
       sub.unsubscribe();
     };
-  }, [setUser, reset]);
+  }, []);
 
   const handlePasswordLogin = useCallback(
     async (email: string, password: string) => {
@@ -101,7 +87,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (role !== "admin") {
             return "Esta cuenta no tiene acceso de administrador";
           }
-          setUser("admin");
           setUserRole("admin");
         }
         return null;
@@ -111,7 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setAuthLoading(false);
       }
     },
-    [setUser],
+    [],
   );
 
   const handleGoogleLogin = useCallback(async () => {

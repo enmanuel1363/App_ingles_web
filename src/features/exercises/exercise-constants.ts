@@ -113,8 +113,8 @@ export const EXERCISE_DEFAULT_CONTENT: Record<lesson_type, any> = {
     items: [{ correct_answer: "", clues: [], descriptive_text: "" }],
   },
   video_session: { items: [{ video_url: "", disclaimer: "" }] },
-  write_word: { items: [{ image_url: "", image_title: "" }] },
-  audio_session: { items: [{ cover_image: "", story: "", questions: [] }] },
+  write_word: { mode: "free_input", items: [{ image_url: "", image_title: "" }] },
+  audio_session: { items: [{ fragments: [{ cover_image: "", story: "" }], questions: [] }] },
   speak: { items: [{ correct_answer: "" }] },
   identify_picture: { items: [{ audio_url: "", images: [] }] },
 };

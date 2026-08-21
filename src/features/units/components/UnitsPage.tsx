@@ -14,11 +14,12 @@ import { useModal } from "@/components/ui/ModalProvider";
 type Props = {
   courseId: string;
   courseTitle?: string;
+  initialUnits?: Unit[];
 };
 
-export default function UnitsPage({ courseId, courseTitle }: Props) {
+export default function UnitsPage({ courseId, courseTitle, initialUnits }: Props) {
   const router = useRouter();
-  const { data, isLoading } = useUnits(courseId);
+  const { data, isLoading } = useUnits(courseId, initialUnits);
   const { mutate: deleteUnit } = useDeleteUnit();
   const units = data || [];
   const { showAlert } = useModal();

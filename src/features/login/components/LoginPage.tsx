@@ -1,7 +1,6 @@
 "use client";
 
 import { useAuth } from "@/features/login/hooks/useAuth";
-import useAuthStore from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Loader2, AlertCircle, Lock, ShieldCheck, LogIn } from "lucide-react";
@@ -9,18 +8,16 @@ import Button from "@/components/ui/Button";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setUser } = useAuthStore();
   const { session, userRole, loading, authLoading, handleGoogleLogin } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (session && userRole === "admin") {
-      setUser("admin");
       router.replace("/dashboard");
     } else if (session && userRole !== "" && userRole !== "admin") {
       setError("Tu cuenta no tiene permisos de administrador.");
     }
-  }, [session, userRole, setUser, router]);
+  }, [session, userRole, router]);
 
   const onGoogleLogin = async () => {
     setError(null);

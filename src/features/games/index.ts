@@ -5,6 +5,7 @@ export { default as GameManager } from "./components/GameManager";
 export { default as GameCard } from "./components/GameCard";
 export { default as GameRoomHost } from "./components/GameRoomHost";
 export { default as GameCreator } from "./components/GameCreator";
+export { default as GamesPageClient } from "./components/GamesPageClient";
 
 // Services
 export * from "./services/games.service";

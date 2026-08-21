@@ -23,7 +23,9 @@ export default function RewardsPage() {
   const { showAlert } = useModal();
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedReward, setSelectedReward] = useState<RewardWithGoal | null>(null);
+  const [selectedReward, setSelectedReward] = useState<RewardWithGoal | null>(
+    null,
+  );
 
   const handleEditClick = (reward: RewardWithGoal) => {
     setSelectedReward(reward);
@@ -35,7 +37,10 @@ export default function RewardsPage() {
     setModalVisible(true);
   };
 
-  const handleSaveReward = async (rewardData: CreateRewardDTO, file?: File): Promise<boolean> => {
+  const handleSaveReward = async (
+    rewardData: CreateRewardDTO,
+    file?: File,
+  ): Promise<boolean> => {
     if (selectedReward) {
       // Editar
       const res = await updateReward(selectedReward.id, rewardData, file);
@@ -95,14 +100,14 @@ export default function RewardsPage() {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Top Header Card */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl p-6 md:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
+      <div className="border-b border-slate-200/80  p-2 md:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 ">
         <div className="space-y-1">
           <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-            <Gift className="w-8 h-8 text-primary-dark" />
             Gestión de Recompensas
           </h1>
           <p className="text-sm font-semibold text-slate-500">
-            Administra los stickers y GIFs animados que los estudiantes pueden desbloquear completando objetivos.
+            Administra los stickers y GIFs animados que los estudiantes pueden
+            desbloquear completando objetivos.
           </p>
         </div>
 
@@ -114,7 +119,9 @@ export default function RewardsPage() {
             className="p-3"
             aria-label="Refrescar lista"
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
+            />
           </Button>
 
           <Button
@@ -167,9 +174,12 @@ export default function RewardsPage() {
             <Gift className="w-8 h-8 text-slate-400 stroke-[1.5]" />
           </div>
           <div className="space-y-1.5">
-            <h3 className="text-lg font-bold text-slate-800">No hay recompensas</h3>
+            <h3 className="text-lg font-bold text-slate-800">
+              No hay recompensas
+            </h3>
             <p className="text-sm font-semibold text-slate-400 max-w-xs mx-auto">
-              Crea tu primera recompensa para que los estudiantes comiencen a coleccionarlas.
+              Crea tu primera recompensa para que los estudiantes comiencen a
+              coleccionarlas.
             </p>
           </div>
           <Button

@@ -3,16 +3,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { coursesService } from '../services/courses.service';
 
-export const useCourses = () => {
+import { CourseWithGrade } from "../course.types";
+
+export const useCourses = (initialCourses?: CourseWithGrade[]) => {
   const queryClient = useQueryClient();
 
   const {
-    data: courses = [],
+    data: courses = initialCourses || [],
     isLoading: isLoadingCourses,
     error: coursesError,
   } = useQuery({
     queryKey: ["courses"],
     queryFn: coursesService.getCourses,
+    initialData: initialCourses,
   });
 
   const {
@@ -100,7 +103,8 @@ export const useCourses = () => {
   return {
     courses,
     grades,
-    isLoading: isLoadingCourses || isLoadingGrades,
+    isLoading: isLoadingCourses,
+    isLoadingGrades,
     error: coursesError?.message || gradesError?.message || null,
     createCourse: handleCreateCourse,
     updateCourse: handleUpdateCourse,
@@ -109,3 +113,4 @@ export const useCourses = () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] }),
   };
 };
+

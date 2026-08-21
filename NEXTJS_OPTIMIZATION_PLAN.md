@@ -36,19 +36,6 @@ Actualmente, todas las vistas principales de administración (`DashboardPage`, `
 
 ---
 
-## 3. Server Actions
-
-El proyecto realiza todas las operaciones de escritura (INSERT, UPDATE, DELETE) desde el cliente a través del cliente de navegador de Supabase (`createBrowserClient`).
-
-### Oportunidades para Server Actions
-Se identifican oportunidades críticas para migrar las siguientes mutaciones a Server Actions:
-1. **Creación, Edición y Eliminación de Cursos, Unidades y Clases:**
-   - Actualmente expuestas directamente al cliente. Con Server Actions se pueden autorizar a nivel de servidor y aplicar validación de esquemas robusta con `zod`.
-2. **Batching de Ejercicios y Juegos:**
-   - La lógica de creación y edición secuencial de juegos/ejercicios que involucra eliminar e insertar registros de forma separa debe encapsularse en un Server Action que maneje transacciones atómicas de forma segura.
-
----
-
 ## 4. Data Fetching y Caching
 
 ### Análisis de la Estrategia de Fetching
@@ -66,20 +53,6 @@ El fetching de datos en el cliente utiliza React Query con un `staleTime` global
 
 ### Backend / Servidor
 - **Consultas redundantes en Middleware:** Cada petición HTTP a rutas protegidas consulta la base de datos para validar el rol del usuario, ralentizando el TTFB.
-
----
-
-## 6. Estado de la Aplicación
-
-- **Doble Sincronización:** El rol del usuario se almacena en el estado de Zustand (`useAuthStore`) y en el contexto de React (`AuthProvider`), duplicando callbacks y arriesgando inconsistencias de estado.
-- **Duplicación de Event Listeners:** `AdminNav` configura su propio listener `onAuthStateChange` duplicando el comportamiento del `AuthProvider` global. Esto crea fugas de memoria potenciales y ejecuciones innecesarias.
-
----
-
-## 7. Routing, Layouts y Navegación
-
-- **Next.js Middleware:** La middleware actual tiene un gran acoplamiento con la base de datos.
-- **Ruta de Juegos no estandarizada:** `src/app/(admin)/games/page.tsx` está marcada como `"use client"`, rompiendo la convención del proyecto de mantener las páginas de ruta libres de lógica pesada de cliente.
 
 ---
 
@@ -116,118 +89,6 @@ Se utiliza la siguiente matriz de priorización:
 ## 12. Análisis de Evidencia y Oportunidades Confirmadas
 
 A continuación se detallan las 10 oportunidades clave detectadas en la auditoría del código fuente:
-
-### [P1] Eliminar consultas de base de datos en el Middleware
-
-- **Archivo:** [`src/middleware.ts`](file:///C:/proyectos/React/App_ingles_web/src/middleware.ts)
-- **Componente:** `middleware`
-- **Situación actual:** En las líneas 54-58 y 68-72 se realiza la consulta `.from("profiles").select("role")` en cada solicitud coincendente.
-- **Problema:** Middleware corre en el Edge. Hacer consultas SQL en cada cambio de ruta o carga de assets ralentiza drásticamente el Time to First Byte (TTFB), consume rápidamente el pool de conexiones de base de datos y aumenta la latencia.
-- **Evidencia:** 
-  ```typescript
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", session.user.id)
-    .maybeSingle();
-  ```
-- **Recomendación:** Limitar el middleware a validar la existencia de una sesión de usuario. El control de rol de administrador debe realizarse una única vez a nivel de Server Component en el layout principal (`(admin)/layout.tsx`).
-- **Implementación propuesta:**
-  1. Simplificar `middleware.ts` eliminando las consultas SQL a `profiles`.
-  2. En `src/app/(admin)/layout.tsx`, instanciar el cliente de base de datos de servidor, consultar el rol y, si no es admin, realizar una redirección utilizando la función nativa `redirect("/")` de Next.js.
-- **Beneficio:** Reducción sustancial del TTFB y optimización drástica de conexiones de base de datos.
-- **Riesgos:** Ninguno.
-- **Esfuerzo:** S
-- **Prioridad:** P1
-
----
-
-### [P1] Reemplazar getSession con getUser en servidores y middleware
-
-- **Archivo:** [`src/middleware.ts`](file:///C:/proyectos/React/App_ingles_web/src/middleware.ts), [`src/components/navigation/AdminNav.tsx`](file:///C:/proyectos/React/App_ingles_web/src/components/navigation/AdminNav.tsx), [`src/features/login/services/auth.service.ts`](file:///C:/proyectos/React/App_ingles_web/src/features/login/services/auth.service.ts)
-- **Componente:** `middleware`, `AdminNav`, `getSession`
-- **Situación actual:** Se llama a `supabase.auth.getSession()` para verificar si el usuario tiene una sesión activa.
-- **Problema:** `getSession` lee la cookie local pero no realiza una verificación criptográfica del JWT con el servidor de Supabase Auth. Un atacante podría falsificar las cookies locales con un JWT expirado o manipulado y evadir la verificación del middleware.
-- **Evidencia:** 
-  - `middleware.ts` línea 38: `const { data: { session } } = await supabase.auth.getSession();`
-  - `AdminNav.tsx` línea 46: `const { session } = await getSession();`
-- **Recomendación:** Reemplazar todas las llamadas de servidor a `getSession()` por `supabase.auth.getUser()`, el cual valida el token de forma segura contra la API de Supabase.
-- **Implementación propuesta:**
-  Actualizar `middleware.ts` para extraer al usuario mediante `supabase.auth.getUser()`. Si el usuario no existe, redirigir al login.
-- **Beneficio:** Seguridad robusta contra suplantación de identidad (JWT forgery).
-- **Riesgos:** Puede generar una petición de red adicional si el token requiere refresco inmediato (comportamiento esperado por seguridad).
-- **Esfuerzo:** XS
-- **Prioridad:** P1
-
----
-
-### [P1] Evitar sobrecarga y over-fetching al calcular el promedio en el Dashboard
-
-- **Archivo:** [`src/features/dashboard/services/dashboard.service.ts`](file:///C:/proyectos/React/App_ingles_web/src/features/dashboard/services/dashboard.service.ts)
-- **Componente:** `dashboardService.getStats`
-- **Situación actual:** Para calcular el rendimiento promedio, se descargan todas las filas de la tabla `exercise_student` en el cliente.
-- **Problema:** Si hay miles de filas en la tabla `exercise_student`, esta consulta descargará megabytes de información innecesaria y saturará el navegador al procesarla con un `reduce()` de JavaScript.
-- **Evidencia:**
-  ```typescript
-  const { data: scoresData, error: scoresError } = await supabase
-    .from("exercise_student")
-    .select("score");
-  ```
-- **Recomendación:** Calcular el promedio directamente en la base de datos utilizando la función de agregación SQL `avg` o crear un RPC/Vista que resuelva las métricas unificadas.
-- **Implementación propuesta:**
-  Modificar la consulta para obtener el promedio directamente mediante la sintaxis de Supabase:
-  ```typescript
-  const { data, error } = await supabase
-    .from("exercise_student")
-    .select("score.avg()");
-  ```
-- **Beneficio:** Transferencia de datos casi nula (solo un valor decimal) y cálculo instantáneo del lado del motor de base de datos.
-- **Riesgos:** Ninguno.
-- **Esfuerzo:** XS
-- **Prioridad:** P1
-
----
-
-### [P2] Resolver consultas secuenciales y cascadas de red (waterfalls) en el Dashboard
-
-- **Archivo:** [`src/features/dashboard/services/dashboard.service.ts`](file:///C:/proyectos/React/App_ingles_web/src/features/dashboard/services/dashboard.service.ts)
-- **Componente:** `dashboardService.getStats`
-- **Situación actual:** Las llamadas a `profiles`, `class`, `reward_student` y `exercise_student` se realizan secuencialmente con bloqueos `await` consecutivos.
-- **Problema:** La latencia total es la suma de los tiempos de respuesta de cada una de las 4 peticiones individuales, incrementando los tiempos de carga en conexiones lentas.
-- **Evidencia:** `dashboard.service.ts` líneas 7-30 (cuatro llamadas `await supabase.from(...)` secuenciales).
-- **Recomendación:** Paralelizar las consultas utilizando `Promise.all` o reestructurar el servicio para que las consultas se realicen a nivel de servidor.
-- **Implementación propuesta:**
-  ```typescript
-  const [studentsRes, classesRes, rewardsRes, scoresRes] = await Promise.all([
-    supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "student"),
-    supabase.from("class").select("*", { count: "exact", head: true }),
-    supabase.from("reward_student").select("*", { count: "exact", head: true }),
-    supabase.from("exercise_student").select("score") // o promedio agregado
-  ]);
-  ```
-- **Beneficio:** Reducción del tiempo de respuesta global del servicio de estadísticas a más de la mitad (equivalente a la llamada más lenta).
-- **Riesgos:** Ninguno.
-- **Esfuerzo:** S
-- **Prioridad:** P2
-
----
-
-### [P2] Eliminar duplicación del escuchador de autenticación en AdminNav
-
-- **Archivo:** [`src/components/navigation/AdminNav.tsx`](file:///C:/proyectos/React/App_ingles_web/src/components/navigation/AdminNav.tsx)
-- **Componente:** `AdminNav`
-- **Situación actual:** `AdminNav` tiene su propia lógica de `useEffect` con suscripciones de autenticación en tiempo real (`onAuthStateChange` y `getSession()`).
-- **Problema:** Al estar renderizado dentro de `AuthProvider` en `providers.tsx`, esta suscripción es completamente redundante. Causa peticiones extra e innecesarias a la API de Supabase y posibles inconsistencias de sincronización de UI.
-- **Evidencia:** [`AdminNav.tsx`](file:///C:/proyectos/React/App_ingles_web/src/components/navigation/AdminNav.tsx) líneas 41-80.
-- **Recomendación:** Eliminar el `useEffect` completo de `AdminNav` y consumir directamente el estado `session` de la sesión compartida del hook `useAuth()`.
-- **Implementación propuesta:**
-  1. Importar `useAuth` en `AdminNav.tsx`.
-  2. Sustituir el estado local `currentUser` por valores derivados de `session` provisto por `useAuth()`.
-  3. Eliminar el bloque de inicialización y suscripción redundante del `useEffect`.
-- **Beneficio:** Código más limpio, menor uso de memoria al eliminar escuchadores activos innecesarios y eliminación de consultas duplicadas al cargar el dashboard.
-- **Riesgos:** Ajustar levemente el tipado de los datos del usuario extraídos del contexto.
-- **Esfuerzo:** S
-- **Prioridad:** P2
 
 ---
 

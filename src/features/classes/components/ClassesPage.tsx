@@ -15,6 +15,7 @@ type Props = {
   unitId: string;
   unitName?: string;
   unitOrder?: string;
+  initialClasses?: ClassModel[];
 };
 
 export default function ClassesPage({
@@ -22,12 +23,13 @@ export default function ClassesPage({
   unitId,
   unitName,
   unitOrder,
+  initialClasses,
 }: Props) {
   const router = useRouter();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [classToEdit, setClassToEdit] = useState<ClassModel | null>(null);
 
-  const { data, isLoading, error } = useClasses(unitId);
+  const { data, isLoading, error } = useClasses(unitId, initialClasses);
   const { mutateAsync: deleteClassMutation } = useDeleteClass();
   const { confirm, showAlert } = useModal();
 
