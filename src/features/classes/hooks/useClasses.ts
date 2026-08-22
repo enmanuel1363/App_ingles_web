@@ -1,8 +1,13 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createClass, deleteClass, fetchClasses, updateClass } from '../services/class.service';
-import { ClassModel } from '../class.types';
+import {
+  createClass,
+  deleteClass,
+  fetchClasses,
+  updateClass,
+} from "../services/class.service";
+import { ClassModel } from "../class.types";
 
 export const useClasses = (id_unit: string, initialClasses?: ClassModel[]) => {
   return useQuery<ClassModel[]>({
@@ -32,8 +37,10 @@ export const useUpdateClass = () => {
 
   return useMutation({
     mutationFn: updateClass,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["classes", data.id_unit] });
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["classes", variables.id_unit],
+      });
     },
     onError: (error) => {
       console.error("Error al actualizar la clase:", error);
@@ -48,7 +55,9 @@ export const useDeleteClass = () => {
     mutationFn: ({ classId, unitId }: { classId: string; unitId: string }) =>
       deleteClass(classId, unitId),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["classes", variables.unitId] });
+      queryClient.invalidateQueries({
+        queryKey: ["classes", variables.unitId],
+      });
     },
     onError: (error) => {
       console.error("Error al eliminar la clase:", error);
