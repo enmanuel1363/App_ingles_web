@@ -268,3 +268,28 @@ export async function deleteGame(gameId: string): Promise<void> {
   if (error) throw error;
 }
 
+/**
+ * Fetch all game exercises of a specific subtype to allow copying/cloning.
+ */
+export async function getExercisesByType(type: string): Promise<any[]> {
+  const { data, error } = await supabase
+    .from("exercise_game")
+    .select(`
+      id,
+      name,
+      description,
+      type,
+      content,
+      points_reward,
+      games (
+        name
+      )
+    `)
+    .eq("type", type)
+    .limit(50);
+
+  if (error) throw error;
+  return data || [];
+}
+
+

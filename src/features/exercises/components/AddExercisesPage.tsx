@@ -150,12 +150,12 @@ export default function AddExercisesPage({ classId }: Props) {
 
   const introValid = categoryCounts["Introducción"] >= 2;
   const valValid = categoryCounts["Validación"] >= 3;
-  const totalValid = data.length <= 12;
+  const totalValid = data.length <= 15;
   const hasDraft = drafts && !!drafts[classId];
 
   const handleAddAnother = () => {
-    if (data.length >= 12) {
-      setFormError("Maximum of 12 exercises allowed in total.");
+    if (data.length >= 15) {
+      setFormError("Maximum of 15 exercises allowed in total.");
       return;
     }
     addExercise({
@@ -387,8 +387,10 @@ export default function AddExercisesPage({ classId }: Props) {
             return;
           }
         } else if (ex.type === "identify_picture") {
-          const hasAudio = item.audio_url && String(item.audio_url).trim() !== "";
-          const hasImages = item.images && item.images.length >= 2 && item.images.length <= 6;
+          const hasAudio =
+            item.audio_url && String(item.audio_url).trim() !== "";
+          const hasImages =
+            item.images && item.images.length >= 2 && item.images.length <= 6;
           if (!hasAudio) {
             setFormError(
               `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener un audio seleccionado.`,
@@ -432,8 +434,8 @@ export default function AddExercisesPage({ classId }: Props) {
       setFormError("At least 3 exercises of type Validación are required.");
       return;
     }
-    if (sanitizedData.length > 12) {
-      setFormError("Maximum of 12 exercises allowed in total.");
+    if (sanitizedData.length > 15) {
+      setFormError("Maximum of 15 exercises allowed in total.");
       return;
     }
 
@@ -636,7 +638,7 @@ export default function AddExercisesPage({ classId }: Props) {
                 >
                   {data.length}{" "}
                   <span className="text-xs font-semibold text-slate-400">
-                    / 12
+                    / 15
                   </span>
                 </span>
               </div>
@@ -648,7 +650,7 @@ export default function AddExercisesPage({ classId }: Props) {
                       : "bg-rose-500"
                   }`}
                   style={{
-                    width: `${Math.min((data.length / 12) * 100, 100)}%`,
+                    width: `${Math.min((data.length / 15) * 100, 100)}%`,
                   }}
                 />
               </div>
@@ -712,7 +714,7 @@ export default function AddExercisesPage({ classId }: Props) {
                     Máximo de ejercicios
                   </p>
                   <p className="text-[10px] text-slate-500 leading-normal mt-0.5">
-                    No exceder los 12 elementos por lección.
+                    No exceder los 15 elementos por lección.
                   </p>
                 </div>
               </div>
