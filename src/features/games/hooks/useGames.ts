@@ -10,6 +10,7 @@ import {
   getStudentGameLogs,
   updateGameWithExercises,
   deleteGame,
+  getExercisesByType,
 } from "../services/games.service";
 import { CreateGameDTO, CreateExerciseGameDTO, CreateGameStudentLogDTO } from "../games.types";
 
@@ -141,4 +142,16 @@ export const useDeleteGame = () => {
     },
   });
 };
+
+/**
+ * Hook to retrieve all exercises of a specific subtype to allow copying/cloning.
+ */
+export const useGetExercisesByType = (type: string) => {
+  return useQuery({
+    queryKey: ["exercises", "by-type", type],
+    queryFn: () => getExercisesByType(type),
+    enabled: !!type,
+  });
+};
+
 
