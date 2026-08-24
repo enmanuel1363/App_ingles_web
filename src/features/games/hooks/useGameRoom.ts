@@ -99,9 +99,11 @@ export const useGameRoom = (roomCode?: string) => {
       });
 
     // Subscribe and track the host (teacher) presence
-    roomChannel.subscribe(async (status) => {
+    roomChannel.subscribe(async (status, err) => {
       if (status === "SUBSCRIBED") {
         await roomChannel.track({ role: "host", username: "Teacher (Host)" });
+      } else if (status === "CHANNEL_ERROR") {
+        console.error("Realtime subscription failed:", err);
       }
     });
 
