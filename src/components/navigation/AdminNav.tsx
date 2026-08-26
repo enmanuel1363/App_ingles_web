@@ -13,6 +13,8 @@ import {
   LogOut,
   Target,
 } from "lucide-react";
+import Image from "next/image";
+import Logo from "../../assets/logo.png";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", Icon: LayoutDashboard },
@@ -48,11 +50,10 @@ export default function AdminNav({ children }: { children: React.ReactNode }) {
         <div>
           {/* Brand header */}
           <div className="flex items-center space-x-3 mb-8 px-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-400 to-lime-300 flex items-center justify-center font-bold text-slate-950 shadow-sm shadow-cyan-500/10">
-              E
-            </div>
+            <Image src={Logo} alt="App Logo" width={40} height={40} priority />
+
             <span className="text-xl font-extrabold bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent tracking-tight">
-              My English app
+              Zóe Admin
             </span>
           </div>
 
