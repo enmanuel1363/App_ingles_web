@@ -10,7 +10,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "My English app - Admin",
+  title: "Zóe App - Admin",
   description: "Panel de administración de App_ingles",
 };
 
