@@ -36,6 +36,9 @@ function getGoalTypeBadgeClass(type: string): string {
     time: "bg-amber-50 text-amber-700 border-amber-100",
     classes: "bg-indigo-50 text-indigo-700 border-indigo-100",
     streak: "bg-orange-50 text-orange-700 border-orange-100",
+    approvals: "bg-violet-50 text-violet-700 border-violet-100",
+    collection: "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-100",
+    ranking: "bg-yellow-50 text-yellow-700 border-yellow-100",
   };
   return classes[type] || "bg-slate-50 text-slate-700 border-slate-100";
 }
@@ -101,7 +104,19 @@ export default function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
           <span className="text-xs font-extrabold text-slate-800 text-right truncate max-w-[180px]" title={goal.targetLabel || ""}>
             {goal.type === "lesson" || goal.type === "classes" 
               ? (goal.targetLabel || "No especificado")
-              : `${targetValue} ${goal.type === "points" ? "XP" : goal.type === "time" ? "Segs" : "veces"}`}
+              : `${targetValue} ${
+                  goal.type === "points" 
+                    ? "XP" 
+                    : goal.type === "time" 
+                      ? "Segs" 
+                      : goal.type === "ranking" 
+                        ? "º Lugar" 
+                        : goal.type === "collection" 
+                          ? "Premios" 
+                          : goal.type === "approvals" 
+                            ? "Lecciones" 
+                            : "veces"
+                }`}
           </span>
         </div>
 
