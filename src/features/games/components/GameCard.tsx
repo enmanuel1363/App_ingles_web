@@ -20,6 +20,7 @@ export default function GameCard({
   onEdit,
   onDelete,
 }: GameCardProps) {
+
   // Select matching icon and background color for the game type
   const getTypeConfig = (type: string) => {
     switch (type) {

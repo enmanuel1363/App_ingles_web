@@ -114,3 +114,106 @@ export const getSubtypes = (
       ];
   }
 };
+
+export const GAME_TYPE_CONFIG: Record<
+  GameType,
+  { label: string; description: string; badgeColor: string; textColor: string; borderColor: string }
+> = {
+  write: {
+    label: "Escritura",
+    description: "Retos de vocabulario, ortografía y crucigramas",
+    badgeColor: "bg-[#24DFE2]/20",
+    textColor: "text-cyan-900",
+    borderColor: "border-[#24DFE2]/40",
+  },
+  listen: {
+    label: "Escucha",
+    description: "Retos de comprensión auditiva y velocidad",
+    badgeColor: "bg-[#B4FF2B]/25",
+    textColor: "text-lime-950",
+    borderColor: "border-[#B4FF2B]/40",
+  },
+  speak: {
+    label: "Habla",
+    description: "Retos de pronunciación oral y trabalenguas",
+    badgeColor: "bg-[#FF9400]/20",
+    textColor: "text-amber-950",
+    borderColor: "border-[#FF9400]/40",
+  },
+  mix: {
+    label: "Mixto",
+    description: "Desafíos combinados de todas las destrezas",
+    badgeColor: "bg-slate-100",
+    textColor: "text-slate-800",
+    borderColor: "border-slate-300",
+  },
+};
+
+export const SUBTYPE_METADATA: Record<
+  GameExerciseType,
+  { label: string; gameType: GameType; shortDesc: string }
+> = {
+  match_name_to_picture: {
+    label: "Match Name to Picture",
+    gameType: "write",
+    shortDesc: "Emparejar nombre con imagen",
+  },
+  identify_picture_reading_name: {
+    label: "Identify Picture by Name",
+    gameType: "write",
+    shortDesc: "Identificar imagen leyendo el nombre",
+  },
+  timed_typing_challenge: {
+    label: "Timed Typing Challenge",
+    gameType: "write",
+    shortDesc: "Mecanografía rápida contrarreloj",
+  },
+  match_word: {
+    label: "Match Word Challenge",
+    gameType: "write",
+    shortDesc: "Emparejar palabras y significados",
+  },
+  crossword: {
+    label: "Crossword Challenge",
+    gameType: "write",
+    shortDesc: "Crucigrama interactivo con pistas",
+  },
+  match_audio_to_text: {
+    label: "Match Audio to Text",
+    gameType: "listen",
+    shortDesc: "Escuchar audio y emparejar con texto",
+  },
+  identify_audio: {
+    label: "Identify Audio",
+    gameType: "listen",
+    shortDesc: "Identificar opción correcta por audio",
+  },
+  fast_audio_mode: {
+    label: "Fast Audio Mode",
+    gameType: "listen",
+    shortDesc: "Comprensión auditiva a velocidad rápida",
+  },
+  speak_before_timer: {
+    label: "Speak Before Timer Ends",
+    gameType: "speak",
+    shortDesc: "Pronunciar frase antes del tiempo límite",
+  },
+  say_5_words_quickly: {
+    label: "Say 5 Words Quickly",
+    gameType: "speak",
+    shortDesc: "Decir 5 palabras rápidamente en el micro",
+  },
+  tongue_twister_challenge: {
+    label: "Tongue Twister Challenge",
+    gameType: "speak",
+    shortDesc: "Desafío de trabalenguas con intentos",
+  },
+};
+
+export const getSubtypeLabel = (subtype: string): string => {
+  return (
+    SUBTYPE_METADATA[subtype as GameExerciseType]?.label ||
+    subtype.replace(/_/g, " ")
+  );
+};
+

@@ -11,6 +11,9 @@ import {
   updateGameWithExercises,
   deleteGame,
   getExercisesByType,
+  getAllExercisesWithGame,
+  getGamesWithExercises,
+  cloneGame,
 } from "../services/games.service";
 import { CreateGameDTO, CreateExerciseGameDTO, CreateGameStudentLogDTO } from "../games.types";
 
@@ -153,5 +156,51 @@ export const useGetExercisesByType = (type: string) => {
     enabled: !!type,
   });
 };
+
+/**
+ * Hook to retrieve all exercises across all games with game metadata for library/copying.
+ */
+export const useGetAllExercisesWithGame = () => {
+  return useQuery({
+    queryKey: ["all-game-exercises"],
+    queryFn: getAllExercisesWithGame,
+  });
+};
+
+/**
+ * Hook to retrieve all games with their exercises for full game copying.
+ */
+export const useGetGamesWithExercises = () => {
+  return useQuery({
+    queryKey: ["games-with-exercises"],
+    queryFn: getGamesWithExercises,
+  });
+};
+
+/**
+ * Hook to clone an entire game with its exercises.
+ */
+export const useCloneGame = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      gameId,
+      currentTeacherId,
+    }: {
+      gameId: string;
+      currentTeacherId?: string;
+    }) => cloneGame(gameId, currentTeacherId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["games"] });
+      queryClient.invalidateQueries({ queryKey: ["games-with-exercises"] });
+      queryClient.invalidateQueries({ queryKey: ["all-game-exercises"] });
+    },
+    onError: (error) => {
+      console.error("Error cloning game:", error);
+    },
+  });
+};
+
 
 

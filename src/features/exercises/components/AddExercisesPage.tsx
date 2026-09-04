@@ -727,10 +727,6 @@ export default function AddExercisesPage({ classId }: Props) {
                   <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
                   <span>Borrador Local Activo</span>
                 </div>
-                <p className="text-[10px] text-amber-700 leading-relaxed font-semibold">
-                  Tienes cambios locales guardados en este navegador que no se
-                  han guardado en el servidor.
-                </p>
                 <button
                   type="button"
                   onClick={handleDiscardDraft}
@@ -743,22 +739,21 @@ export default function AddExercisesPage({ classId }: Props) {
             )}
 
             {/* Quick Helper Banner */}
-            <div className="p-3 bg-slate-55 rounded-xl border border-slate-150 text-[10px] leading-relaxed text-slate-600 font-semibold">
+            {/* <div className="p-3 bg-slate-55 rounded-xl border border-slate-150 text-[10px] leading-relaxed text-slate-600 font-semibold">
               💡 <span className="text-cyan-700 font-extrabold">Tip:</span>{" "}
               Puedes arrastrar y soltar, o usar las flechas (↑, ↓) para ordenar
               los formularios.
-            </div>
+            </div> */}
           </div>
-
-          {/* Footer action buttons */}
-          <div className="flex flex-col gap-4 border-t border-slate-200 pt-6 pb-12">
+          {/* action buttons */}
+          <div className="flex flex-col gap-4 border-slate-200">
             <Button
               variant="outlined"
               onClick={handleAddAnother}
               disabled={isSaving}
               leftIcon={<Plus className="w-4 h-4" />}
             >
-              Add other exercises
+              Add exercise
             </Button>
             <Button
               variant="primary"
@@ -767,7 +762,7 @@ export default function AddExercisesPage({ classId }: Props) {
               disabled={isSaving}
               leftIcon={!isSaving && <Save className="w-4 h-4" />}
             >
-              {isProcessing ? "Subiendo archivos…" : "Save exercises"}
+              {isProcessing ? "Subiendo archivos…" : "Save All"}
             </Button>
           </div>
         </div>

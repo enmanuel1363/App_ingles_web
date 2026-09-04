@@ -9,7 +9,10 @@ import {
   GameRoom,
   CreateGameRoomDTO,
   GameRoomStatus,
+  ExerciseGameWithGame,
+  GameWithExercises,
 } from "../games.types";
+
 
 /**
  * Fetch all active games.
@@ -291,5 +294,103 @@ export async function getExercisesByType(type: string): Promise<any[]> {
   if (error) throw error;
   return data || [];
 }
+
+/**
+ * Fetch all game exercises joined with their parent game data,
+ * allowing filtering and categorization by game type and exercise subtype.
+ */
+export async function getAllExercisesWithGame(): Promise<ExerciseGameWithGame[]> {
+  const { data, error } = await supabase
+    .from("exercise_game")
+    .select(`
+      id,
+      id_game,
+      name,
+      description,
+      type,
+      content,
+      order_index,
+      points_reward,
+      created_at,
+      games (
+        id,
+        name,
+        type,
+        description,
+        is_active
+      )
+    `)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return (data || []) as unknown as ExerciseGameWithGame[];
+}
+
+/**
+ * Fetch all games with their exercises to allow copying full games.
+ */
+export async function getGamesWithExercises(): Promise<GameWithExercises[]> {
+  const { data, error } = await supabase
+    .from("games")
+    .select(`
+      id,
+      name,
+      description,
+      type,
+      created_by,
+      is_active,
+      created_at,
+      updated_at,
+      exercises:exercise_game (
+        id,
+        id_game,
+        name,
+        description,
+        type,
+        content,
+        order_index,
+        points_reward
+      )
+    `)
+    .eq("is_active", true)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return (data || []) as unknown as GameWithExercises[];
+}
+
+/**
+ * Clones a complete game along with all its exercises.
+ */
+export async function cloneGame(
+  gameId: string,
+  currentTeacherId?: string
+): Promise<{ game: Game; exercises: ExerciseGame[] }> {
+  const originalGame = await getGameById(gameId);
+  if (!originalGame) throw new Error("Original game not found");
+
+  const originalExercises = await getExercisesByGameId(gameId);
+
+  const newGameData: CreateGameDTO = {
+    name: `${originalGame.name} (Copia)`,
+    description: originalGame.description || null,
+    type: originalGame.type,
+    created_by: currentTeacherId || originalGame.created_by,
+    is_active: true,
+  };
+
+  const clonedExercises: Omit<CreateExerciseGameDTO, "id_game">[] =
+    originalExercises.map((ex, idx) => ({
+      name: ex.name,
+      description: ex.description || null,
+      type: ex.type,
+      content: JSON.parse(JSON.stringify(ex.content)),
+      order_index: idx,
+      points_reward: ex.points_reward || 10,
+    }));
+
+  return createGameWithExercises(newGameData, clonedExercises);
+}
+
 
 

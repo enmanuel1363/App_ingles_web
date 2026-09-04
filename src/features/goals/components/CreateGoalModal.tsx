@@ -22,6 +22,9 @@ const GOAL_TYPES: { value: GoalType; label: string }[] = [
   { value: "time", label: "Tiempo récord (segundos)" },
   { value: "classes", label: "Curso completado" },
   { value: "streak", label: "Días de racha activa" },
+  { value: "approvals", label: "Lecciones aprobadas (acumuladas)" },
+  { value: "collection", label: "Colección de recompensas" },
+  { value: "ranking", label: "Puesto en la Liga (Top N)" },
 ];
 
 export default function CreateGoalModal({
@@ -241,12 +244,18 @@ export default function CreateGoalModal({
             <div className="flex flex-col space-y-1.5">
               <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-450">
                 {type === "time"
-                  ? "Tiempo Récord (Segundos)"
+                  ? "Tiempo Récord en Juego (Segundos)"
                   : type === "lesson"
                     ? "Selecciona la Lección"
                     : type === "classes"
                       ? "Selecciona el Curso"
-                      : "Meta Requerida"}
+                      : type === "approvals"
+                        ? "Lecciones a Aprobar"
+                        : type === "collection"
+                          ? "Recompensas a Acumular"
+                          : type === "ranking"
+                            ? "Puesto Máximo en Liga (Top N)"
+                            : "Meta Requerida"}
               </label>
               {type === "lesson" ? (
                 <select
