@@ -47,6 +47,21 @@ export type ExerciseGame<T = any> = {
   updated_at?: string | null;
 };
 
+export type ExerciseGameWithGame<T = any> = ExerciseGame<T> & {
+  games?: {
+    id: string;
+    name: string;
+    type: GameType;
+    description?: string | null;
+    is_active?: boolean;
+  } | null;
+};
+
+export type GameWithExercises = Game & {
+  exercises: ExerciseGame[];
+};
+
+
 export type GameStudentLog<T = any> = {
   id?: string;
   id_student_profile: string;

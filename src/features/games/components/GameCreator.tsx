@@ -6,15 +6,16 @@ import {
   useGetGameById,
   useGetExercisesByGame,
   useUpdateGameWithExercises,
-  useGetExercisesByType,
 } from "../hooks/useGames";
-import { GameType } from "../games.types";
+import { GameType, ExerciseGame } from "../games.types";
 import { getDefaultContentSchema, getSubtypes } from "../games.constants";
 import { uploadFile } from "@/features/exercises/services/storage.service";
 import Button from "@/components/ui/Button";
 import FormInput from "@/components/ui/FormInput";
 import AlertModal from "@/components/ui/AlertModal";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
+import CopyGameContentModal from "./CopyGameContentModal";
+
 import MatchNameToPictureForm from "./exercises/writing/MatchNameToPictureForm";
 import IdentifyPictureReadingNameForm from "./exercises/writing/IdentifyPictureReadingNameForm";
 import TimedTypingChallengeForm from "./exercises/writing/TimedTypingChallengeForm";
@@ -66,13 +67,13 @@ export default function GameCreator({
   );
   const [isUploading, setIsUploading] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [importFilterSubtype, setImportFilterSubtype] = useState<string | "all">("all");
+  const [importFilterGameType, setImportFilterGameType] = useState<GameType | "all">("all");
+  const activeExercise =
+    activeExerciseIndex !== null && exercises[activeExerciseIndex]
+      ? exercises[activeExerciseIndex]
+      : null;
 
-  // Fetch exercises of the active subtype for importing
-  const activeExercise = activeExerciseIndex !== null && exercises[activeExerciseIndex] ? exercises[activeExerciseIndex] : null;
-  const activeSubtype = activeExercise ? activeExercise.type : "";
-  const { data: libraryExercises = [], isLoading: isLoadingLibrary } = useGetExercisesByType(
-    isImportModalOpen ? activeSubtype : ""
-  );
 
   // Modal states
   const [alertConfig, setAlertConfig] = useState<{
@@ -178,20 +179,42 @@ export default function GameCreator({
     setActiveExerciseIndex(activeExerciseIndex + 1);
   };
 
-  const handleImportExercise = (sourceExercise: any) => {
-    if (activeExerciseIndex === null) return;
+  const handleCopyExerciseFromLibrary = (
+    sourceExercise: ExerciseGame,
+    mode: "replace" | "append",
+  ) => {
     const clonedContent = JSON.parse(JSON.stringify(sourceExercise.content));
 
-    const updated = [...exercises];
-    updated[activeExerciseIndex] = {
-      ...updated[activeExerciseIndex],
-      name: sourceExercise.name,
-      description: sourceExercise.description || "",
-      points_reward: sourceExercise.points_reward || 10,
-      content: clonedContent,
-    };
-    setExercises(updated);
-    setIsImportModalOpen(false);
+    if (mode === "replace" && activeExerciseIndex !== null) {
+      const updated = [...exercises];
+      updated[activeExerciseIndex] = {
+        name: sourceExercise.name,
+        description: sourceExercise.description || "",
+        type: sourceExercise.type,
+        points_reward: sourceExercise.points_reward || 10,
+        content: clonedContent,
+      };
+      setExercises(updated);
+    } else {
+      if (exercises.length >= 8) {
+        setAlertConfig({
+          visible: true,
+          title: "Límite Alcanzado",
+          message: "¡Un juego puede tener un máximo de 8 ejercicios!",
+          type: "info",
+        });
+        return;
+      }
+      const newEx: TempExercise = {
+        name: sourceExercise.name,
+        description: sourceExercise.description || "",
+        type: sourceExercise.type,
+        points_reward: sourceExercise.points_reward || 10,
+        content: clonedContent,
+      };
+      setExercises((prev) => [...prev, newEx]);
+      setActiveExerciseIndex(exercises.length);
+    }
   };
 
   const handleRemoveExercise = (index: number) => {
@@ -564,11 +587,25 @@ export default function GameCreator({
         {/* Column 2: Exercises Manager (6/12 width) */}
         <div className="col-span-1 lg:col-span-9 space-y-6">
           <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
               <h3 className="text-sm font-black text-slate-800">
                 Exercises & Questions ({exercises.length} of 8)
               </h3>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Button
+                  variant="outlined"
+                  leftIcon={<Sparkles className="w-3.5 h-3.5 text-[#24DFE2]" />}
+                  onClick={() => {
+                    setImportFilterSubtype("all");
+                    setImportFilterGameType(type);
+                    setIsImportModalOpen(true);
+                  }}
+                  className="text-slate-900 font-extrabold text-xs py-2 px-3 rounded-xl border-slate-200 hover:bg-slate-50"
+                  title="Copiar ejercicios de juegos ya creados categorizados por tipo y subtipo"
+                >
+                  Copiar Ejercicios
+                </Button>
+
                 {activeExerciseIndex !== null && (
                   <Button
                     variant="secondary"
@@ -591,11 +628,36 @@ export default function GameCreator({
             </div>
 
             {exercises.length === 0 ? (
-              <div className="text-center py-10 border-2 border-dashed border-slate-200 rounded-xl">
-                <p className="text-slate-400 text-xs font-semibold">
-                  No exercises added yet. Click "Add Exercise" above to get
-                  started.
+              <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-2xl p-6">
+                <Sparkles className="w-10 h-10 text-cyan-400 mx-auto mb-3 animate-pulse" />
+                <p className="text-slate-800 text-sm font-black">
+                  No hay ejercicios en este juego todavía.
                 </p>
+                <p className="text-slate-400 text-xs mt-1 mb-5 font-medium">
+                  Comienza agregando un ejercicio en blanco o copia ejercicios de juegos existentes categorizados por tipo y subtipo.
+                </p>
+                <div className="flex items-center justify-center gap-3">
+                  <Button
+                    variant="primary"
+                    leftIcon={<Plus className="w-4 h-4" />}
+                    onClick={handleAddExercise}
+                    className="text-slate-950 font-black text-xs"
+                  >
+                    Crear desde cero
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    leftIcon={<Copy className="w-4 h-4 text-[#24DFE2]" />}
+                    onClick={() => {
+                      setImportFilterSubtype("all");
+                      setImportFilterGameType(type);
+                      setIsImportModalOpen(true);
+                    }}
+                    className="text-slate-900 font-bold text-xs border-slate-200 hover:bg-slate-50"
+                  >
+                    Copiar ejercicios de otros juegos
+                  </Button>
+                </div>
               </div>
             ) : (
               <div className="flex flex-wrap gap-2 mb-4">
@@ -643,10 +705,15 @@ export default function GameCreator({
                       </label>
                       <button
                         type="button"
-                        onClick={() => setIsImportModalOpen(true)}
+                        onClick={() => {
+                          setImportFilterSubtype(exercises[activeExerciseIndex].type);
+                          setImportFilterGameType(type);
+                          setIsImportModalOpen(true);
+                        }}
                         className="text-cyan-600 hover:text-cyan-700 font-extrabold text-[10px] flex items-center gap-1 transition-all uppercase tracking-wider bg-transparent border-0 cursor-pointer"
+                        title="Buscar ejercicios de este subtipo u otros para copiar contenido"
                       >
-                        <Sparkles className="w-3 h-3 text-[#24DFE2]" /> Import from Library
+                        <Sparkles className="w-3 h-3 text-[#24DFE2]" /> Copiar de Librería
                       </button>
                     </div>
                     <select
@@ -746,141 +813,19 @@ export default function GameCreator({
         }
       />
 
-      {/* Import Exercise Modal */}
-      {isImportModalOpen && activeExercise && (
-        <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-2xl w-full shadow-xl relative border border-slate-100 max-h-[85vh] flex flex-col">
-            {/* Modal Close */}
-            <button
-              onClick={() => setIsImportModalOpen(false)}
-              className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-slate-50 text-slate-400 hover:text-slate-700 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {/* Modal Header */}
-            <div className="border-b border-slate-100 pb-4 mb-4">
-              <span className="text-[10px] font-black text-[#24DFE2] uppercase tracking-widest">
-                Exercise Library
-              </span>
-              <h3 className="text-lg font-black text-slate-900">
-                Import "{getSubtypes(type).find(s => s.value === activeExercise.type)?.label || activeExercise.type}" Exercise
-              </h3>
-              <p className="text-slate-500 text-xs mt-1 font-medium">
-                Select an existing exercise of this subtype from other games to copy its configuration.
-              </p>
-            </div>
-
-            {/* Modal Content / List */}
-            <div className="flex-1 overflow-y-auto space-y-3 pr-1 min-h-[250px]">
-              {isLoadingLibrary ? (
-                <div className="flex flex-col items-center justify-center py-12 space-y-3">
-                  <div className="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin" />
-                  <p className="text-slate-550 text-xs font-semibold">
-                    Fetching library exercises...
-                  </p>
-                </div>
-              ) : libraryExercises.length === 0 ? (
-                <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-2xl">
-                  <Sparkles className="w-8 h-8 text-slate-300 mx-auto mb-2 animate-pulse" />
-                  <p className="text-slate-400 text-xs font-semibold">
-                    No exercises of this type found in other games yet.
-                  </p>
-                  <p className="text-slate-350 text-[10px] mt-0.5 font-medium">
-                    Exercises will appear here once you create them in other games.
-                  </p>
-                </div>
-              ) : (
-                libraryExercises.map((libEx) => (
-                  <div
-                    key={libEx.id}
-                    onClick={() => handleImportExercise(libEx)}
-                    className="p-4 border border-slate-200/60 rounded-2xl bg-slate-50/50 hover:bg-slate-50 hover:border-cyan-400 cursor-pointer transition-all duration-200 group text-left"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h4 className="text-xs font-black text-slate-800 group-hover:text-cyan-600 transition-colors">
-                          {libEx.name}
-                        </h4>
-                        {libEx.description && (
-                          <p className="text-slate-500 text-[10px] mt-0.5 font-medium leading-relaxed">
-                            {libEx.description}
-                          </p>
-                        )}
-                        <div className="mt-2 text-[10px] text-slate-400 font-semibold flex items-center gap-1.5">
-                          {libEx.games?.name && (
-                            <>
-                              <span>Game: {libEx.games.name}</span>
-                              <span className="w-1 h-1 rounded-full bg-slate-300" />
-                            </>
-                          )}
-                          <span>Reward: {libEx.points_reward} pts</span>
-                        </div>
-                      </div>
-                      <div className="shrink-0 bg-white border border-slate-200/50 text-[9px] font-black px-2 py-1 rounded-lg uppercase tracking-wider text-slate-400 group-hover:border-cyan-200 group-hover:text-cyan-500 transition-colors">
-                        Select
-                      </div>
-                    </div>
-
-                    {/* Preview of Content */}
-                    <div className="mt-2.5 pt-2 border-t border-slate-100 text-[10px] text-slate-450 leading-relaxed font-mono truncate">
-                      {getExerciseContentPreview(libEx.type, libEx.content)}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="border-t border-slate-100 pt-4 mt-4 flex justify-end">
-              <Button
-                variant="secondary"
-                onClick={() => setIsImportModalOpen(false)}
-                className="text-slate-900 font-extrabold text-xs"
-              >
-                Close Library
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Copy Game Content Modal (Categorized by Type & Subtype) */}
+      <CopyGameContentModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onCopyExercise={handleCopyExerciseFromLibrary}
+        activeExerciseIndex={activeExerciseIndex}
+        currentExercisesCount={exercises.length}
+        maxExercises={8}
+        initialGameType={importFilterGameType}
+        initialSubtype={importFilterSubtype}
+      />
     </div>
   );
 }
 
-/**
- * Generates a clean text preview based on exercise subtype configuration.
- */
-function getExerciseContentPreview(type: string, content: any): string {
-  if (!content) return "";
-  try {
-    switch (type) {
-      case "match_name_to_picture":
-        return `Correct Answer: "${content.correctAnswer || ''}" | Options: ${Array.isArray(content.options) ? content.options.filter(Boolean).join(', ') : ''}`;
-      case "identify_picture_reading_name":
-        return `Correct Answer: "${content.correctAnswer || ''}" | Options: ${Array.isArray(content.imageOptions) ? content.imageOptions.map((o: any) => o.label).filter(Boolean).join(', ') : ''}`;
-      case "match_word":
-        return `Items: ${Array.isArray(content.items) ? content.items.map((i: any) => `${i.wordToMatch || ''} (${i.correctAnswer || ''})`).join(', ') : ''}`;
-      case "timed_typing_challenge":
-        return `Time Limit: ${content.timeLimitSeconds || 30}s | Words: ${Array.isArray(content.words) ? content.words.join(', ') : ''}`;
-      case "crossword":
-        return `Clues: ${Array.isArray(content.clue) ? content.clue.map((c: any) => c.text).join(', ') : ''}`;
-      case "match_audio_to_text":
-        return `Items: ${Array.isArray(content.items) ? content.items.map((i: any) => `${i.phrase || ''} (${i.answer || ''})`).join(', ') : ''}`;
-      case "identify_audio":
-      case "fast_audio_mode":
-        return `Correct Answer: "${content.correctAnswer || ''}" | Options: ${Array.isArray(content.options) ? content.options.filter(Boolean).join(', ') : ''}`;
-      case "speak_before_timer":
-        return `Phrase: "${content.phraseToSpeak || ''}" | Time: ${content.durationSeconds || 15}s`;
-      case "say_5_words_quickly":
-        return `Words: ${Array.isArray(content.words) ? content.words.filter(Boolean).join(', ') : ''}`;
-      case "tongue_twister_challenge":
-        return `Tongue Twister: "${content.tongueTwister || ''}" | Attempts: ${content.maxAttempts || 3}`;
-      default:
-        return "";
-    }
-  } catch (e) {
-    return "Error parsing content preview";
-  }
-}
 
