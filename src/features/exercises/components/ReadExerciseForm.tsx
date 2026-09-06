@@ -4,7 +4,15 @@ import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
 import { useState } from "react";
 import { useExerciseStore } from "../hooks/useExerciseStore";
-import { X, Plus, AlertCircle, Trash2, Edit3, CheckCircle2, Circle } from "lucide-react";
+import {
+  X,
+  Plus,
+  AlertCircle,
+  Trash2,
+  Edit3,
+  CheckCircle2,
+  Circle,
+} from "lucide-react";
 
 type Props = {
   id_class: string;
@@ -21,16 +29,17 @@ export default function ReadExerciseForm({ order_index }: Props) {
   };
 
   const rawItems = exercise.content?.items || [];
-  
+
   // Enforce exactly one item structure
   const firstItem = rawItems[0] || {};
   const phrase = firstItem.phrase || "";
-  
+
   // Migration of old format if present
   let questions = firstItem.questions || [];
   if (
     questions.length === 0 &&
-    (firstItem.correct_answer || (firstItem.possible_answers && firstItem.possible_answers.length > 0))
+    (firstItem.correct_answer ||
+      (firstItem.possible_answers && firstItem.possible_answers.length > 0))
   ) {
     questions = [
       {
@@ -65,7 +74,7 @@ export default function ReadExerciseForm({ order_index }: Props) {
 
   const updateQuestionField = (qIndex: number, field: string, value: any) => {
     const updatedQuestions = questions.map((q: any, i: number) =>
-      i === qIndex ? { ...q, [field]: value } : q
+      i === qIndex ? { ...q, [field]: value } : q,
     );
     const updatedItem = {
       phrase: phrase,
@@ -92,12 +101,18 @@ export default function ReadExerciseForm({ order_index }: Props) {
       }
     }
 
-    newPossibles = Array.from(new Set(newPossibles)).filter((p) => p.trim() !== "");
+    newPossibles = Array.from(new Set(newPossibles)).filter(
+      (p) => p.trim() !== "",
+    );
 
     const updatedQuestions = questions.map((item: any, i: number) =>
       i === qIndex
-        ? { ...item, correct_answer: newCorrectVal, possible_answers: newPossibles }
-        : item
+        ? {
+            ...item,
+            correct_answer: newCorrectVal,
+            possible_answers: newPossibles,
+          }
+        : item,
     );
     const updatedItem = {
       phrase: phrase,
@@ -120,7 +135,9 @@ export default function ReadExerciseForm({ order_index }: Props) {
   };
 
   const removeQuestion = (qIndex: number) => {
-    const updatedQuestions = questions.filter((_: any, i: number) => i !== qIndex);
+    const updatedQuestions = questions.filter(
+      (_: any, i: number) => i !== qIndex,
+    );
     const updatedItem = {
       phrase: phrase,
       questions: updatedQuestions,
@@ -132,8 +149,8 @@ export default function ReadExerciseForm({ order_index }: Props) {
     const currentQuestion = questions[qIndex] || {};
     const currentPossibles = currentQuestion.possible_answers || [];
 
-    if (text.includes(",")) {
-      const parts = text.split(",");
+    if (text.includes("; ")) {
+      const parts = text.split("; ");
       const lastPart = parts.pop() || "";
       const newAnswers = parts
         .map((p) => p.trim())
@@ -157,7 +174,7 @@ export default function ReadExerciseForm({ order_index }: Props) {
     updateQuestionField(
       qIndex,
       "possible_answers",
-      currentPossibles.filter((_: any, i: number) => i !== answerIdx)
+      currentPossibles.filter((_: any, i: number) => i !== answerIdx),
     );
   };
 
@@ -212,7 +229,9 @@ export default function ReadExerciseForm({ order_index }: Props) {
                 <div
                   key={qIndex}
                   className={`p-4 bg-slate-50/40 rounded-xl border transition-colors ${
-                    isQInvalid ? "border-amber-300 bg-amber-50/5" : "border-slate-200/80"
+                    isQInvalid
+                      ? "border-amber-300 bg-amber-50/5"
+                      : "border-slate-200/80"
                   }`}
                 >
                   <div className="flex justify-between items-start mb-3">
@@ -221,7 +240,12 @@ export default function ReadExerciseForm({ order_index }: Props) {
                         Pregunta {qIndex + 1}
                       </span>
                       <p className="font-semibold text-slate-800 text-sm">
-                        Q: {q.question || <span className="text-slate-400 italic">Pregunta no formulada</span>}
+                        Q:{" "}
+                        {q.question || (
+                          <span className="text-slate-400 italic">
+                            Pregunta no formulada
+                          </span>
+                        )}
                       </p>
                     </div>
                     <div className="flex gap-1.5 shrink-0">
@@ -245,33 +269,39 @@ export default function ReadExerciseForm({ order_index }: Props) {
                   </div>
 
                   <div className="flex flex-wrap gap-2 mt-3.5">
-                    {(q.possible_answers || []).map((answer: string, idx: number) => {
-                      const isCorrect = answer === q.correct_answer;
-                      return (
-                        <span
-                          key={idx}
-                          className={`px-3 py-1.5 rounded-full text-xs border flex items-center gap-1.5 ${
-                            isCorrect
-                              ? "bg-emerald-500/5 border-emerald-500/30 text-emerald-600 font-semibold"
-                              : "bg-white border-slate-200/80 text-slate-650"
-                          }`}
-                        >
-                          {isCorrect ? (
-                            <CheckCircle2 size={14} className="text-emerald-600" />
-                          ) : (
-                            <Circle size={14} className="text-slate-400" />
-                          )}{" "}
-                          {answer}
-                        </span>
-                      );
-                    })}
+                    {(q.possible_answers || []).map(
+                      (answer: string, idx: number) => {
+                        const isCorrect = answer === q.correct_answer;
+                        return (
+                          <span
+                            key={idx}
+                            className={`px-3 py-1.5 rounded-full text-xs border flex items-center gap-1.5 ${
+                              isCorrect
+                                ? "bg-emerald-500/5 border-emerald-500/30 text-emerald-600 font-semibold"
+                                : "bg-white border-slate-200/80 text-slate-650"
+                            }`}
+                          >
+                            {isCorrect ? (
+                              <CheckCircle2
+                                size={14}
+                                className="text-emerald-600"
+                              />
+                            ) : (
+                              <Circle size={14} className="text-slate-400" />
+                            )}{" "}
+                            {answer}
+                          </span>
+                        );
+                      },
+                    )}
                   </div>
 
                   {isQInvalid && (
                     <div className="flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50/50 p-2 rounded-lg border border-amber-100 mt-3.5">
                       <AlertCircle className="w-4 h-4 shrink-0" />
                       <span>
-                        Se requiere una pregunta, respuesta correcta y al menos una posible respuesta.
+                        Se requiere una pregunta, respuesta correcta y al menos
+                        una posible respuesta.
                       </span>
                     </div>
                   )}
@@ -303,7 +333,9 @@ export default function ReadExerciseForm({ order_index }: Props) {
                     label="Pregunta"
                     placeholder="e.g. Where did we go?"
                     value={q.question || ""}
-                    onChangeText={(text) => updateQuestionField(qIndex, "question", text)}
+                    onChangeText={(text) =>
+                      updateQuestionField(qIndex, "question", text)
+                    }
                   />
 
                   <FormInput
@@ -318,24 +350,26 @@ export default function ReadExerciseForm({ order_index }: Props) {
                       Posibles Respuestas (Opciones de Quiz)
                     </label>
                     <div className="flex flex-wrap gap-1.5 mb-2">
-                      {q.possible_answers?.map((answer: string, idx: number) => (
-                        <div
-                          key={idx}
-                          className="bg-slate-100 px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-slate-200 text-xs text-slate-700 font-medium"
-                        >
-                          <span>{answer}</span>
-                          <button
-                            type="button"
-                            className="text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
-                            onClick={() => removeAnswer(qIndex, idx)}
+                      {q.possible_answers?.map(
+                        (answer: string, idx: number) => (
+                          <div
+                            key={idx}
+                            className="bg-slate-100 px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-slate-200 text-xs text-slate-700 font-medium"
                           >
-                            <X size={12} />
-                          </button>
-                        </div>
-                      ))}
+                            <span>{answer}</span>
+                            <button
+                              type="button"
+                              className="text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
+                              onClick={() => removeAnswer(qIndex, idx)}
+                            >
+                              <X size={12} />
+                            </button>
+                          </div>
+                        ),
+                      )}
                     </div>
                     <FormInput
-                      placeholder="Escribe las opciones y sepáralas con comas (,)"
+                      placeholder="write answers separated by semicolon ( ; )"
                       value={inputValues[qIndex] || ""}
                       onChangeText={(text) => handleAddAnswer(text, qIndex)}
                     />
@@ -345,7 +379,8 @@ export default function ReadExerciseForm({ order_index }: Props) {
                     <div className="flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50/50 p-2 rounded-lg border border-amber-100 mt-2">
                       <AlertCircle className="w-4 h-4 shrink-0" />
                       <span>
-                        Se requiere una pregunta, respuesta correcta y al menos una posible respuesta.
+                        Se requiere una pregunta, respuesta correcta y al menos
+                        una posible respuesta.
                       </span>
                     </div>
                   )}
