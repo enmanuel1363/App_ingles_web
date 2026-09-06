@@ -65,12 +65,18 @@ export default function CompleteWordExerciseForm({ order_index }: Props) {
       }
     }
 
-    newPossibles = Array.from(new Set(newPossibles)).filter((p) => p.trim() !== "");
+    newPossibles = Array.from(new Set(newPossibles)).filter(
+      (p) => p.trim() !== "",
+    );
 
     const newItems = items.map((it: any, i: number) =>
       i === itemIndex
-        ? { ...it, correct_answer: newCorrectVal, possible_answers: newPossibles }
-        : it
+        ? {
+            ...it,
+            correct_answer: newCorrectVal,
+            possible_answers: newPossibles,
+          }
+        : it,
     );
     updateContent("items", newItems);
   };
@@ -86,8 +92,8 @@ export default function CompleteWordExerciseForm({ order_index }: Props) {
   };
 
   const handleAddAnswer = (text: string, itemIndex: number) => {
-    if (text.includes(",")) {
-      const parts = text.split(",");
+    if (text.includes(";")) {
+      const parts = text.split("; ");
       const lastPart = parts.pop() || "";
       const newAnswers = parts
         .map((p) => p.trim())
@@ -140,80 +146,86 @@ export default function CompleteWordExerciseForm({ order_index }: Props) {
         faltante en tu frase
       </p>
       {items.map((item: any, itemIndex: number) => {
-        const isItemInvalid = !item.correct_answer?.trim() || !item.possible_answers || item.possible_answers.length === 0;
+        const isItemInvalid =
+          !item.correct_answer?.trim() ||
+          !item.possible_answers ||
+          item.possible_answers.length === 0;
         return (
           <div
             key={itemIndex}
             className={`mt-4 p-5 bg-slate-50/70 rounded-xl border transition-colors ${
-              isItemInvalid ? "border-amber-300 bg-amber-50/10" : "border-slate-200/80"
+              isItemInvalid
+                ? "border-amber-300 bg-amber-50/10"
+                : "border-slate-200/80"
             }`}
           >
-          <div className="flex justify-between items-center mb-3">
-            <span className="font-semibold text-cyan-650 text-sm tracking-wide uppercase">
-              Item {itemIndex + 1}
-            </span>
-            {items.length > 1 && (
-              <button
-                className="text-slate-500 hover:text-rose-600 transition-colors p-1 rounded-lg hover:bg-rose-500/5"
-                onClick={() => removeItem(itemIndex)}
-              >
-                <X size={18} />
-              </button>
+            <div className="flex justify-between items-center mb-3">
+              <span className="font-semibold text-cyan-650 text-sm tracking-wide uppercase">
+                Item {itemIndex + 1}
+              </span>
+              {items.length > 1 && (
+                <button
+                  className="text-slate-500 hover:text-rose-600 transition-colors p-1 rounded-lg hover:bg-rose-500/5"
+                  onClick={() => removeItem(itemIndex)}
+                >
+                  <X size={18} />
+                </button>
+              )}
+            </div>
+
+            <FormInput
+              label="Sentence text"
+              placeholder="e.g. I ____ to the park"
+              value={item.sentence}
+              onChangeText={(text) => updateItem(itemIndex, "sentence", text)}
+            />
+            <FormInput
+              label="Correct answer"
+              placeholder="e.g. went"
+              value={item.correct_answer}
+              onChangeText={(text) => updateCorrectAnswer(itemIndex, text)}
+            />
+
+            <div className="mt-4">
+              <label className="text-sm font-medium text-slate-650 mb-2 block">
+                Posibles respuestas
+              </label>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {item.possible_answers?.map((answer: string, idx: number) => (
+                  <div
+                    key={idx}
+                    className="bg-slate-100 px-3 py-1.5 rounded-full flex items-center gap-2 border border-slate-200 text-sm text-slate-700"
+                  >
+                    <span>{answer}</span>
+                    <button
+                      className="text-slate-500 hover:text-rose-600 transition-colors"
+                      onClick={() => removeAnswer(itemIndex, idx)}
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <FormInput
+                placeholder="Type an answer and separate by semicolon ( ; )"
+                value={inputValues[itemIndex] || ""}
+                onChangeText={(text) => handleAddAnswer(text, itemIndex)}
+                multiline
+              />
+            </div>
+
+            {isItemInvalid && (
+              <div className="mt-3 flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50/50 p-2 rounded-lg border border-amber-100">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>
+                  Se requiere asignar una respuesta correcta y al menos una
+                  posible respuesta.
+                </span>
+              </div>
             )}
           </div>
-
-          <FormInput
-            label="Sentence text"
-            placeholder="e.g. I ____ to the park"
-            value={item.sentence}
-            onChangeText={(text) => updateItem(itemIndex, "sentence", text)}
-          />
-          <FormInput
-            label="Correct answer"
-            placeholder="e.g. went"
-            value={item.correct_answer}
-            onChangeText={(text) =>
-              updateCorrectAnswer(itemIndex, text)
-            }
-          />
-
-          <div className="mt-4">
-            <label className="text-sm font-medium text-slate-650 mb-2 block">
-              Posibles respuestas
-            </label>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {item.possible_answers?.map((answer: string, idx: number) => (
-                <div
-                  key={idx}
-                  className="bg-slate-100 px-3 py-1.5 rounded-full flex items-center gap-2 border border-slate-200 text-sm text-slate-700"
-                >
-                  <span>{answer}</span>
-                  <button
-                    className="text-slate-500 hover:text-rose-600 transition-colors"
-                    onClick={() => removeAnswer(itemIndex, idx)}
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <FormInput
-              placeholder="Type an answer and separate by comma ( , )"
-              value={inputValues[itemIndex] || ""}
-              onChangeText={(text) => handleAddAnswer(text, itemIndex)}
-              multiline
-            />
-          </div>
-
-          {isItemInvalid && (
-            <div className="mt-3 flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50/50 p-2 rounded-lg border border-amber-100">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>Se requiere asignar una respuesta correcta y al menos una posible respuesta.</span>
-            </div>
-          )}
-        </div>
-      );
-    })}
+        );
+      })}
 
       <Button
         variant="outlined"
