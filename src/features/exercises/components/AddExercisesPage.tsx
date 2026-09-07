@@ -148,7 +148,7 @@ export default function AddExercisesPage({ classId }: Props) {
     }
   });
 
-  const introValid = categoryCounts["Introducción"] >= 2;
+  const introValid = categoryCounts["Introducción"] >= 1;
   const valValid = categoryCounts["Validación"] >= 3;
   const totalValid = data.length <= 15;
   const hasDraft = drafts && !!drafts[classId];
@@ -187,9 +187,9 @@ export default function AddExercisesPage({ classId }: Props) {
       }
     });
 
-    if (removedCat === "Introducción" && countsAfter["Introducción"] < 2) {
+    if (removedCat === "Introducción" && countsAfter["Introducción"] < 1) {
       setFormError(
-        "Recuerda que necesitas un mínimo de 2 ejercicios de tipo Introducción para poder guardar.",
+        "Recuerda que necesitas un mínimo de 1 ejercicios de tipo Introducción para poder guardar.",
       );
     } else if (removedCat === "Validación" && countsAfter["Validación"] < 3) {
       setFormError(
@@ -426,8 +426,8 @@ export default function AddExercisesPage({ classId }: Props) {
       }
     }
 
-    if (categoryCounts["Introducción"] < 2) {
-      setFormError("At least 2 exercises of type Introducción are required.");
+    if (categoryCounts["Introducción"] < 1) {
+      setFormError("At least 1 exercises of type Introducción are required.");
       return;
     }
     if (categoryCounts["Validación"] < 3) {
@@ -673,7 +673,7 @@ export default function AddExercisesPage({ classId }: Props) {
                   <p className="text-xs font-bold text-slate-700 leading-tight">
                     Introducción: {categoryCounts["Introducción"]}{" "}
                     <span className="text-[10px] font-semibold text-slate-450">
-                      / mín. 2
+                      / mín. 1
                     </span>
                   </p>
                   <p className="text-[10px] text-slate-500 leading-normal mt-0.5">
