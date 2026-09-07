@@ -88,13 +88,22 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Enlace a la Política de Privacidad — solo texto, no es un botón */}
-      <Link
-        href="/politica-de-privacidad"
-        className="relative z-10 mt-6 text-xs text-slate-400 hover:text-cyan-650 underline underline-offset-2 transition-colors"
-      >
-        Política de Privacidad
-      </Link>
+      {/* Enlaces legales — solo texto, no son botones */}
+      <div className="relative z-10 mt-6 flex items-center gap-3 text-xs text-slate-400">
+        <Link
+          href="/politica-de-privacidad"
+          className="hover:text-cyan-650 underline underline-offset-2 transition-colors"
+        >
+          Política de Privacidad
+        </Link>
+        <span className="text-slate-300">•</span>
+        <Link
+          href="/solicitud-eliminacion-cuenta"
+          className="hover:text-cyan-650 underline underline-offset-2 transition-colors"
+        >
+          Eliminar mi cuenta
+        </Link>
+      </div>
     </div>
   );
 }
