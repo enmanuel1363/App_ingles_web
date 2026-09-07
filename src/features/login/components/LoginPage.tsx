@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Loader2, AlertCircle, Lock, ShieldCheck, LogIn } from "lucide-react";
 import Button from "@/components/ui/Button";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -35,7 +36,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fffcf2] text-slate-800 flex items-center justify-center p-4 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-[#fffcf2] text-slate-800 flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans">
       {/* Ambient background glow */}
       <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 rounded-full bg-lime-500/10 blur-3xl pointer-events-none" />
@@ -86,6 +87,14 @@ export default function LoginPage() {
           <span>Acceso exclusivo para administradores autorizados.</span>
         </div>
       </div>
+
+      {/* Enlace a la Política de Privacidad — solo texto, no es un botón */}
+      <Link
+        href="/politica-de-privacidad"
+        className="relative z-10 mt-6 text-xs text-slate-400 hover:text-cyan-650 underline underline-offset-2 transition-colors"
+      >
+        Política de Privacidad
+      </Link>
     </div>
   );
 }
