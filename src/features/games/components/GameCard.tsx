@@ -3,11 +3,19 @@
 import React from "react";
 import { Game } from "../games.types";
 import Button from "@/components/ui/Button";
-import { PenTool, Volume2, Mic, Gamepad2, Users, Play, Edit2, Trash2 } from "lucide-react";
+import {
+  PenTool,
+  Volume2,
+  Mic,
+  Gamepad2,
+  Users,
+  Play,
+  Edit2,
+  Trash2,
+} from "lucide-react";
 
 interface GameCardProps {
   game: Game;
-  onPlay: (gameId: string) => void;
   onCreateRoom?: (gameId: string) => void;
   onEdit?: (game: Game) => void;
   onDelete?: (gameId: string) => void;
@@ -15,12 +23,10 @@ interface GameCardProps {
 
 export default function GameCard({
   game,
-  onPlay,
   onCreateRoom,
   onEdit,
   onDelete,
 }: GameCardProps) {
-
   // Select matching icon and background color for the game type
   const getTypeConfig = (type: string) => {
     switch (type) {
@@ -58,14 +64,18 @@ export default function GameCard({
       <div>
         {/* Header: Type Badge */}
         <div className="flex items-center justify-between mb-4">
-          <div className={`flex items-center space-x-2 px-3  py-1.5 rounded-full text-xs font-bold ${config.colorBg}`}>
+          <div
+            className={`flex items-center space-x-2 px-3  py-1.5 rounded-full text-xs font-bold ${config.colorBg}`}
+          >
             {config.icon}
             <span>{config.label}</span>
           </div>
           {game.is_active ? (
             <span className="h-2 w-2 rounded-full bg-[#B4FF2B] animate-pulse" />
           ) : (
-            <span className="text-xs text-slate-400 font-semibold">Inactive</span>
+            <span className="text-xs text-slate-400 font-semibold">
+              Inactive
+            </span>
           )}
         </div>
 
@@ -74,21 +84,13 @@ export default function GameCard({
           {game.name}
         </h3>
         <p className="text-sm text-slate-500 mb-6 line-clamp-3 leading-relaxed">
-          {game.description || "Challenge yourself and improve your skills with this dynamic game!"}
+          {game.description ||
+            "Challenge yourself and improve your skills with this dynamic game!"}
         </p>
       </div>
 
       {/* Action Buttons */}
       <div className="flex flex-col space-y-2 mt-auto">
-        <Button
-          variant="primary"
-          leftIcon={<Play className="w-4 h-4 fill-slate-950" />}
-          onClick={() => game.id && onPlay(game.id)}
-          className="w-full text-slate-950 font-extrabold"
-        >
-          Solo Play
-        </Button>
-
         {onCreateRoom && (
           <Button
             variant="outlined"
