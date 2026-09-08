@@ -30,7 +30,6 @@ export default function GameManager({
   const { initializeRoom, loading: startingRoom } = useCreateRoom();
   const deleteGameMutation = useDeleteGame();
   const [activeRoomCode, setActiveRoomCode] = useState<string | null>(null);
-  const [activeSoloGameId, setActiveSoloGameId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [editingGameId, setEditingGameId] = useState<string | null>(null);
 
@@ -72,10 +71,6 @@ export default function GameManager({
         type: "error",
       });
     }
-  };
-
-  const handlePlaySolo = (gameId: string) => {
-    setActiveSoloGameId(gameId);
   };
 
   const handleEditGame = (game: Game) => {
@@ -200,46 +195,11 @@ export default function GameManager({
             <GameCard
               key={game.id}
               game={game}
-              onPlay={handlePlaySolo}
               onCreateRoom={handleCreateRoom}
               onEdit={handleEditGame}
               onDelete={handleDeleteGame}
             />
           ))}
-        </div>
-      )}
-
-      {/* Solo Play Preview Modal */}
-      {activeSoloGameId && (
-        <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-xl relative border border-slate-100">
-            <button
-              onClick={() => setActiveSoloGameId(null)}
-              className="absolute top-4 right-4 p-1 rounded-full hover:bg-slate-50 text-slate-400 hover:text-slate-700"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <div className="text-center space-y-4 py-4">
-              <Gamepad2 className="w-12 h-12 text-tertiary mx-auto animate-bounce" />
-              <h3 className="text-lg font-black text-slate-900">
-                Solo Play Preview
-              </h3>
-              <p className="text-slate-550 text-xs leading-relaxed">
-                Solo games must be played from the Student Mobile App. Please
-                log in with your credentials on the mobile application to start
-                playing this challenge arena.
-              </p>
-              <div className="pt-4">
-                <Button
-                  variant="primary"
-                  onClick={() => setActiveSoloGameId(null)}
-                  className="w-full text-slate-900 font-extrabold"
-                >
-                  Understood
-                </Button>
-              </div>
-            </div>
-          </div>
         </div>
       )}
 
