@@ -1,142 +1,18 @@
-"use client";
-
-import React, { useState } from "react";
-import { useGetGames, useDeleteGame } from "../hooks/useGames";
-import { useCreateRoom } from "../hooks/useGameRoom";
+import React from "react";
+import Link from "next/link";
 import { Game } from "../games.types";
 import GameCard from "./GameCard";
-import GameRoomHost from "./GameRoomHost";
-import GameCreator from "./GameCreator";
-import Button from "@/components/ui/Button";
-import AlertModal from "@/components/ui/AlertModal";
-import ConfirmationModal from "@/components/ui/ConfirmationModal";
-import {
-  Gamepad2,
-  Plus,
-  Sparkles,
-  X,
-  ChevronRight,
-  HelpCircle,
-} from "lucide-react";
+import { Gamepad2, Plus } from "lucide-react";
 
 interface GameManagerProps {
-  currentTeacherProfileId: string; // The logged-in teacher's ID
+  games: Game[];
+  currentTeacherProfileId: string;
 }
 
 export default function GameManager({
+  games,
   currentTeacherProfileId,
 }: GameManagerProps) {
-  const { data: games = [], isLoading, error, refetch } = useGetGames();
-  const { initializeRoom, loading: startingRoom } = useCreateRoom();
-  const deleteGameMutation = useDeleteGame();
-  const [activeRoomCode, setActiveRoomCode] = useState<string | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
-  const [editingGameId, setEditingGameId] = useState<string | null>(null);
-
-  // Modal states
-  const [alertConfig, setAlertConfig] = useState<{
-    visible: boolean;
-    title?: string;
-    message: string;
-    type?: "success" | "error" | "info";
-  }>({ visible: false, message: "" });
-
-  const [confirmConfig, setConfirmConfig] = useState<{
-    visible: boolean;
-    title: string;
-    description: string;
-    confirmText?: string;
-    cancelText?: string;
-    variant?: "danger" | "primary" | "secondary";
-    onConfirm: () => void;
-  }>({
-    visible: false,
-    title: "",
-    description: "",
-    onConfirm: () => {},
-  });
-
-  const handleCreateRoom = async (gameId: string) => {
-    try {
-      const room = await initializeRoom(gameId, currentTeacherProfileId);
-      if (room && room.room_code) {
-        setActiveRoomCode(room.room_code);
-      }
-    } catch (err) {
-      setAlertConfig({
-        visible: true,
-        title: "Lobby Error",
-        message:
-          "Error generating multiplayer game room lobby. Please check connection.",
-        type: "error",
-      });
-    }
-  };
-
-  const handleEditGame = (game: Game) => {
-    if (game.id) {
-      setEditingGameId(game.id);
-    }
-  };
-
-  const handleDeleteGame = (gameId: string) => {
-    setConfirmConfig({
-      visible: true,
-      title: "Delete Game",
-      description:
-        "Are you sure you want to permanently delete this game? This action cannot be undone.",
-      confirmText: "Delete",
-      cancelText: "Cancel",
-      variant: "danger",
-      onConfirm: async () => {
-        try {
-          await deleteGameMutation.mutateAsync(gameId);
-          setAlertConfig({
-            visible: true,
-            title: "Success",
-            message: "Game successfully deleted.",
-            type: "success",
-          });
-        } catch (err) {
-          setAlertConfig({
-            visible: true,
-            title: "Error",
-            message: "Failed to delete game. Please check your connection.",
-            type: "error",
-          });
-        }
-      },
-    });
-  };
-
-  if (activeRoomCode) {
-    return (
-      <div className="py-6 px-4 bg-[#fffcf2] min-h-screen">
-        <GameRoomHost
-          roomCode={activeRoomCode}
-          onClose={() => {
-            setActiveRoomCode(null);
-            refetch();
-          }}
-        />
-      </div>
-    );
-  }
-
-  if (isCreating || editingGameId) {
-    return (
-      <GameCreator
-        teacherId={currentTeacherProfileId}
-        editingGameId={editingGameId || undefined}
-        onClose={() => {
-          setIsCreating(false);
-          setEditingGameId(null);
-          refetch();
-        }}
-      />
-    );
-  }
-
   return (
     <div className="space-y-8 max-w-6xl mx-auto p-4">
       {/* Header section with Premium Light Theme styling */}
@@ -151,82 +27,46 @@ export default function GameManager({
           </p>
         </div>
         <div>
-          <Button
-            variant="primary"
-            leftIcon={<Plus className="w-4 h-4" />}
-            onClick={() => setIsCreating(true)}
-            className="text-slate-950 font-black shadow-sm"
+          <Link
+            href="/games/create"
+            className="inline-flex items-center justify-center space-x-2 px-5 py-3 rounded-xl font-black text-sm bg-primary hover:bg-primary-dark text-slate-950 shadow-sm transition-all duration-200 active:scale-[0.98]"
           >
-            Crear Juego
-          </Button>
+            <Plus className="w-4 h-4" />
+            <span>Crear Juego</span>
+          </Link>
         </div>
       </div>
 
       {/* Games List Grid */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="bg-white border border-slate-100 rounded-2xl h-[200px]"
-            />
-          ))}
-        </div>
-      ) : error ? (
-        <div className="text-center p-8 bg-white border border-slate-100 rounded-2xl">
-          <p className="text-rose-500 font-bold text-sm">
-            Failed to retrieve games from database.
-          </p>
-        </div>
-      ) : games.length === 0 ? (
+      {games.length === 0 ? (
         <div className="text-center p-12 bg-white border border-slate-100 rounded-2xl max-w-md mx-auto">
           <Gamepad2 className="w-12 h-12 text-slate-300 mx-auto mb-4" />
           <h4 className="text-base font-black text-slate-800">
             No Games Published Yet
           </h4>
           <p className="text-slate-500 text-xs mt-1 mb-6">
-            Click the button above to publish your first game and add challenge
+            Click the button below to publish your first game and add challenge
             questions.
           </p>
+          <Link
+            href="/games/create"
+            className="inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl font-bold text-xs bg-primary hover:bg-primary-dark text-slate-950 shadow-sm transition-all duration-200"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Crear Primer Juego</span>
+          </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {games.map((game) => (
             <GameCard
               key={game.id}
               game={game}
-              onCreateRoom={handleCreateRoom}
-              onEdit={handleEditGame}
-              onDelete={handleDeleteGame}
+              teacherId={currentTeacherProfileId}
             />
           ))}
         </div>
       )}
-
-      {/* Custom Alert & Confirmation Modals */}
-      <AlertModal
-        visible={alertConfig.visible}
-        title={alertConfig.title}
-        message={alertConfig.message}
-        type={alertConfig.type}
-        onClose={() => setAlertConfig((prev) => ({ ...prev, visible: false }))}
-      />
-
-      <ConfirmationModal
-        visible={confirmConfig.visible}
-        title={confirmConfig.title}
-        description={confirmConfig.description}
-        confirmText={confirmConfig.confirmText}
-        cancelText={confirmConfig.cancelText}
-        variant={confirmConfig.variant}
-        onConfirm={() => {
-          setConfirmConfig((prev) => ({ ...prev, visible: false }));
-          confirmConfig.onConfirm();
-        }}
-        onClose={() =>
-          setConfirmConfig((prev) => ({ ...prev, visible: false }))
-        }
-      />
     </div>
   );
 }

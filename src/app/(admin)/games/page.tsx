@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabaseServer";
-import { GamesPageClient } from "@/features/games";
+import GameManager from "@/features/games/components/GameManager";
+import { getGamesServer } from "@/features/games/services/games.server";
 
 export default async function GamesRoute() {
   const supabase = await createClient();
@@ -18,5 +19,11 @@ export default async function GamesRoute() {
     );
   }
 
-  return <GamesPageClient currentTeacherProfileId={user.id} />;
+  const games = await getGamesServer();
+
+  return (
+    <div className="min-h-screen bg-[#fffcf2]">
+      <GameManager games={games} currentTeacherProfileId={user.id} />
+    </div>
+  );
 }
