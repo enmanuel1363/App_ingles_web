@@ -12,6 +12,7 @@ import {
   Edit3,
   CheckCircle2,
   Circle,
+  GripVertical,
 } from "lucide-react";
 
 type Props = {
@@ -52,6 +53,20 @@ export default function ReadExerciseForm({ order_index }: Props) {
 
   const [inputValues, setInputValues] = useState<Record<number, string>>({});
   const [editingQIndex, setEditingQIndex] = useState<number | null>(null);
+  const [draggedQIndex, setDraggedQIndex] = useState<number | null>(null);
+  const [dragOverQIndex, setDragOverQIndex] = useState<number | null>(null);
+  const [draggableQIndex, setDraggableQIndex] = useState<number | null>(null);
+
+  const reorderQuestions = (fromIndex: number, toIndex: number) => {
+    const updatedQuestions = [...questions];
+    const [movedQ] = updatedQuestions.splice(fromIndex, 1);
+    updatedQuestions.splice(toIndex, 0, movedQ);
+    const updatedItem = {
+      phrase: phrase,
+      questions: updatedQuestions,
+    };
+    updateContent("items", [updatedItem]);
+  };
 
   const updateField = (field: string, value: any) => {
     updateExercise(order_index, { ...exercise, [field]: value });
@@ -228,25 +243,78 @@ export default function ReadExerciseForm({ order_index }: Props) {
               return (
                 <div
                   key={qIndex}
-                  className={`p-4 bg-slate-50/40 rounded-xl border transition-colors ${
+                  draggable={draggableQIndex === qIndex}
+                  onDragStart={(e) => {
+                    e.stopPropagation();
+                    setDraggedQIndex(qIndex);
+                    e.dataTransfer.effectAllowed = "move";
+                    e.dataTransfer.setData("text/plain", qIndex.toString());
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (dragOverQIndex !== qIndex) {
+                      setDragOverQIndex(qIndex);
+                    }
+                  }}
+                  onDragLeave={(e) => {
+                    e.stopPropagation();
+                    setDragOverQIndex(null);
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const fromIndex = draggedQIndex;
+                    if (fromIndex !== null && fromIndex !== qIndex) {
+                      reorderQuestions(fromIndex, qIndex);
+                    }
+                    setDraggedQIndex(null);
+                    setDragOverQIndex(null);
+                    setDraggableQIndex(null);
+                  }}
+                  onDragEnd={(e) => {
+                    e.stopPropagation();
+                    setDraggedQIndex(null);
+                    setDragOverQIndex(null);
+                    setDraggableQIndex(null);
+                  }}
+                  className={`p-4 bg-slate-50/40 rounded-xl border transition-all duration-200 ${
                     isQInvalid
                       ? "border-amber-300 bg-amber-50/5"
                       : "border-slate-200/80"
+                  } ${
+                    draggedQIndex === qIndex ? "opacity-35 scale-[0.98]" : ""
+                  } ${
+                    dragOverQIndex === qIndex && draggedQIndex !== qIndex
+                      ? "ring-2 ring-cyan-500 ring-offset-2 rounded-xl scale-[1.01]"
+                      : ""
                   }`}
                 >
                   <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-650 block mb-1">
-                        Pregunta {qIndex + 1}
-                      </span>
-                      <p className="font-semibold text-slate-800 text-sm">
-                        Q:{" "}
-                        {q.question || (
-                          <span className="text-slate-400 italic">
-                            Pregunta no formulada
-                          </span>
-                        )}
-                      </p>
+                    <div className="flex items-start gap-2">
+                      {questions.length > 1 && (
+                        <div
+                          className="text-slate-400 hover:text-slate-655 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/50 transition-colors mt-0.5"
+                          onMouseDown={() => setDraggableQIndex(qIndex)}
+                          onMouseUp={() => setDraggableQIndex(null)}
+                          title="Arrastrar para reordenar"
+                        >
+                          <GripVertical size={16} />
+                        </div>
+                      )}
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-650 block mb-1">
+                          Pregunta {qIndex + 1}
+                        </span>
+                        <p className="font-semibold text-slate-800 text-sm">
+                          Q:{" "}
+                          {q.question || (
+                            <span className="text-slate-400 italic">
+                              Pregunta no formulada
+                            </span>
+                          )}
+                        </p>
+                      </div>
                     </div>
                     <div className="flex gap-1.5 shrink-0">
                       <button
@@ -312,12 +380,65 @@ export default function ReadExerciseForm({ order_index }: Props) {
             return (
               <div
                 key={qIndex}
-                className="p-4 bg-white rounded-xl border border-cyan-200 bg-cyan-50/5 shadow-sm"
+                draggable={draggableQIndex === qIndex}
+                onDragStart={(e) => {
+                  e.stopPropagation();
+                  setDraggedQIndex(qIndex);
+                  e.dataTransfer.effectAllowed = "move";
+                  e.dataTransfer.setData("text/plain", qIndex.toString());
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (dragOverQIndex !== qIndex) {
+                    setDragOverQIndex(qIndex);
+                  }
+                }}
+                onDragLeave={(e) => {
+                  e.stopPropagation();
+                  setDragOverQIndex(null);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const fromIndex = draggedQIndex;
+                  if (fromIndex !== null && fromIndex !== qIndex) {
+                    reorderQuestions(fromIndex, qIndex);
+                  }
+                  setDraggedQIndex(null);
+                  setDragOverQIndex(null);
+                  setDraggableQIndex(null);
+                }}
+                onDragEnd={(e) => {
+                  e.stopPropagation();
+                  setDraggedQIndex(null);
+                  setDragOverQIndex(null);
+                  setDraggableQIndex(null);
+                }}
+                className={`p-4 bg-white rounded-xl border border-cyan-200 bg-cyan-50/5 shadow-sm transition-all duration-200 ${
+                  draggedQIndex === qIndex ? "opacity-35 scale-[0.98]" : ""
+                } ${
+                  dragOverQIndex === qIndex && draggedQIndex !== qIndex
+                    ? "ring-2 ring-cyan-500 ring-offset-2 rounded-xl scale-[1.01]"
+                    : ""
+                }`}
               >
                 <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
-                  <span className="text-xs font-extrabold uppercase tracking-wider text-cyan-650">
-                    Editando Pregunta {qIndex + 1}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {questions.length > 1 && (
+                      <div
+                        className="text-slate-400 hover:text-slate-655 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/50 transition-colors"
+                        onMouseDown={() => setDraggableQIndex(qIndex)}
+                        onMouseUp={() => setDraggableQIndex(null)}
+                        title="Arrastrar para reordenar"
+                      >
+                        <GripVertical size={16} />
+                      </div>
+                    )}
+                    <span className="text-xs font-extrabold uppercase tracking-wider text-cyan-650">
+                      Editando Pregunta {qIndex + 1}
+                    </span>
+                  </div>
                   <button
                     type="button"
                     className="text-slate-400 hover:text-rose-600 transition-colors p-1.5 rounded-lg hover:bg-rose-500/5 cursor-pointer"

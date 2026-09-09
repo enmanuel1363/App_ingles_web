@@ -16,6 +16,7 @@ import {
   ArrowUp,
   ArrowDown,
   HelpCircle,
+  GripVertical,
 } from "lucide-react";
 import { previewSrc, isDraftPlaceholder } from "../utils/imagePreview";
 
@@ -80,6 +81,21 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
     question: string;
     options: AnswerOption[];
   } | null>(null);
+
+  // DnD States for Items (Sessions)
+  const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
+  const [dragOverItemIndex, setDragOverItemIndex] = useState<number | null>(null);
+  const [draggableItemIndex, setDraggableItemIndex] = useState<number | null>(null);
+
+  // DnD States for Fragments
+  const [draggedFragInfo, setDraggedFragInfo] = useState<{ itemIndex: number; fragIndex: number } | null>(null);
+  const [dragOverFragInfo, setDragOverFragInfo] = useState<{ itemIndex: number; fragIndex: number } | null>(null);
+  const [draggableFragIndex, setDraggableFragIndex] = useState<{ itemIndex: number; fragIndex: number } | null>(null);
+
+  // DnD States for Questions
+  const [draggedQAInfo, setDraggedQAInfo] = useState<{ itemIndex: number; qIndex: number } | null>(null);
+  const [dragOverQAInfo, setDragOverQAInfo] = useState<{ itemIndex: number; qIndex: number } | null>(null);
+  const [draggableQAIndex, setDraggableQAIndex] = useState<{ itemIndex: number; qIndex: number } | null>(null);
 
   const updateField = (field: string, value: any) => {
     updateExercise(order_index, { ...exercise, [field]: value });
@@ -186,6 +202,47 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
         ? { ...item, fragments: currentFragments, questions: newQuestions }
         : item,
     );
+    updateContent("items", newItems);
+  };
+
+  const reorderFragments = (itemIndex: number, fromIndex: number, toIndex: number) => {
+    const currentFragments = [...items[itemIndex].fragments];
+    const [movedFrag] = currentFragments.splice(fromIndex, 1);
+    currentFragments.splice(toIndex, 0, movedFrag);
+
+    // Update questions fragment_index
+    const currentQuestions = items[itemIndex].questions.map((q) => {
+      if (q.fragment_index === fromIndex) {
+        return { ...q, fragment_index: toIndex };
+      }
+      if (fromIndex < toIndex && q.fragment_index > fromIndex && q.fragment_index <= toIndex) {
+        return { ...q, fragment_index: q.fragment_index - 1 };
+      }
+      if (fromIndex > toIndex && q.fragment_index >= toIndex && q.fragment_index < fromIndex) {
+        return { ...q, fragment_index: q.fragment_index + 1 };
+      }
+      return q;
+    });
+
+    const newItems = items.map((item, i) =>
+      i === itemIndex
+        ? { ...item, fragments: currentFragments, questions: currentQuestions }
+        : item,
+    );
+    updateContent("items", newItems);
+  };
+
+  const reorderQA = (itemIndex: number, fromIndex: number, toIndex: number) => {
+    const currentQuestions = [...items[itemIndex].questions];
+    const [movedQA] = currentQuestions.splice(fromIndex, 1);
+    currentQuestions.splice(toIndex, 0, movedQA);
+    updateItem(itemIndex, "questions", currentQuestions);
+  };
+
+  const reorderItems = (fromIndex: number, toIndex: number) => {
+    const newItems = [...items];
+    const [movedItem] = newItems.splice(fromIndex, 1);
+    newItems.splice(toIndex, 0, movedItem);
     updateContent("items", newItems);
   };
 
@@ -420,17 +477,70 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
         return (
           <div
             key={itemIndex}
+            draggable={draggableItemIndex === itemIndex}
+            onDragStart={(e) => {
+              e.stopPropagation();
+              setDraggedItemIndex(itemIndex);
+              e.dataTransfer.effectAllowed = "move";
+              e.dataTransfer.setData("text/plain", itemIndex.toString());
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (dragOverItemIndex !== itemIndex) {
+                setDragOverItemIndex(itemIndex);
+              }
+            }}
+            onDragLeave={(e) => {
+              e.stopPropagation();
+              setDragOverItemIndex(null);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const fromIndex = draggedItemIndex;
+              if (fromIndex !== null && fromIndex !== itemIndex) {
+                reorderItems(fromIndex, itemIndex);
+              }
+              setDraggedItemIndex(null);
+              setDragOverItemIndex(null);
+              setDraggableItemIndex(null);
+            }}
+            onDragEnd={(e) => {
+              e.stopPropagation();
+              setDraggedItemIndex(null);
+              setDragOverItemIndex(null);
+              setDraggableItemIndex(null);
+            }}
             className={`mt-4 p-6 bg-white rounded-2xl border transition-all duration-200 shadow-sm ${
               isItemInvalid
                 ? "border-amber-300 ring-2 ring-amber-50"
                 : "border-slate-200/70"
+            } ${
+              draggedItemIndex === itemIndex ? "opacity-35 scale-[0.98]" : ""
+            } ${
+              dragOverItemIndex === itemIndex && draggedItemIndex !== itemIndex
+                ? "ring-2 ring-cyan-500 ring-offset-2 rounded-2xl scale-[1.01]"
+                : ""
             }`}
           >
             {/* Header of Item */}
             <div className="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
-              <span className="font-extrabold text-cyan-750 text-xs tracking-wider uppercase">
-                Storytelling Session {itemIndex + 1}
-              </span>
+              <div className="flex items-center gap-2">
+                {items.length > 1 && (
+                  <div
+                    className="text-slate-400 hover:text-slate-655 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/50 transition-colors"
+                    onMouseDown={() => setDraggableItemIndex(itemIndex)}
+                    onMouseUp={() => setDraggableItemIndex(null)}
+                    title="Arrastrar para reordenar sesión"
+                  >
+                    <GripVertical size={18} />
+                  </div>
+                )}
+                <span className="font-extrabold text-cyan-750 text-xs tracking-wider uppercase">
+                  Storytelling Session {itemIndex + 1}
+                </span>
+              </div>
               {items.length > 1 && (
                 <button
                   type="button"
@@ -466,13 +576,86 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
                 {item.fragments.map((frag, fragIndex) => (
                   <div
                     key={fragIndex}
-                    className="p-4 bg-slate-50/50 border border-slate-150 rounded-xl space-y-3 relative"
+                    draggable={
+                      draggableFragIndex?.itemIndex === itemIndex &&
+                      draggableFragIndex?.fragIndex === fragIndex
+                    }
+                    onDragStart={(e) => {
+                      e.stopPropagation();
+                      setDraggedFragInfo({ itemIndex, fragIndex });
+                      e.dataTransfer.effectAllowed = "move";
+                      e.dataTransfer.setData("text/plain", `${itemIndex},${fragIndex}`);
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (
+                        dragOverFragInfo?.itemIndex !== itemIndex ||
+                        dragOverFragInfo?.fragIndex !== fragIndex
+                      ) {
+                        setDragOverFragInfo({ itemIndex, fragIndex });
+                      }
+                    }}
+                    onDragLeave={(e) => {
+                      e.stopPropagation();
+                      setDragOverFragInfo(null);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (
+                        draggedFragInfo &&
+                        draggedFragInfo.itemIndex === itemIndex &&
+                        draggedFragInfo.fragIndex !== fragIndex
+                      ) {
+                        reorderFragments(
+                          itemIndex,
+                          draggedFragInfo.fragIndex,
+                          fragIndex,
+                        );
+                      }
+                      setDraggedFragInfo(null);
+                      setDragOverFragInfo(null);
+                      setDraggableFragIndex(null);
+                    }}
+                    onDragEnd={(e) => {
+                      e.stopPropagation();
+                      setDraggedFragInfo(null);
+                      setDragOverFragInfo(null);
+                      setDraggableFragIndex(null);
+                    }}
+                    className={`p-4 bg-slate-50/50 border rounded-xl space-y-3 relative transition-all duration-200 ${
+                      draggedFragInfo?.itemIndex === itemIndex &&
+                      draggedFragInfo?.fragIndex === fragIndex
+                        ? "opacity-35 scale-[0.98]"
+                        : "border-slate-150"
+                    } ${
+                      dragOverFragInfo?.itemIndex === itemIndex &&
+                      dragOverFragInfo?.fragIndex === fragIndex &&
+                      draggedFragInfo?.fragIndex !== fragIndex
+                        ? "ring-2 ring-cyan-500 ring-offset-2 rounded-xl scale-[1.01]"
+                        : ""
+                    }`}
                   >
                     {/* Fragment Card Header */}
                     <div className="flex justify-between items-center">
-                      <span className="text-xs font-bold text-slate-500">
-                        Fragment {fragIndex + 1}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {item.fragments.length > 1 && (
+                          <div
+                            className="text-slate-400 hover:text-slate-655 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/50 transition-colors"
+                            onMouseDown={() =>
+                              setDraggableFragIndex({ itemIndex, fragIndex })
+                            }
+                            onMouseUp={() => setDraggableFragIndex(null)}
+                            title="Arrastrar para reordenar fragmento"
+                          >
+                            <GripVertical size={16} />
+                          </div>
+                        )}
+                        <span className="text-xs font-bold text-slate-500">
+                          Fragment {fragIndex + 1}
+                        </span>
+                      </div>
                       <div className="flex items-center gap-1 bg-white border border-slate-100 rounded-lg p-0.5 shadow-sm">
                         <button
                           type="button"
@@ -708,10 +891,77 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
                 return (
                   <div
                     key={qIndex}
-                    className="p-4 bg-white border border-slate-150 rounded-xl flex items-start justify-between gap-4 shadow-sm hover:shadow transition-shadow duration-150"
+                    draggable={
+                      draggableQAIndex?.itemIndex === itemIndex &&
+                      draggableQAIndex?.qIndex === qIndex
+                    }
+                    onDragStart={(e) => {
+                      e.stopPropagation();
+                      setDraggedQAInfo({ itemIndex, qIndex });
+                      e.dataTransfer.effectAllowed = "move";
+                      e.dataTransfer.setData("text/plain", `${itemIndex},${qIndex}`);
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (
+                        dragOverQAInfo?.itemIndex !== itemIndex ||
+                        dragOverQAInfo?.qIndex !== qIndex
+                      ) {
+                        setDragOverQAInfo({ itemIndex, qIndex });
+                      }
+                    }}
+                    onDragLeave={(e) => {
+                      e.stopPropagation();
+                      setDragOverQAInfo(null);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (
+                        draggedQAInfo &&
+                        draggedQAInfo.itemIndex === itemIndex &&
+                        draggedQAInfo.qIndex !== qIndex
+                      ) {
+                        reorderQA(itemIndex, draggedQAInfo.qIndex, qIndex);
+                      }
+                      setDraggedQAInfo(null);
+                      setDragOverQAInfo(null);
+                      setDraggableQAIndex(null);
+                    }}
+                    onDragEnd={(e) => {
+                      e.stopPropagation();
+                      setDraggedQAInfo(null);
+                      setDragOverQAInfo(null);
+                      setDraggableQAIndex(null);
+                    }}
+                    className={`p-4 bg-white border rounded-xl flex items-start justify-between gap-4 shadow-sm transition-all duration-200 ${
+                      draggedQAInfo?.itemIndex === itemIndex &&
+                      draggedQAInfo?.qIndex === qIndex
+                        ? "opacity-35 scale-[0.98]"
+                        : "border-slate-150 hover:shadow"
+                    } ${
+                      dragOverQAInfo?.itemIndex === itemIndex &&
+                      dragOverQAInfo?.qIndex === qIndex &&
+                      draggedQAInfo?.qIndex !== qIndex
+                        ? "ring-2 ring-cyan-500 ring-offset-2 rounded-xl scale-[1.01]"
+                        : ""
+                    }`}
                   >
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-2 flex-wrap">
+                        {item.questions.length > 1 && (
+                          <div
+                            className="text-slate-400 hover:text-slate-655 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/50 transition-colors"
+                            onMouseDown={() =>
+                              setDraggableQAIndex({ itemIndex, qIndex })
+                            }
+                            onMouseUp={() => setDraggableQAIndex(null)}
+                            title="Arrastrar para reordenar pregunta"
+                          >
+                            <GripVertical size={16} />
+                          </div>
+                        )}
                         <p className="font-bold text-slate-800 text-sm">
                           Q: {qa.question}
                         </p>

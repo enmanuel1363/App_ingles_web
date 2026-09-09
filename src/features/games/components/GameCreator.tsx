@@ -24,11 +24,12 @@ import CrosswordChallengeForm from "./exercises/writing/CrosswordChallengeForm";
 import AudioChallengeForm from "./exercises/AudioChallengeForm";
 import SpeakingChallengeForm from "./exercises/SpeakingChallengeForm";
 import GameProgressWidget from "./GameProgressWidget";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Sparkles, Plus, Trash2, Copy, X } from "lucide-react";
 
 interface GameCreatorProps {
   teacherId: string;
-  onClose: () => void;
+  onClose?: () => void;
   editingGameId?: string;
 }
 
@@ -45,6 +46,17 @@ export default function GameCreator({
   onClose,
   editingGameId,
 }: GameCreatorProps) {
+  const router = useRouter();
+
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    } else {
+      router.push("/games");
+      router.refresh();
+    }
+  };
+
   const createGameMutation = useCreateGameWithExercises();
   const updateGameMutation = useUpdateGameWithExercises();
 
@@ -355,7 +367,7 @@ export default function GameCreator({
                 title: "Success",
                 message: "Game successfully updated!",
                 type: "success",
-                onClose: onClose,
+                onClose: handleClose,
               });
             },
             onError: () => {
@@ -373,7 +385,7 @@ export default function GameCreator({
                 title: "Success",
                 message: "Game successfully created and published!",
                 type: "success",
-                onClose: onClose,
+                onClose: handleClose,
               });
             },
             onError: () => {
@@ -484,7 +496,7 @@ export default function GameCreator({
       <div className="flex items-center justify-between border-b border-slate-200/60 pb-6">
         <div className="flex items-center space-x-3">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="p-2 hover:bg-white rounded-full border border-slate-200 text-slate-500 hover:text-slate-800 transition-all shadow-sm"
           >
             <ArrowLeft className="w-5 h-5" />

@@ -1,32 +1,19 @@
-"use client";
-
 import React from "react";
 import { Game } from "../games.types";
-import Button from "@/components/ui/Button";
+import GameCardActions from "./GameCardActions";
 import {
   PenTool,
   Volume2,
   Mic,
   Gamepad2,
-  Users,
-  Play,
-  Edit2,
-  Trash2,
 } from "lucide-react";
 
 interface GameCardProps {
   game: Game;
-  onCreateRoom?: (gameId: string) => void;
-  onEdit?: (game: Game) => void;
-  onDelete?: (gameId: string) => void;
+  teacherId: string;
 }
 
-export default function GameCard({
-  game,
-  onCreateRoom,
-  onEdit,
-  onDelete,
-}: GameCardProps) {
+export default function GameCard({ game, teacherId }: GameCardProps) {
   // Select matching icon and background color for the game type
   const getTypeConfig = (type: string) => {
     switch (type) {
@@ -65,7 +52,7 @@ export default function GameCard({
         {/* Header: Type Badge */}
         <div className="flex items-center justify-between mb-4">
           <div
-            className={`flex items-center space-x-2 px-3  py-1.5 rounded-full text-xs font-bold ${config.colorBg}`}
+            className={`flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-bold ${config.colorBg}`}
           >
             {config.icon}
             <span>{config.label}</span>
@@ -89,44 +76,10 @@ export default function GameCard({
         </p>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex flex-col space-y-2 mt-auto">
-        {onCreateRoom && (
-          <Button
-            variant="outlined"
-            leftIcon={<Users className="w-4 h-4" />}
-            onClick={() => game.id && onCreateRoom(game.id)}
-            className="w-full font-bold border-slate-200"
-          >
-            Create Competition Room
-          </Button>
-        )}
-
-        {(onEdit || onDelete) && (
-          <div className="flex gap-2 pt-2 border-t border-slate-100 mt-2">
-            {onEdit && (
-              <Button
-                variant="outlined"
-                leftIcon={<Edit2 className="w-4 h-4" />}
-                onClick={() => game.id && onEdit(game)}
-                className="flex-1 font-semibold text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-50 py-2 px-3 h-10 rounded-xl"
-              >
-                Edit
-              </Button>
-            )}
-            {onDelete && (
-              <Button
-                variant="danger"
-                leftIcon={<Trash2 className="w-4 h-4" />}
-                onClick={() => game.id && onDelete(game.id)}
-                className="flex-1 font-semibold bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-100 hover:border-rose-250 py-2 px-3 h-10 rounded-xl"
-              >
-                Delete
-              </Button>
-            )}
-          </div>
-        )}
-      </div>
+      {/* Action Buttons (Client Island) */}
+      {game.id && (
+        <GameCardActions gameId={game.id} teacherId={teacherId} />
+      )}
     </div>
   );
 }

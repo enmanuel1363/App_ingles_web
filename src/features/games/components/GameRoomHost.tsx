@@ -3,15 +3,27 @@
 import React, { useState, useEffect } from "react";
 import { useGameRoom } from "../hooks/useGameRoom";
 import { useGetExercisesByGame } from "../hooks/useGames";
+import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import { Users, Play, Trophy, ArrowRight, ShieldAlert, Sparkles, Clock } from "lucide-react";
 
 interface GameRoomHostProps {
   roomCode: string;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 export default function GameRoomHost({ roomCode, onClose }: GameRoomHostProps) {
+  const router = useRouter();
+
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    } else {
+      router.push("/games");
+      router.refresh();
+    }
+  };
+
   const { room, loading, error, changeStatus, changeQuestionIndex, players } = useGameRoom(roomCode);
   const { data: exercises = [], isLoading: loadingExercises } = useGetExercisesByGame(room?.id_game || "");
 
@@ -41,7 +53,7 @@ export default function GameRoomHost({ roomCode, onClose }: GameRoomHostProps) {
         <p className="text-slate-500 text-xs mt-2 mb-6">
           Could not establish or locate the requested multiplayer lobby.
         </p>
-        <Button variant="outlined" onClick={onClose} className="w-full">
+        <Button variant="outlined" onClick={handleClose} className="w-full">
           Close Lobby
         </Button>
       </div>
@@ -98,7 +110,7 @@ export default function GameRoomHost({ roomCode, onClose }: GameRoomHostProps) {
           >
             Start Competition
           </Button>
-          <Button variant="outlined" onClick={onClose} className="px-6 border-slate-200">
+          <Button variant="outlined" onClick={handleClose} className="px-6 border-slate-200">
             Cancel
           </Button>
         </div>
@@ -213,7 +225,7 @@ export default function GameRoomHost({ roomCode, onClose }: GameRoomHostProps) {
       </div>
 
       <div className="mt-8 flex justify-center space-x-3">
-        <Button variant="primary" onClick={onClose} className="px-8 text-slate-900 font-extrabold">
+        <Button variant="primary" onClick={handleClose} className="px-8 text-slate-900 font-extrabold">
           Return to Dashboard
         </Button>
       </div>
