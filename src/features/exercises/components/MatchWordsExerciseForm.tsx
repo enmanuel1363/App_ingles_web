@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
 import { useExerciseStore } from "../hooks/useExerciseStore";
@@ -10,6 +11,7 @@ import {
   Info,
   Languages,
   ArrowRightLeft,
+  GripVertical,
 } from "lucide-react";
 
 const EMPTY_PAIR = {
@@ -35,6 +37,17 @@ export default function MatchWordsExerciseForm({ order_index }: Props) {
   const items = exercise.content?.items || [{ pairs: [{ ...EMPTY_PAIR }] }];
   const firstItem = items[0] || { pairs: [] };
   const pairs = firstItem.pairs || [];
+  const [draggedPairIndex, setDraggedPairIndex] = useState<number | null>(null);
+  const [dragOverPairIndex, setDragOverPairIndex] = useState<number | null>(null);
+  const [draggableIndex, setDraggableIndex] = useState<number | null>(null);
+
+  const reorderPairs = (fromIndex: number, toIndex: number) => {
+    const newPairs = [...pairs];
+    const [movedPair] = newPairs.splice(fromIndex, 1);
+    newPairs.splice(toIndex, 0, movedPair);
+    const newItems = [{ ...firstItem, pairs: newPairs }];
+    updateContent("items", newItems);
+  };
 
   const updateField = (field: string, value: any) => {
     updateExercise(order_index, { ...exercise, [field]: value });
@@ -176,11 +189,64 @@ export default function MatchWordsExerciseForm({ order_index }: Props) {
           return (
             <div
               key={pairIndex}
-              className="flex items-end gap-3.5 p-4.5 bg-slate-50/60 rounded-2xl border border-slate-200/60 hover:bg-slate-50 transition-all duration-200"
+              draggable={draggableIndex === pairIndex}
+              onDragStart={(e) => {
+                e.stopPropagation();
+                setDraggedPairIndex(pairIndex);
+                e.dataTransfer.effectAllowed = "move";
+                e.dataTransfer.setData("text/plain", pairIndex.toString());
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (dragOverPairIndex !== pairIndex) {
+                  setDragOverPairIndex(pairIndex);
+                }
+              }}
+              onDragLeave={(e) => {
+                e.stopPropagation();
+                setDragOverPairIndex(null);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const fromIndex = draggedPairIndex;
+                if (fromIndex !== null && fromIndex !== pairIndex) {
+                  reorderPairs(fromIndex, pairIndex);
+                }
+                setDraggedPairIndex(null);
+                setDragOverPairIndex(null);
+                setDraggableIndex(null);
+              }}
+              onDragEnd={(e) => {
+                e.stopPropagation();
+                setDraggedPairIndex(null);
+                setDragOverPairIndex(null);
+                setDraggableIndex(null);
+              }}
+              className={`flex items-end gap-3.5 p-4.5 bg-slate-50/60 rounded-2xl border transition-all duration-200 ${
+                draggedPairIndex === pairIndex ? "opacity-35 scale-[0.98]" : ""
+              } ${
+                dragOverPairIndex === pairIndex && draggedPairIndex !== pairIndex
+                  ? "ring-2 ring-cyan-500 ring-offset-2 rounded-2xl scale-[1.01]"
+                  : "border-slate-200/60 hover:bg-slate-50"
+              }`}
             >
-              <span className="text-xs font-extrabold text-cyan-650 uppercase tracking-wider shrink-0 pb-3.5 w-6">
-                #{pairIndex + 1}
-              </span>
+              <div className="flex items-center gap-1 shrink-0 pb-3.5">
+                {pairs.length > 1 && (
+                  <div
+                    className="text-slate-400 hover:text-slate-655 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/50 transition-colors"
+                    onMouseDown={() => setDraggableIndex(pairIndex)}
+                    onMouseUp={() => setDraggableIndex(null)}
+                    title="Arrastrar para reordenar"
+                  >
+                    <GripVertical size={16} />
+                  </div>
+                )}
+                <span className="text-xs font-extrabold text-cyan-650 uppercase tracking-wider w-6">
+                  #{pairIndex + 1}
+                </span>
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
                 <FormInput
