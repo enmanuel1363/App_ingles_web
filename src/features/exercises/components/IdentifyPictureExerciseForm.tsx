@@ -85,19 +85,27 @@ export default function IdentifyPictureExerciseForm({ order_index }: Props) {
   // States for audio playback
   const [playingAudioSrc, setPlayingAudioSrc] = useState<string | null>(null);
 
-  const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
-  const [dragOverItemIndex, setDragOverItemIndex] = useState<number | null>(
-    null,
-  );
-  const [draggableIndex, setDraggableIndex] = useState<number | null>(null);
+  const [draggedImgInfo, setDraggedImgInfo] = useState<{
+    itemIndex: number;
+    imgIndex: number;
+  } | null>(null);
+  const [dragOverImgInfo, setDragOverImgInfo] = useState<{
+    itemIndex: number;
+    imgIndex: number;
+  } | null>(null);
 
   const audioInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
 
-  const reorderItems = (fromIndex: number, toIndex: number) => {
-    const newItems = [...items];
-    const [movedItem] = newItems.splice(fromIndex, 1);
-    newItems.splice(toIndex, 0, movedItem);
-    updateContent("items", newItems);
+  const reorderImages = (
+    itemIndex: number,
+    fromIndex: number,
+    toIndex: number,
+  ) => {
+    const item = items[itemIndex];
+    const newImages = [...(item.images || [])];
+    const [movedImage] = newImages.splice(fromIndex, 1);
+    newImages.splice(toIndex, 0, movedImage);
+    updateItem(itemIndex, { images: newImages });
   };
 
   const updateField = (field: string, value: any) => {
@@ -370,72 +378,20 @@ export default function IdentifyPictureExerciseForm({ order_index }: Props) {
         return (
           <div
             key={itemIndex}
-            draggable={draggableIndex === itemIndex}
-            onDragStart={(e) => {
-              e.stopPropagation();
-              setDraggedItemIndex(itemIndex);
-              e.dataTransfer.effectAllowed = "move";
-              e.dataTransfer.setData("text/plain", itemIndex.toString());
-            }}
-            onDragOver={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (dragOverItemIndex !== itemIndex) {
-                setDragOverItemIndex(itemIndex);
-              }
-            }}
-            onDragLeave={(e) => {
-              e.stopPropagation();
-              setDragOverItemIndex(null);
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              const fromIndex = draggedItemIndex;
-              if (fromIndex !== null && fromIndex !== itemIndex) {
-                reorderItems(fromIndex, itemIndex);
-              }
-              setDraggedItemIndex(null);
-              setDragOverItemIndex(null);
-              setDraggableIndex(null);
-            }}
-            onDragEnd={(e) => {
-              e.stopPropagation();
-              setDraggedItemIndex(null);
-              setDragOverItemIndex(null);
-              setDraggableIndex(null);
-            }}
             className={`p-6 bg-white border rounded-2xl shadow-sm transition-all duration-200 ${
               isItemInvalid
                 ? "border-amber-300 bg-amber-50/5"
                 : "border-slate-200/80"
-            } ${
-              draggedItemIndex === itemIndex ? "opacity-35 scale-[0.98]" : ""
-            } ${
-              dragOverItemIndex === itemIndex && draggedItemIndex !== itemIndex
-                ? "ring-2 ring-cyan-500 ring-offset-2 rounded-2xl scale-[1.01]"
-                : ""
             }`}
           >
             {/* Item Header */}
             <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-2">
-                {items.length > 1 && (
-                  <div
-                    className="text-slate-400 hover:text-slate-600 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-50 transition-colors"
-                    onMouseDown={() => setDraggableIndex(itemIndex)}
-                    onMouseUp={() => setDraggableIndex(null)}
-                    title="Arrastrar para reordenar"
-                  >
-                    <GripVertical size={18} />
-                  </div>
-                )}
-                <span className="font-bold text-cyan-600 text-xs tracking-wider uppercase">
-                  Question {itemIndex + 1}
-                </span>
-              </div>
+              <span className="font-bold text-cyan-600 text-xs tracking-wider uppercase">
+                Question {itemIndex + 1}
+              </span>
               {items.length > 1 && (
                 <button
+                  type="button"
                   className="text-slate-400 hover:text-rose-600 transition-colors p-1.5 rounded-lg hover:bg-rose-50/5 cursor-pointer"
                   onClick={() => removeItem(itemIndex)}
                   title="Eliminar pregunta"
@@ -553,12 +509,71 @@ export default function IdentifyPictureExerciseForm({ order_index }: Props) {
                     return (
                       <div
                         key={imageIndex}
-                        className={`relative group bg-white border rounded-xl overflow-hidden shadow-sm transition-all duration-200 flex flex-col aspect-[4/3] ${
+                        draggable
+                        onDragStart={(e) => {
+                          e.stopPropagation();
+                          setDraggedImgInfo({ itemIndex, imgIndex: imageIndex });
+                          e.dataTransfer.effectAllowed = "move";
+                          e.dataTransfer.setData("text/plain", `${itemIndex},${imageIndex}`);
+                        }}
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (
+                            draggedImgInfo &&
+                            draggedImgInfo.itemIndex === itemIndex &&
+                            (dragOverImgInfo?.itemIndex !== itemIndex || dragOverImgInfo?.imgIndex !== imageIndex)
+                          ) {
+                            setDragOverImgInfo({ itemIndex, imgIndex: imageIndex });
+                          }
+                        }}
+                        onDragLeave={(e) => {
+                          e.stopPropagation();
+                          setDragOverImgInfo(null);
+                        }}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (
+                            draggedImgInfo &&
+                            draggedImgInfo.itemIndex === itemIndex &&
+                            draggedImgInfo.imgIndex !== imageIndex
+                          ) {
+                            reorderImages(itemIndex, draggedImgInfo.imgIndex, imageIndex);
+                          }
+                          setDraggedImgInfo(null);
+                          setDragOverImgInfo(null);
+                        }}
+                        onDragEnd={(e) => {
+                          e.stopPropagation();
+                          setDraggedImgInfo(null);
+                          setDragOverImgInfo(null);
+                        }}
+                        className={`relative group bg-white border rounded-xl overflow-hidden shadow-sm transition-all duration-200 flex flex-col aspect-[4/3] cursor-grab active:cursor-grabbing ${
                           img.is_correct
                             ? "border-cyan-500 ring-1 ring-cyan-500"
                             : "border-slate-200/80"
+                        } ${
+                          draggedImgInfo?.itemIndex === itemIndex &&
+                          draggedImgInfo?.imgIndex === imageIndex
+                            ? "opacity-30 scale-[0.95]"
+                            : ""
+                        } ${
+                          dragOverImgInfo?.itemIndex === itemIndex &&
+                          dragOverImgInfo?.imgIndex === imageIndex &&
+                          draggedImgInfo?.imgIndex !== imageIndex
+                            ? "ring-2 ring-cyan-500 ring-offset-2 scale-[1.03]"
+                            : ""
                         }`}
                       >
+                        {/* Drag Handle Indicator */}
+                        <div
+                          className="absolute top-2 left-2 z-10 p-1.5 bg-white/95 rounded-lg shadow-sm text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                          title="Arrastrar imagen para reordenar"
+                        >
+                          <GripVertical size={13} />
+                        </div>
+
                         {/* Hidden input to replace this specific image */}
                         <input
                           id={`image-replace-${itemIndex}-${imageIndex}`}
@@ -590,14 +605,18 @@ export default function IdentifyPictureExerciseForm({ order_index }: Props) {
                             <img
                               src={previewSrc(img.image_url)}
                               alt="Option"
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-cover select-none pointer-events-none"
+                              draggable={false}
                             />
                           )}
 
                           {/* Image Actions Overlay */}
-                          <div className="absolute top-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="absolute top-2 right-2 z-10 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
-                              onClick={() => {
+                              type="button"
+                              onMouseDown={(e) => e.stopPropagation()}
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 const el = document.getElementById(
                                   `image-replace-${itemIndex}-${imageIndex}`,
                                 );
@@ -609,9 +628,12 @@ export default function IdentifyPictureExerciseForm({ order_index }: Props) {
                               <Edit size={13} />
                             </button>
                             <button
-                              onClick={() =>
-                                removeImageOption(itemIndex, imageIndex)
-                              }
+                              type="button"
+                              onMouseDown={(e) => e.stopPropagation()}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeImageOption(itemIndex, imageIndex);
+                              }}
                               className="p-1.5 bg-white/95 rounded-lg shadow-sm hover:text-rose-650 text-slate-500 transition-colors cursor-pointer"
                               title="Eliminar opción"
                             >
@@ -621,10 +643,13 @@ export default function IdentifyPictureExerciseForm({ order_index }: Props) {
 
                           {/* Correct/Incorrect Badge */}
                           <button
-                            onClick={() =>
-                              setCorrectOption(itemIndex, imageIndex)
-                            }
-                            className={`absolute bottom-2 left-2 flex items-center gap-1.5 py-1 px-2.5 rounded-lg text-[10px] font-bold shadow-md cursor-pointer transition-all ${
+                            type="button"
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCorrectOption(itemIndex, imageIndex);
+                            }}
+                            className={`absolute bottom-2 left-2 z-10 flex items-center gap-1.5 py-1 px-2.5 rounded-lg text-[10px] font-bold shadow-md cursor-pointer transition-all ${
                               img.is_correct
                                 ? "bg-cyan-500 text-white"
                                 : "bg-white/90 text-slate-600 hover:bg-white hover:text-slate-800"
