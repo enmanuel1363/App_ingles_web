@@ -340,14 +340,14 @@ export default function DashboardPage() {
             <div>
               <h2 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-1.5">
                 <Flame className="w-5 h-5 text-orange-500 fill-current animate-pulse" />
-                Mejores Rachas
+                Rachas de Estudiantes
               </h2>
               <p className="text-slate-500 text-sm font-medium">
-                Estudiantes más constantes del aula
+                Todos los estudiantes registrados, de mayor a menor racha
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[420px] overflow-y-auto pr-1">
               {isLoading ? (
                 Array.from({ length: 2 }).map((_, idx) => (
                   <div

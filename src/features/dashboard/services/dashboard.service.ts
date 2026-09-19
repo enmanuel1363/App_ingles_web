@@ -80,8 +80,7 @@ export const dashboardService = {
         longest_streak,
         student:id_student_profile(full_name, avatar_url)
       `)
-      .order("current_streak", { ascending: false })
-      .limit(3);
+      .order("current_streak", { ascending: false });
 
     if (error) throw error;
 
