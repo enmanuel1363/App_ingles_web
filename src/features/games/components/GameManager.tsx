@@ -32,7 +32,7 @@ export default function GameManager({
             className="inline-flex items-center justify-center space-x-2 px-5 py-3 rounded-xl font-black text-sm bg-primary hover:bg-primary-dark text-slate-950 shadow-sm transition-all duration-200 active:scale-[0.98]"
           >
             <Plus className="w-4 h-4" />
-            <span>Crear Juego</span>
+            <span>Create Game</span>
           </Link>
         </div>
       </div>
@@ -53,7 +53,7 @@ export default function GameManager({
             className="inline-flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl font-bold text-xs bg-primary hover:bg-primary-dark text-slate-950 shadow-sm transition-all duration-200"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>Crear Primer Juego</span>
+            <span>Create First Game</span>
           </Link>
         </div>
       ) : (

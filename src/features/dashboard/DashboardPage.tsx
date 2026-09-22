@@ -83,6 +83,7 @@ export default function DashboardPage() {
       subtitle: "Alumnos registrados",
       Icon: Users,
       color: "text-cyan-600 bg-cyan-50 border-cyan-100",
+      route: "/students",
     },
     {
       label: "Lecciones Creadas",
@@ -90,6 +91,7 @@ export default function DashboardPage() {
       subtitle: "Clases en la plataforma",
       Icon: GraduationCap,
       color: "text-lime-600 bg-lime-50 border-lime-100",
+      route: "/courses",
     },
     {
       label: "Recompensas Reclamadas",
@@ -97,6 +99,7 @@ export default function DashboardPage() {
       subtitle: "Medallas desbloqueadas",
       Icon: Trophy,
       color: "text-amber-600 bg-amber-50 border-amber-100",
+      route: "/rewards",
     },
     {
       label: "Rendimiento Promedio",
@@ -104,6 +107,7 @@ export default function DashboardPage() {
       subtitle: "Puntaje promedio global",
       Icon: BarChart3,
       color: "text-indigo-600 bg-indigo-50 border-indigo-100",
+      route: undefined,
     },
   ];
 
@@ -206,13 +210,15 @@ export default function DashboardPage() {
                 >
                   <Icon className="w-6 h-6" />
                 </div>
-                <button
-                  onClick={() => router.push("/courses")}
-                  className="text-[10px] font-bold text-cyan-600 bg-cyan-500/10 px-2.5 py-1 rounded-full border border-cyan-500/20 flex items-center space-x-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer focus:outline-none"
-                >
-                  <span>Detalle</span>
-                  <ArrowUpRight className="w-3 h-3" />
-                </button>
+                {stat.route ? (
+                  <button
+                    onClick={() => router.push(stat.route!)}
+                    className="text-[10px] font-bold text-cyan-600 bg-cyan-500/10 px-2.5 py-1 rounded-full border border-cyan-500/20 flex items-center space-x-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer focus:outline-none"
+                  >
+                    <span>Detalle</span>
+                    <ArrowUpRight className="w-3 h-3" />
+                  </button>
+                ) : null}
               </div>
               <div className="mt-4 space-y-1">
                 <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">

@@ -372,7 +372,7 @@ export async function cloneGame(
   const originalExercises = await getExercisesByGameId(gameId);
 
   const newGameData: CreateGameDTO = {
-    name: `${originalGame.name} (Copia)`,
+    name: `${originalGame.name} (Copy)`,
     description: originalGame.description || null,
     type: originalGame.type,
     created_by: currentTeacherId || originalGame.created_by,

@@ -120,29 +120,29 @@ export const GAME_TYPE_CONFIG: Record<
   { label: string; description: string; badgeColor: string; textColor: string; borderColor: string }
 > = {
   write: {
-    label: "Escritura",
-    description: "Retos de vocabulario, ortografía y crucigramas",
+    label: "Writing",
+    description: "Vocabulary, spelling, and crossword challenges",
     badgeColor: "bg-[#24DFE2]/20",
     textColor: "text-cyan-900",
     borderColor: "border-[#24DFE2]/40",
   },
   listen: {
-    label: "Escucha",
-    description: "Retos de comprensión auditiva y velocidad",
+    label: "Listening",
+    description: "Listening comprehension and speed challenges",
     badgeColor: "bg-[#B4FF2B]/25",
     textColor: "text-lime-950",
     borderColor: "border-[#B4FF2B]/40",
   },
   speak: {
-    label: "Habla",
-    description: "Retos de pronunciación oral y trabalenguas",
+    label: "Speaking",
+    description: "Oral pronunciation and tongue twister challenges",
     badgeColor: "bg-[#FF9400]/20",
     textColor: "text-amber-950",
     borderColor: "border-[#FF9400]/40",
   },
   mix: {
-    label: "Mixto",
-    description: "Desafíos combinados de todas las destrezas",
+    label: "Mixed",
+    description: "Combined challenges across all skills",
     badgeColor: "bg-slate-100",
     textColor: "text-slate-800",
     borderColor: "border-slate-300",
@@ -156,57 +156,57 @@ export const SUBTYPE_METADATA: Record<
   match_name_to_picture: {
     label: "Match Name to Picture",
     gameType: "write",
-    shortDesc: "Emparejar nombre con imagen",
+    shortDesc: "Match name with picture",
   },
   identify_picture_reading_name: {
     label: "Identify Picture by Name",
     gameType: "write",
-    shortDesc: "Identificar imagen leyendo el nombre",
+    shortDesc: "Identify picture by reading name",
   },
   timed_typing_challenge: {
     label: "Timed Typing Challenge",
     gameType: "write",
-    shortDesc: "Mecanografía rápida contrarreloj",
+    shortDesc: "Fast timed typing challenge",
   },
   match_word: {
     label: "Match Word Challenge",
     gameType: "write",
-    shortDesc: "Emparejar palabras y significados",
+    shortDesc: "Match words and meanings",
   },
   crossword: {
     label: "Crossword Challenge",
     gameType: "write",
-    shortDesc: "Crucigrama interactivo con pistas",
+    shortDesc: "Interactive crossword with clues",
   },
   match_audio_to_text: {
     label: "Match Audio to Text",
     gameType: "listen",
-    shortDesc: "Escuchar audio y emparejar con texto",
+    shortDesc: "Listen to audio and match with text",
   },
   identify_audio: {
     label: "Identify Audio",
     gameType: "listen",
-    shortDesc: "Identificar opción correcta por audio",
+    shortDesc: "Identify correct option by audio",
   },
   fast_audio_mode: {
     label: "Fast Audio Mode",
     gameType: "listen",
-    shortDesc: "Comprensión auditiva a velocidad rápida",
+    shortDesc: "Fast-speed listening comprehension",
   },
   speak_before_timer: {
     label: "Speak Before Timer Ends",
     gameType: "speak",
-    shortDesc: "Pronunciar frase antes del tiempo límite",
+    shortDesc: "Pronounce phrase before time limit",
   },
   say_5_words_quickly: {
     label: "Say 5 Words Quickly",
     gameType: "speak",
-    shortDesc: "Decir 5 palabras rápidamente en el micro",
+    shortDesc: "Say 5 words quickly into the mic",
   },
   tongue_twister_challenge: {
     label: "Tongue Twister Challenge",
     gameType: "speak",
-    shortDesc: "Desafío de trabalenguas con intentos",
+    shortDesc: "Tongue twister challenge with attempts",
   },
 };
 

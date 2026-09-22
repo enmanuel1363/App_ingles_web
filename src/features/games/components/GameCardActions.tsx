@@ -31,8 +31,8 @@ export default function GameCardActions({
       }
     } catch (err) {
       showAlert({
-        title: "Error al crear sala",
-        message: "No se pudo generar la sala multijugador. Verifica tu conexión.",
+        title: "Error creating room",
+        message: "Could not generate multiplayer room. Please check your connection.",
         type: "error",
       });
     }
@@ -40,11 +40,11 @@ export default function GameCardActions({
 
   const handleDelete = async () => {
     const isConfirmed = await confirm({
-      title: "¿Eliminar juego?",
+      title: "Delete game?",
       description:
-        "¿Estás seguro de que deseas eliminar permanentemente este juego? Esta acción no se puede deshacer.",
-      confirmText: "Eliminar",
-      cancelText: "Cancelar",
+        "Are you sure you want to permanently delete this game? This action cannot be undone.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
       variant: "danger",
     });
 
@@ -53,15 +53,15 @@ export default function GameCardActions({
     try {
       await deleteGameMutation.mutateAsync(gameId);
       showAlert({
-        title: "Juego eliminado",
-        message: "El juego ha sido eliminado exitosamente.",
+        title: "Game deleted",
+        message: "The game was successfully deleted.",
         type: "success",
       });
       router.refresh();
     } catch (err) {
       showAlert({
         title: "Error",
-        message: "No se pudo eliminar el juego. Intenta de nuevo.",
+        message: "Could not delete game. Please try again.",
         type: "error",
       });
     }

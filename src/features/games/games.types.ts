@@ -14,9 +14,9 @@ export type ListeningGameExerciseType =
   | "fast_audio_mode"; // Fast audio mode
 
 export type SpeakingGameExerciseType =
-  | "speak_before_timer" // Decir una frase antes de que acaben los 15 segundos
-  | "say_5_words_quickly" // Decir 5 palabras rápidamente
-  | "tongue_twister_challenge"; // Trabalenguas con número máximo de intentos
+  | "speak_before_timer" // Speak a phrase before 15 seconds run out
+  | "say_5_words_quickly" // Say 5 words quickly
+  | "tongue_twister_challenge"; // Tongue twister with max attempts
 
 export type GameExerciseType =
   | WrittenGameExerciseType

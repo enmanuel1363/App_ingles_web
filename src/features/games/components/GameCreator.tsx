@@ -211,8 +211,8 @@ export default function GameCreator({
       if (exercises.length >= 8) {
         setAlertConfig({
           visible: true,
-          title: "Límite Alcanzado",
-          message: "¡Un juego puede tener un máximo de 8 ejercicios!",
+          title: "Limit Reached",
+          message: "A game can have a maximum of 8 exercises!",
           type: "info",
         });
         return;
@@ -613,9 +613,9 @@ export default function GameCreator({
                     setIsImportModalOpen(true);
                   }}
                   className="text-slate-900 font-extrabold text-xs py-2 px-3 rounded-xl border-slate-200 hover:bg-slate-50"
-                  title="Copiar ejercicios de juegos ya creados categorizados por tipo y subtipo"
+                  title="Copy exercises from existing games categorized by type and subtype"
                 >
-                  Copiar Ejercicios
+                  Copy Exercises
                 </Button>
 
                 {activeExerciseIndex !== null && (
@@ -643,10 +643,10 @@ export default function GameCreator({
               <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-2xl p-6">
                 <Sparkles className="w-10 h-10 text-cyan-400 mx-auto mb-3 animate-pulse" />
                 <p className="text-slate-800 text-sm font-black">
-                  No hay ejercicios en este juego todavía.
+                  No exercises in this game yet.
                 </p>
                 <p className="text-slate-400 text-xs mt-1 mb-5 font-medium">
-                  Comienza agregando un ejercicio en blanco o copia ejercicios de juegos existentes categorizados por tipo y subtipo.
+                  Start by adding a blank exercise or copy exercises from existing games categorized by type and subtype.
                 </p>
                 <div className="flex items-center justify-center gap-3">
                   <Button
@@ -655,7 +655,7 @@ export default function GameCreator({
                     onClick={handleAddExercise}
                     className="text-slate-950 font-black text-xs"
                   >
-                    Crear desde cero
+                    Create from scratch
                   </Button>
                   <Button
                     variant="outlined"
@@ -667,7 +667,7 @@ export default function GameCreator({
                     }}
                     className="text-slate-900 font-bold text-xs border-slate-200 hover:bg-slate-50"
                   >
-                    Copiar ejercicios de otros juegos
+                    Copy exercises from other games
                   </Button>
                 </div>
               </div>
@@ -723,9 +723,9 @@ export default function GameCreator({
                           setIsImportModalOpen(true);
                         }}
                         className="text-cyan-600 hover:text-cyan-700 font-extrabold text-[10px] flex items-center gap-1 transition-all uppercase tracking-wider bg-transparent border-0 cursor-pointer"
-                        title="Buscar ejercicios de este subtipo u otros para copiar contenido"
+                        title="Search exercises of this subtype or others to copy content"
                       >
-                        <Sparkles className="w-3 h-3 text-[#24DFE2]" /> Copiar de Librería
+                        <Sparkles className="w-3 h-3 text-[#24DFE2]" /> Copy from Library
                       </button>
                     </div>
                     <select

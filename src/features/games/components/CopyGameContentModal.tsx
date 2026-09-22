@@ -151,8 +151,8 @@ export default function CopyGameContentModal({
     onCopyExercise(ex, mode);
     triggerNotification(
       mode === "replace"
-        ? `Ejercicio reemplazado con "${ex.name}"`
-        : `Ejercicio "${ex.name}" agregado exitosamente`,
+        ? `Exercise replaced with "${ex.name}"`
+        : `Exercise "${ex.name}" added successfully`,
     );
   };
 
@@ -176,37 +176,37 @@ export default function CopyGameContentModal({
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-[10px] font-black text-cyan-700 bg-cyan-50 border border-cyan-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
                   <Sparkles className="w-3 h-3 text-[#24DFE2]" />
-                  Librería de Ejercicios
+                  Exercise Library
                 </span>
                 <span className="text-xs font-bold text-slate-400">
-                  • {allExercises.length} ejercicios disponibles en juegos creados
+                  • {allExercises.length} exercises available from created games
                 </span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                Copiar Contenido de Ejercicios
+                Copy Exercise Content
               </h2>
               <p className="text-xs text-slate-500 font-medium mt-0.5">
-                Reutiliza ejercicios creados en otros juegos, clasificados por tipo de juego y subtipo de reto.
+                Reuse exercises created in other games, classified by game type and challenge subtype.
               </p>
             </div>
 
             <div className="flex items-center gap-3">
               {/* Capacity indicator */}
               <div className="text-[11px] font-semibold text-slate-500 hidden sm:flex items-center gap-1.5">
-                <span>Capacidad:</span>
+                <span>Capacity:</span>
                 <span className={`px-2 py-0.5 rounded-md font-extrabold ${
                   currentExercisesCount >= maxExercises
                     ? "bg-rose-100 text-rose-700"
                     : "bg-emerald-50 text-emerald-700 border border-emerald-200"
                 }`}>
-                  {currentExercisesCount} de {maxExercises}
+                  {currentExercisesCount} of {maxExercises}
                 </span>
               </div>
 
               <button
                 onClick={onClose}
                 className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
-                title="Cerrar modal"
+                title="Close modal"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -214,12 +214,12 @@ export default function CopyGameContentModal({
           </div>
         </div>
 
-        {/* Filters Bar: Categorización por Tipo y Subtipo */}
+        {/* Filters Bar: Categorization by Type and Subtype */}
         <div className="bg-white/80 backdrop-blur-sm border-b border-slate-200/60 p-4 px-5 sm:px-6 space-y-3 shrink-0">
-          {/* 1. Categoría por Tipo de Juego (GameType) */}
+          {/* 1. Category by Game Type (GameType) */}
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-[10px] font-black text-slate-450 uppercase tracking-wider mr-1">
-              Tipo:
+              Type:
             </span>
 
             <button
@@ -230,7 +230,7 @@ export default function CopyGameContentModal({
                   : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
               }`}
             >
-              🌟 Todos ({typeCounts.all})
+              🌟 All ({typeCounts.all})
             </button>
 
             <button
@@ -242,7 +242,7 @@ export default function CopyGameContentModal({
               }`}
             >
               <PenTool className="w-3.5 h-3.5 text-cyan-600" />
-              <span>Escritura ({typeCounts.write})</span>
+              <span>Writing ({typeCounts.write})</span>
             </button>
 
             <button
@@ -254,7 +254,7 @@ export default function CopyGameContentModal({
               }`}
             >
               <Volume2 className="w-3.5 h-3.5 text-lime-600" />
-              <span>Escucha ({typeCounts.listen})</span>
+              <span>Listening ({typeCounts.listen})</span>
             </button>
 
             <button
@@ -266,7 +266,7 @@ export default function CopyGameContentModal({
               }`}
             >
               <Mic className="w-3.5 h-3.5 text-amber-600" />
-              <span>Habla ({typeCounts.speak})</span>
+              <span>Speaking ({typeCounts.speak})</span>
             </button>
 
             <button
@@ -278,16 +278,16 @@ export default function CopyGameContentModal({
               }`}
             >
               <Gamepad2 className="w-3.5 h-3.5 text-indigo-500" />
-              <span>Mixto ({typeCounts.mix})</span>
+              <span>Mixed ({typeCounts.mix})</span>
             </button>
           </div>
 
-          {/* 2. Categoría por Subtipo + Buscador */}
+          {/* 2. Category by Subtype + Search */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
             {/* Subtypes dropdown / selector */}
             <div className="flex items-center gap-2 flex-1 overflow-x-auto pb-1 sm:pb-0">
               <span className="text-[10px] font-black text-slate-450 uppercase tracking-wider shrink-0">
-                Subtipo:
+                Subtype:
               </span>
               <select
                 value={selectedSubtype}
@@ -295,7 +295,7 @@ export default function CopyGameContentModal({
                 className="bg-white border border-slate-200 text-slate-800 text-xs font-semibold rounded-xl px-3 py-2 outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all cursor-pointer min-w-[220px]"
               >
                 <option value="all">
-                  Todos los Subtipos ({availableSubtypes.length})
+                  All Subtypes ({availableSubtypes.length})
                 </option>
                 {availableSubtypes.map((sub) => (
                   <option key={sub.value} value={sub.value}>
@@ -309,7 +309,7 @@ export default function CopyGameContentModal({
                   onClick={() => setSelectedSubtype("all")}
                   className="text-[11px] text-rose-500 hover:text-rose-700 font-bold underline cursor-pointer shrink-0"
                 >
-                  Quitar filtro subtipo
+                  Clear subtype filter
                 </button>
               )}
             </div>
@@ -321,7 +321,7 @@ export default function CopyGameContentModal({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Buscar por nombre o palabra..."
+                placeholder="Search by name or keyword..."
                 className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-8 py-2 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all"
               />
               {searchQuery && (
@@ -336,14 +336,14 @@ export default function CopyGameContentModal({
           </div>
         </div>
 
-        {/* Content Body: Lista de Ejercicios */}
+        {/* Content Body: Exercises List */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
           {/* Loading State */}
           {isLoadingExercises && (
             <div className="flex flex-col items-center justify-center py-20 space-y-3">
               <div className="w-9 h-9 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin" />
               <p className="text-slate-600 text-xs font-bold">
-                Cargando ejercicios de la biblioteca...
+                Loading exercises from library...
               </p>
             </div>
           )}
@@ -354,10 +354,10 @@ export default function CopyGameContentModal({
                 <div className="text-center py-16 bg-white border-2 border-dashed border-slate-200 rounded-2xl p-6">
                   <Sparkles className="w-10 h-10 text-slate-300 mx-auto mb-3" />
                   <h4 className="text-sm font-black text-slate-800">
-                    No se encontraron ejercicios
+                    No exercises found
                   </h4>
                   <p className="text-slate-500 text-xs mt-1 max-w-md mx-auto font-medium">
-                    No hay ejercicios que coincidan con los filtros seleccionados de tipo, subtipo o búsqueda. Intenta cambiar los filtros superiores.
+                    No exercises match the selected type, subtype, or search filters. Try adjusting the filters above.
                   </p>
                 </div>
               ) : (
@@ -408,9 +408,9 @@ export default function CopyGameContentModal({
                           {/* Origin Game Link */}
                           <div className="mt-2.5 flex items-center gap-1.5 text-[10px] text-slate-500 font-semibold bg-slate-50/80 border border-slate-100 rounded-lg px-2.5 py-1 w-fit">
                             <Gamepad2 className="w-3.5 h-3.5 text-slate-400" />
-                            <span>Juego de origen:</span>
+                            <span>Origin game:</span>
                             <span className="text-slate-800 font-black">
-                              {ex.games?.name || "Sin asignar"}
+                              {ex.games?.name || "Unassigned"}
                             </span>
                           </div>
 
@@ -431,9 +431,9 @@ export default function CopyGameContentModal({
                               leftIcon={<Copy className="w-3.5 h-3.5" />}
                               onClick={() => handleCopyOne(ex, "replace")}
                               className="text-xs py-1.5 px-3 h-9 rounded-xl font-bold border-slate-200 hover:bg-slate-50"
-                              title="Reemplaza los datos del ejercicio que tienes abierto actualmente"
+                              title="Replace data of the exercise currently open"
                             >
-                              Reemplazar actual
+                              Replace active
                             </Button>
                           )}
 
@@ -445,11 +445,11 @@ export default function CopyGameContentModal({
                             className="text-xs py-1.5 px-3 h-9 rounded-xl font-black text-slate-950 shadow-sm"
                             title={
                               currentExercisesCount >= maxExercises
-                                ? "Límite de 8 ejercicios alcanzado"
-                                : "Añade este ejercicio como uno nuevo en la lista"
+                                ? "8 exercises limit reached"
+                                : "Add this exercise as a new item in the list"
                             }
                           >
-                            + Agregar nuevo
+                            + Add new
                           </Button>
                         </div>
                       </div>
@@ -464,14 +464,14 @@ export default function CopyGameContentModal({
         {/* Modal Footer */}
         <div className="bg-white border-t border-slate-200/70 p-4 px-6 flex items-center justify-between shrink-0">
           <p className="text-[11px] text-slate-400 font-medium">
-            💡 Al copiar, la configuración del ejercicio se duplicará limpiamente en tu juego actual.
+            💡 When copying, the exercise configuration will be cleanly duplicated into your current game.
           </p>
           <Button
             variant="secondary"
             onClick={onClose}
             className="text-xs py-2 px-5 rounded-xl font-bold text-slate-900"
           >
-            Cerrar
+            Close
           </Button>
         </div>
       </div>
@@ -504,15 +504,15 @@ function ExerciseContentPreviewBadge({
               />
             ) : (
               <div className="w-12 h-12 rounded-lg bg-slate-100 border border-dashed border-slate-200 flex items-center justify-center text-[9px] font-bold text-slate-400 shrink-0">
-                Sin foto
+                No image
               </div>
             )}
             <div className="text-[11px] space-y-0.5 overflow-hidden">
               <p className="font-extrabold text-slate-800 truncate">
-                Correcta: <span className="text-emerald-600">"{content.correctAnswer || '---'}"</span>
+                Correct: <span className="text-emerald-600">"{content.correctAnswer || '---'}"</span>
               </p>
               <p className="text-[10px] text-slate-400 truncate">
-                Opciones: {Array.isArray(content.options) ? content.options.filter(Boolean).join(", ") : ""}
+                Options: {Array.isArray(content.options) ? content.options.filter(Boolean).join(", ") : ""}
               </p>
             </div>
           </div>
@@ -522,10 +522,10 @@ function ExerciseContentPreviewBadge({
         return (
           <div className="text-[11px] space-y-1">
             <p className="font-extrabold text-slate-800 truncate">
-              Palabra a leer: <span className="text-cyan-700 font-black">"{content.wordToRead || '---'}"</span>
+              Word to read: <span className="text-cyan-700 font-black">"{content.wordToRead || '---'}"</span>
             </p>
             <p className="text-[10px] text-slate-500 font-medium truncate">
-              Imágenes ({Array.isArray(content.imageOptions) ? content.imageOptions.length : 0}): {Array.isArray(content.imageOptions) ? content.imageOptions.map((o: any) => o.label).filter(Boolean).join(", ") : ""}
+              Images ({Array.isArray(content.imageOptions) ? content.imageOptions.length : 0}): {Array.isArray(content.imageOptions) ? content.imageOptions.map((o: any) => o.label).filter(Boolean).join(", ") : ""}
             </p>
           </div>
         );
@@ -534,7 +534,7 @@ function ExerciseContentPreviewBadge({
         return (
           <div className="text-[11px] space-y-1">
             <p className="font-extrabold text-slate-700">
-              Pares a emparejar ({Array.isArray(content.items) ? content.items.length : 0}):
+              Pairs to match ({Array.isArray(content.items) ? content.items.length : 0}):
             </p>
             <div className="flex flex-wrap gap-1">
               {Array.isArray(content.items) &&
@@ -555,11 +555,11 @@ function ExerciseContentPreviewBadge({
           <div className="text-[11px] space-y-1">
             <div className="flex items-center gap-2">
               <span className="font-bold text-slate-700">
-                Tiempo: <span className="font-extrabold text-amber-600">{content.timeLimitSeconds || 30}s</span>
+                Time: <span className="font-extrabold text-amber-600">{content.timeLimitSeconds || 30}s</span>
               </span>
               <span className="text-slate-300">•</span>
               <span className="text-[10px] text-slate-500 font-bold">
-                {Array.isArray(content.words) ? content.words.length : 0} palabras
+                {Array.isArray(content.words) ? content.words.length : 0} words
               </span>
             </div>
             <p className="text-[10px] text-slate-500 font-mono truncate">
@@ -572,14 +572,14 @@ function ExerciseContentPreviewBadge({
         return (
           <div className="text-[11px] space-y-1">
             <p className="font-bold text-slate-700">
-              Crucigrama:{" "}
+              Crossword:{" "}
               <span className="font-extrabold text-cyan-700">
-                {Array.isArray(content.clue) ? content.clue.length : 0} pistas
+                {Array.isArray(content.clue) ? content.clue.length : 0} clues
               </span>{" "}
-              • {Array.isArray(content.caracter) ? content.caracter.length : 0} letras
+              • {Array.isArray(content.caracter) ? content.caracter.length : 0} letters
             </p>
             <p className="text-[10px] text-slate-500 truncate font-medium">
-              Pistas: {Array.isArray(content.clue) ? content.clue.map((c: any) => c.text).filter(Boolean).join(" | ") : ""}
+              Clues: {Array.isArray(content.clue) ? content.clue.map((c: any) => c.text).filter(Boolean).join(" | ") : ""}
             </p>
           </div>
         );
@@ -591,10 +591,10 @@ function ExerciseContentPreviewBadge({
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-black bg-lime-100 text-lime-800 px-2 py-0.5 rounded-full flex items-center gap-1">
                 <Volume2 className="w-3 h-3" />
-                {type === "fast_audio_mode" ? "Modo Rápido 1.6x" : "Audio Challenge"}
+                {type === "fast_audio_mode" ? "Fast Mode 1.6x" : "Audio Challenge"}
               </span>
               <span className="font-bold text-slate-700 truncate">
-                Respuesta: <span className="text-emerald-700 font-extrabold">"{content.correctAnswer || '---'}"</span>
+                Answer: <span className="text-emerald-700 font-extrabold">"{content.correctAnswer || '---'}"</span>
               </span>
             </div>
           </div>
@@ -604,7 +604,7 @@ function ExerciseContentPreviewBadge({
         return (
           <div className="text-[11px] space-y-1">
             <p className="font-bold text-slate-700">
-              Items de audio ({Array.isArray(content.items) ? content.items.length : 0}):
+              Audio items ({Array.isArray(content.items) ? content.items.length : 0}):
             </p>
             <p className="text-[10px] text-slate-500 truncate">
               {Array.isArray(content.items) ? content.items.map((i: any) => i.phrase).filter(Boolean).join(" • ") : ""}
@@ -616,10 +616,10 @@ function ExerciseContentPreviewBadge({
         return (
           <div className="text-[11px] space-y-0.5">
             <p className="font-bold text-slate-700">
-              Frase a decir: <span className="font-extrabold text-amber-700">"{content.phraseToSpeak || '---'}"</span>
+              Phrase to speak: <span className="font-extrabold text-amber-700">"{content.phraseToSpeak || '---'}"</span>
             </p>
             <p className="text-[10px] text-slate-400">
-              Tiempo límite: {content.durationSeconds || 15}s
+              Time limit: {content.durationSeconds || 15}s
             </p>
           </div>
         );
@@ -628,7 +628,7 @@ function ExerciseContentPreviewBadge({
         return (
           <div className="text-[11px] space-y-0.5">
             <p className="font-bold text-slate-700">
-              5 Palabras rápidas ({content.durationSeconds || 10}s):
+              5 Quick words ({content.durationSeconds || 10}s):
             </p>
             <p className="text-[10px] text-slate-500 font-mono truncate">
               {Array.isArray(content.words) ? content.words.join(" • ") : ""}
@@ -640,10 +640,10 @@ function ExerciseContentPreviewBadge({
         return (
           <div className="text-[11px] space-y-0.5">
             <p className="font-bold text-slate-700 truncate">
-              Trabalenguas: <span className="font-extrabold text-amber-700">"{content.tongueTwister || '---'}"</span>
+              Tongue twister: <span className="font-extrabold text-amber-700">"{content.tongueTwister || '---'}"</span>
             </p>
             <p className="text-[10px] text-slate-400">
-              Máx. intentos: {content.maxAttempts || 3} • Tiempo: {content.durationSeconds || 20}s
+              Max attempts: {content.maxAttempts || 3} • Time: {content.durationSeconds || 20}s
             </p>
           </div>
         );
