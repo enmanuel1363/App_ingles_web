@@ -335,7 +335,7 @@ export default function IdentifyPictureExerciseForm({ order_index }: Props) {
 
       <FormInput
         label="Description"
-        placeholder="e.g. Escucha el audio y selecciona la imagen correcta"
+        placeholder="e.g. Listen to the audio and select the correct picture"
         value={exercise.description}
         onChangeText={(text) => updateField("description", text)}
         onCopy={() => navigator.clipboard.writeText(exercise.description)}
@@ -394,7 +394,7 @@ export default function IdentifyPictureExerciseForm({ order_index }: Props) {
                   type="button"
                   className="text-slate-400 hover:text-rose-600 transition-colors p-1.5 rounded-lg hover:bg-rose-50/5 cursor-pointer"
                   onClick={() => removeItem(itemIndex)}
-                  title="Eliminar pregunta"
+                  title="Delete question"
                 >
                   <Trash2 size={18} />
                 </button>
@@ -420,7 +420,7 @@ export default function IdentifyPictureExerciseForm({ order_index }: Props) {
                         : item.audio_name
                           ? item.audio_name
                           : typeof item.audio_url === "string" && !item.audio_url.startsWith("local-audio://")
-                            ? "Audio cargado en servidor"
+                            ? "Audio uploaded to server"
                             : "Local Audio Clip"
                       : "No audio selected yet"}
                   </p>
@@ -569,7 +569,7 @@ export default function IdentifyPictureExerciseForm({ order_index }: Props) {
                         {/* Drag Handle Indicator */}
                         <div
                           className="absolute top-2 left-2 z-10 p-1.5 bg-white/95 rounded-lg shadow-sm text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                          title="Arrastrar imagen para reordenar"
+                          title="Drag image to reorder"
                         >
                           <GripVertical size={13} />
                         </div>
@@ -623,7 +623,7 @@ export default function IdentifyPictureExerciseForm({ order_index }: Props) {
                                 el?.click();
                               }}
                               className="p-1.5 bg-white/95 rounded-lg shadow-sm hover:text-cyan-650 text-slate-500 transition-colors cursor-pointer"
-                              title="Reemplazar imagen"
+                              title="Replace image"
                             >
                               <Edit size={13} />
                             </button>
@@ -635,7 +635,7 @@ export default function IdentifyPictureExerciseForm({ order_index }: Props) {
                                 removeImageOption(itemIndex, imageIndex);
                               }}
                               className="p-1.5 bg-white/95 rounded-lg shadow-sm hover:text-rose-650 text-slate-500 transition-colors cursor-pointer"
-                              title="Eliminar opción"
+                              title="Delete option"
                             >
                               <Trash2 size={13} />
                             </button>
@@ -679,10 +679,10 @@ export default function IdentifyPictureExerciseForm({ order_index }: Props) {
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>
                   {isAudioInvalid
-                    ? "Se requiere seleccionar un clip de audio."
+                    ? "An audio clip must be selected."
                     : isImagesInvalid
-                      ? "Se requieren al menos 2 imágenes de opción."
-                      : "Debes marcar una opción de imagen como la correcta."}
+                      ? "At least 2 option images are required."
+                      : "You must mark one image option as correct."}
                 </span>
               </div>
             )}

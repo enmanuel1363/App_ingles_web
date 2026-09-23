@@ -79,7 +79,7 @@ export default function CreateExercise({ index, moveUp, moveDown, onRemove }: Pr
       {/* Top Header Section */}
       <div className="flex justify-between items-center">
         <span className="text-xs font-bold uppercase tracking-wider text-slate-450">
-          Ejercicio #{index + 1}
+          Exercise #{index + 1}
         </span>
         <div className="flex items-center space-x-1">
           <button 

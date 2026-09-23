@@ -138,18 +138,18 @@ export default function AddExercisesPage({ classId }: Props) {
 
   // Calculate realtime category requirements (Count of exercises, not items)
   const categoryCounts = {
-    Introducción: 0,
-    Validación: 0,
+    Introduction: 0,
+    Validation: 0,
   };
   data.forEach((ex) => {
     const cat = EXERCISE_CATEGORIES[ex.type];
-    if (cat === "Introducción" || cat === "Validación") {
+    if (cat === "Introduction" || cat === "Validation") {
       categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
     }
   });
 
-  const introValid = categoryCounts["Introducción"] >= 1;
-  const valValid = categoryCounts["Validación"] >= 3;
+  const introValid = categoryCounts["Introduction"] >= 1;
+  const valValid = categoryCounts["Validation"] >= 3;
   const totalValid = data.length <= 15;
   const hasDraft = drafts && !!drafts[classId];
 
@@ -174,26 +174,26 @@ export default function AddExercisesPage({ classId }: Props) {
     const removedCat = EXERCISE_CATEGORIES[data[index].type];
     removeExercise(index);
 
-    // Calculate validation on the fly to show a friendly warning warning
+    // Calculate validation on the fly to show a friendly warning
     const countsAfter = {
-      Introducción: 0,
-      Validación: 0,
+      Introduction: 0,
+      Validation: 0,
     };
     data.forEach((ex, i) => {
       if (i === index) return;
       const cat = EXERCISE_CATEGORIES[ex.type];
-      if (cat === "Introducción" || cat === "Validación") {
+      if (cat === "Introduction" || cat === "Validation") {
         countsAfter[cat] = (countsAfter[cat] || 0) + 1;
       }
     });
 
-    if (removedCat === "Introducción" && countsAfter["Introducción"] < 1) {
+    if (removedCat === "Introduction" && countsAfter["Introduction"] < 1) {
       setFormError(
-        "Recuerda que necesitas un mínimo de 1 ejercicios de tipo Introducción para poder guardar.",
+        "Remember that you need a minimum of 1 Introduction exercise to save.",
       );
-    } else if (removedCat === "Validación" && countsAfter["Validación"] < 3) {
+    } else if (removedCat === "Validation" && countsAfter["Validation"] < 3) {
       setFormError(
-        "Recuerda que necesitas un mínimo de 3 ejercicios de tipo Validación para poder guardar.",
+        "Remember that you need a minimum of 3 Validation exercises to save.",
       );
     } else {
       setFormError(null);
@@ -202,20 +202,20 @@ export default function AddExercisesPage({ classId }: Props) {
 
   const handleDiscardDraft = async () => {
     const isConfirmed = await confirm({
-      title: "¿Descartar borrador local?",
+      title: "Discard local draft?",
       description:
-        "Esta acción eliminará de forma permanente tus cambios locales no guardados y cargará la configuración del servidor. ¿Deseas continuar?",
-      confirmText: "Sí, descartar",
-      cancelText: "Cancelar",
+        "This action will permanently delete your unsaved local changes and load the server configuration. Do you want to continue?",
+      confirmText: "Yes, discard",
+      cancelText: "Cancel",
       variant: "danger",
     });
 
     if (isConfirmed) {
       discardDraft(classId, existingExercises || []);
       await showAlert({
-        title: "Borrador descartado",
+        title: "Draft discarded",
         message:
-          "El borrador ha sido eliminado y se ha cargado el contenido del servidor.",
+          "The draft has been discarded and the server content has been loaded.",
         type: "success",
       });
     }
@@ -242,7 +242,7 @@ export default function AddExercisesPage({ classId }: Props) {
 
       if (items.length === 0) {
         setFormError(
-          `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) no tiene ítems.`,
+          `Exercise #${i + 1} (${ex.name || "Untitled"}) has no items.`,
         );
         return;
       }
@@ -257,7 +257,7 @@ export default function AddExercisesPage({ classId }: Props) {
             item.possible_answers && item.possible_answers.length > 0;
           if (!hasCorrect || !hasPossibles) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener respuesta correcta y posibles respuestas.`,
+              `Exercise #${i + 1} (${ex.name || "Untitled"}) has item #${j + 1} incomplete. It must have a correct answer and possible answers.`,
             );
             return;
           }
@@ -266,13 +266,13 @@ export default function AddExercisesPage({ classId }: Props) {
           const hasQuestions = item.questions && item.questions.length > 0;
           if (!hasPhrase) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) debe tener una frase o texto de lectura.`,
+              `Exercise #${i + 1} (${ex.name || "Untitled"}) must have a phrase or reading text.`,
             );
             return;
           }
           if (!hasQuestions) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) debe tener al menos una pregunta.`,
+              `Exercise #${i + 1} (${ex.name || "Untitled"}) must have at least one question.`,
             );
             return;
           }
@@ -285,7 +285,7 @@ export default function AddExercisesPage({ classId }: Props) {
               qItem.possible_answers && qItem.possible_answers.length > 0;
             if (!hasQText || !hasCorrect || !hasPossibles) {
               setFormError(
-                `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene la pregunta #${q + 1} incompleta. Debe tener pregunta, respuesta correcta y al menos una posible respuesta.`,
+                `Exercise #${i + 1} (${ex.name || "Untitled"}) has question #${q + 1} incomplete. It must have a question, correct answer, and at least one possible answer.`,
               );
               return;
             }
@@ -294,7 +294,7 @@ export default function AddExercisesPage({ classId }: Props) {
           const hasImages = item.images && item.images.length > 0;
           if (!hasImages) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener al menos una imagen.`,
+              `Exercise #${i + 1} (${ex.name || "Untitled"}) has item #${j + 1} incomplete. It must have at least one image.`,
             );
             return;
           }
@@ -302,7 +302,7 @@ export default function AddExercisesPage({ classId }: Props) {
           const hasWords = item.words && item.words.length > 0;
           if (!hasWords) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene la sección #${j + 1} incompleta. Debe tener al menos una palabra.`,
+              `Exercise #${i + 1} (${ex.name || "Untitled"}) has section #${j + 1} incomplete. It must have at least one word.`,
             );
             return;
           }
@@ -311,7 +311,7 @@ export default function AddExercisesPage({ classId }: Props) {
           const hasTitle = item.image_title && item.image_title.trim() !== "";
           if (!hasUrl || !hasTitle) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener imagen y palabra asociada.`,
+              `Exercise #${i + 1} (${ex.name || "Untitled"}) has item #${j + 1} incomplete. It must have an image and associated word.`,
             );
             return;
           }
@@ -320,7 +320,7 @@ export default function AddExercisesPage({ classId }: Props) {
             item.correct_answer && item.correct_answer.trim() !== "";
           if (!hasCorrect) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener la respuesta de comparación.`,
+              `Exercise #${i + 1} (${ex.name || "Untitled"}) has item #${j + 1} incomplete. It must have the comparison answer.`,
             );
             return;
           }
@@ -329,7 +329,7 @@ export default function AddExercisesPage({ classId }: Props) {
           const hasQuestions = item.questions && item.questions.length > 0;
           if (!hasFragments || !hasQuestions) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener al menos un fragmento de historia y al menos una pregunta.`,
+              `Exercise #${i + 1} (${ex.name || "Untitled"}) has item #${j + 1} incomplete. It must have at least one story fragment and at least one question.`,
             );
             return;
           }
@@ -337,7 +337,7 @@ export default function AddExercisesPage({ classId }: Props) {
             const frag = item.fragments[f];
             if (!frag.story || !frag.story.trim()) {
               setFormError(
-                `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el fragmento #${f + 1} incompleto. Debe tener texto de historia.`,
+                `Exercise #${i + 1} (${ex.name || "Untitled"}) has fragment #${f + 1} incomplete. It must have story text.`,
               );
               return;
             }
@@ -346,13 +346,13 @@ export default function AddExercisesPage({ classId }: Props) {
             const qItem = item.questions[q];
             if (!qItem.question || !qItem.question.trim()) {
               setFormError(
-                `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene la pregunta #${q + 1} incompleta. Debe tener texto de pregunta.`,
+                `Exercise #${i + 1} (${ex.name || "Untitled"}) has question #${q + 1} incomplete. It must have question text.`,
               );
               return;
             }
             if (!qItem.options || qItem.options.length < 2) {
               setFormError(
-                `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene la pregunta #${q + 1} incompleta. Debe tener al menos 2 opciones de respuesta.`,
+                `Exercise #${i + 1} (${ex.name || "Untitled"}) has question #${q + 1} incomplete. It must have at least 2 answer options.`,
               );
               return;
             }
@@ -362,7 +362,7 @@ export default function AddExercisesPage({ classId }: Props) {
               qItem.fragment_index >= item.fragments.length
             ) {
               setFormError(
-                `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene la pregunta #${q + 1} asociada a un fragmento inválido o inexistente.`,
+                `Exercise #${i + 1} (${ex.name || "Untitled"}) has question #${q + 1} associated with an invalid or non-existent fragment.`,
               );
               return;
             }
@@ -374,7 +374,7 @@ export default function AddExercisesPage({ classId }: Props) {
             item.correct_answer && item.correct_answer.trim() !== "";
           if (!hasDescriptive || !hasCorrect) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener texto descriptivo y respuesta correcta.`,
+              `Exercise #${i + 1} (${ex.name || "Untitled"}) has item #${j + 1} incomplete. It must have descriptive text and a correct answer.`,
             );
             return;
           }
@@ -382,7 +382,7 @@ export default function AddExercisesPage({ classId }: Props) {
           const hasUrl = item.video_url && item.video_url.trim() !== "";
           if (!hasUrl) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener la URL del video.`,
+              `Exercise #${i + 1} (${ex.name || "Untitled"}) has item #${j + 1} incomplete. It must have the video URL.`,
             );
             return;
           }
@@ -393,13 +393,13 @@ export default function AddExercisesPage({ classId }: Props) {
             item.images && item.images.length >= 2 && item.images.length <= 6;
           if (!hasAudio) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener un audio seleccionado.`,
+              `Exercise #${i + 1} (${ex.name || "Untitled"}) has item #${j + 1} incomplete. An audio file must be selected.`,
             );
             return;
           }
           if (!hasImages) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe tener entre 2 y 6 imágenes de opción.`,
+              `Exercise #${i + 1} (${ex.name || "Untitled"}) has item #${j + 1} incomplete. It must have between 2 and 6 option images.`,
             );
             return;
           }
@@ -408,7 +408,7 @@ export default function AddExercisesPage({ classId }: Props) {
             const img = item.images[imgIdx];
             if (!img.image_url) {
               setFormError(
-                `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. La opción #${imgIdx + 1} no tiene una imagen seleccionada.`,
+                `Exercise #${i + 1} (${ex.name || "Untitled"}) has item #${j + 1} incomplete. Option #${imgIdx + 1} does not have an image selected.`,
               );
               return;
             }
@@ -418,7 +418,7 @@ export default function AddExercisesPage({ classId }: Props) {
           }
           if (correctCount !== 1) {
             setFormError(
-              `El ejercicio #${i + 1} (${ex.name || "Sin nombre"}) tiene el ítem #${j + 1} incompleto. Debe marcar exactamente una opción como la correcta (se marcaron ${correctCount}).`,
+              `Exercise #${i + 1} (${ex.name || "Untitled"}) has item #${j + 1} incomplete. Exactly one option must be marked as correct (${correctCount} selected).`,
             );
             return;
           }
@@ -426,12 +426,12 @@ export default function AddExercisesPage({ classId }: Props) {
       }
     }
 
-    if (categoryCounts["Introducción"] < 1) {
-      setFormError("At least 1 exercises of type Introducción are required.");
+    if (categoryCounts["Introduction"] < 1) {
+      setFormError("At least 1 exercise of type Introduction is required.");
       return;
     }
-    if (categoryCounts["Validación"] < 3) {
-      setFormError("At least 3 exercises of type Validación are required.");
+    if (categoryCounts["Validation"] < 3) {
+      setFormError("At least 3 exercises of type Validation are required.");
       return;
     }
     if (sanitizedData.length > 15) {
@@ -465,11 +465,11 @@ export default function AddExercisesPage({ classId }: Props) {
       await createExercises(processedExercises);
 
       await showAlert({
-        title: "Ejercicios guardados",
-        message: "Los ejercicios han sido guardados exitosamente.",
+        title: "Exercises saved",
+        message: "The exercises have been saved successfully.",
         type: "success",
       });
-      clearDraft(classId); // Limpiar el borrador de la clase al guardar con éxito
+      clearDraft(classId); // Clear class draft upon successful save
       router.back();
     } catch (error: any) {
       setFormError(error.message || "Failed to save the exercises");
@@ -511,10 +511,10 @@ export default function AddExercisesPage({ classId }: Props) {
 
         <div className="border-b border-slate-200 pb-5">
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-            Configurar Ejercicios
+            Configure Exercises
           </h1>
           <p className="text-slate-555 text-sm mt-1">
-            Diseña el contenido interactivo y las validaciones del aula actual.
+            Design interactive content and validations for the current lesson.
           </p>
         </div>
       </div>
@@ -526,12 +526,10 @@ export default function AddExercisesPage({ classId }: Props) {
             <AlertCircle className="w-6 h-6 text-amber-600 shrink-0 mt-0.5" />
             <div>
               <h4 className="font-bold text-amber-900">
-                ¡Conflicto de Borrador Detectado!
+                Draft Conflict Detected!
               </h4>
               <p className="text-xs text-amber-800 mt-1 leading-relaxed font-semibold">
-                Los ejercicios de esta lección fueron actualizados en el
-                servidor por otro profesor desde que guardaste tu borrador local
-                en este navegador.
+                The exercises for this lesson were updated on the server by another instructor since your local draft was saved in this browser.
               </p>
             </div>
           </div>
@@ -541,14 +539,14 @@ export default function AddExercisesPage({ classId }: Props) {
               onClick={() => resolveCollisionUseServer()}
               className="py-2 px-3.5 text-xs bg-white border-amber-200 text-amber-900 hover:bg-amber-100/50"
             >
-              Cargar del Servidor
+              Load from Server
             </Button>
             <Button
               variant="primary"
               onClick={() => resolveCollisionUseDraft()}
               className="py-2 px-3.5 text-xs bg-amber-500 hover:bg-amber-600 text-slate-950 border-none"
             >
-              Mantener mi Borrador
+              Keep My Draft
             </Button>
           </div>
         </div>
@@ -620,10 +618,10 @@ export default function AddExercisesPage({ classId }: Props) {
           <div className="bg-white border border-slate-200/80 rounded-2xl p-5 md:p-6 shadow-md space-y-5">
             <div>
               <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-500">
-                Estado de la lección
+                Lesson Status
               </h3>
               <p className="text-[10px] text-slate-550 mt-0.5 font-bold">
-                Requisitos mínimos y métricas
+                Minimum requirements & metrics
               </p>
             </div>
 
@@ -631,7 +629,7 @@ export default function AddExercisesPage({ classId }: Props) {
             <div className="space-y-2">
               <div className="flex justify-between items-baseline">
                 <span className="text-sm font-semibold text-slate-600">
-                  Ejercicios creados
+                  Created exercises
                 </span>
                 <span
                   className={`text-base font-extrabold ${totalValid ? "text-cyan-600" : "text-rose-600"}`}
@@ -659,10 +657,10 @@ export default function AddExercisesPage({ classId }: Props) {
             {/* Checklist */}
             <div className="border-t border-slate-100 pt-4 space-y-3">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block mb-1">
-                Requisitos obligatorios
+                Mandatory requirements
               </span>
 
-              {/* Requirement 1: Introducción */}
+              {/* Requirement 1: Introduction */}
               <div className="flex items-start space-x-2.5">
                 {introValid ? (
                   <CheckCircle2 className="w-4 h-4 text-emerald-605 shrink-0 mt-0.5" />
@@ -671,18 +669,18 @@ export default function AddExercisesPage({ classId }: Props) {
                 )}
                 <div>
                   <p className="text-xs font-bold text-slate-700 leading-tight">
-                    Introducción: {categoryCounts["Introducción"]}{" "}
+                    Introduction: {categoryCounts["Introduction"]}{" "}
                     <span className="text-[10px] font-semibold text-slate-450">
-                      / mín. 1
+                      / min. 1
                     </span>
                   </p>
                   <p className="text-[10px] text-slate-500 leading-normal mt-0.5">
-                    Módulos de presentación de vocabulario.
+                    Vocabulary presentation modules.
                   </p>
                 </div>
               </div>
 
-              {/* Requirement 2: Validación */}
+              {/* Requirement 2: Validation */}
               <div className="flex items-start space-x-2.5">
                 {valValid ? (
                   <CheckCircle2 className="w-4 h-4 text-emerald-605 shrink-0 mt-0.5" />
@@ -691,13 +689,13 @@ export default function AddExercisesPage({ classId }: Props) {
                 )}
                 <div>
                   <p className="text-xs font-bold text-slate-700 leading-tight">
-                    Validación: {categoryCounts["Validación"]}{" "}
+                    Validation: {categoryCounts["Validation"]}{" "}
                     <span className="text-[10px] font-semibold text-slate-450">
-                      / mín. 3
+                      / min. 3
                     </span>
                   </p>
                   <p className="text-[10px] text-slate-500 leading-normal mt-0.5">
-                    Ejercicios interactivos evaluados.
+                    Assessed interactive exercises.
                   </p>
                 </div>
               </div>
@@ -711,10 +709,10 @@ export default function AddExercisesPage({ classId }: Props) {
                 )}
                 <div>
                   <p className="text-xs font-bold text-slate-700 leading-tight">
-                    Máximo de ejercicios
+                    Maximum exercises
                   </p>
                   <p className="text-[10px] text-slate-500 leading-normal mt-0.5">
-                    No exceder los 15 elementos por lección.
+                    Do not exceed 15 items per lesson.
                   </p>
                 </div>
               </div>
@@ -725,7 +723,7 @@ export default function AddExercisesPage({ classId }: Props) {
               <div className="p-3.5 bg-amber-50/50 border border-amber-200/60 rounded-xl space-y-2.5 shadow-sm">
                 <div className="flex items-center space-x-2 text-amber-800 text-[10px] font-extrabold uppercase tracking-wide">
                   <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span>Borrador Local Activo</span>
+                  <span>Active Local Draft</span>
                 </div>
                 <button
                   type="button"
@@ -733,7 +731,7 @@ export default function AddExercisesPage({ classId }: Props) {
                   disabled={isSaving}
                   className="w-full text-center text-[10px] font-bold text-rose-600 hover:text-rose-700 bg-rose-50/50 hover:bg-rose-50 border border-rose-100/80 py-1.5 px-3 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Descartar borrador local
+                  Discard local draft
                 </button>
               </div>
             )}
@@ -762,7 +760,7 @@ export default function AddExercisesPage({ classId }: Props) {
               disabled={isSaving}
               leftIcon={!isSaving && <Save className="w-4 h-4" />}
             >
-              {isProcessing ? "Subiendo archivos…" : "Save All"}
+              {isProcessing ? "Uploading files…" : "Save All"}
             </Button>
           </div>
         </div>

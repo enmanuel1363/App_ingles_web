@@ -27,7 +27,7 @@ export const useCreateClass = () => {
       queryClient.invalidateQueries({ queryKey: ["classes", data.id_unit] });
     },
     onError: (error) => {
-      console.error("Error al crear la clase:", error);
+      console.error("Error creating lesson:", error);
     },
   });
 };
@@ -43,7 +43,7 @@ export const useUpdateClass = () => {
       });
     },
     onError: (error) => {
-      console.error("Error al actualizar la clase:", error);
+      console.error("Error updating lesson:", error);
     },
   });
 };
@@ -60,7 +60,7 @@ export const useDeleteClass = () => {
       });
     },
     onError: (error) => {
-      console.error("Error al eliminar la clase:", error);
+      console.error("Error deleting lesson:", error);
     },
   });
 };

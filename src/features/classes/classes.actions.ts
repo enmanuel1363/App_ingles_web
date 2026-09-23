@@ -7,23 +7,23 @@ import { ClassModel, CreateClassDTO } from "./class.types";
 const classTypeSchema = z.enum(["mix", "write", "read", "speak"]);
 
 const createClassSchema = z.object({
-  id_unit: z.string().uuid("La unidad no es válida"),
+  id_unit: z.string().uuid("Invalid unit ID"),
   name: z
     .string()
-    .min(1, "El nombre de la clase es requerido")
-    .max(100, "El nombre es muy largo"),
+    .min(1, "Lesson name is required")
+    .max(100, "Lesson name is too long"),
   type: classTypeSchema,
-  order_index: z.number().int("El índice de orden debe ser un número entero"),
+  order_index: z.number().int("Order index must be an integer"),
 });
 
 const updateClassSchema = z.object({
-  id: z.string().uuid("ID de clase no válido"),
+  id: z.string().uuid("Invalid lesson ID"),
   name: z
     .string()
-    .min(1, "El nombre de la clase es requerido")
-    .max(100, "El nombre es muy largo"),
+    .min(1, "Lesson name is required")
+    .max(100, "Lesson name is too long"),
   type: classTypeSchema,
-  order_index: z.number().int("El índice de orden debe ser un número entero"),
+  order_index: z.number().int("Order index must be an integer"),
 });
 
 export async function createClassAction(rawData: unknown) {
@@ -43,7 +43,7 @@ export async function createClassAction(rawData: unknown) {
     console.error("Error in createClassAction:", error);
     return {
       success: false,
-      error: error.message || "Error al crear la clase",
+      error: error.message || "Failed to create lesson",
     };
   }
 }
@@ -66,7 +66,7 @@ export async function updateClassAction(rawData: unknown) {
     console.error("Error in updateClassAction:", error);
     return {
       success: false,
-      error: error.message || "Error al actualizar la clase",
+      error: error.message || "Failed to update lesson",
     };
   }
 }
@@ -76,10 +76,10 @@ export async function deleteClassAction(classId: string, unitId: string) {
     const { supabase } = await checkAdmin();
 
     if (!classId || typeof classId !== "string") {
-      throw new Error("ID de clase no válido");
+      throw new Error("Invalid lesson ID");
     }
     if (!unitId || typeof unitId !== "string") {
-      throw new Error("ID de unidad no válido");
+      throw new Error("Invalid unit ID");
     }
 
     const { error } = await supabase.rpc("delete_class", {
@@ -93,7 +93,7 @@ export async function deleteClassAction(classId: string, unitId: string) {
     console.error("Error in deleteClassAction:", error);
     return {
       success: false,
-      error: error.message || "Error al eliminar la clase",
+      error: error.message || "Failed to delete lesson",
     };
   }
 }

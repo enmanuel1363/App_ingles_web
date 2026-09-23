@@ -82,19 +82,19 @@ export const lessonTypeOptions: {
 ];
 
 export const EXERCISE_CATEGORIES: Record<lesson_type, string> = {
-  overview_session: "Introducción",
-  video_session: "Introducción",
-  image_gallery: "Introducción",
-  audio_session: "Desarrollo",
-  reading_quiz: "Desarrollo",
-  match_names: "Desarrollo",
-  match_words: "Desarrollo",
-  complete_word: "Validación",
-  write_word: "Validación",
-  type_answer: "Validación",
-  say_word: "Validación",
-  speak: "Validación",
-  identify_picture: "Validación",
+  overview_session: "Introduction",
+  video_session: "Introduction",
+  image_gallery: "Introduction",
+  audio_session: "Development",
+  reading_quiz: "Development",
+  match_names: "Development",
+  match_words: "Development",
+  complete_word: "Validation",
+  write_word: "Validation",
+  type_answer: "Validation",
+  say_word: "Validation",
+  speak: "Validation",
+  identify_picture: "Validation",
 };
 
 export const EXERCISE_DEFAULT_CONTENT: Record<lesson_type, any> = {
@@ -132,5 +132,5 @@ export const EXERCISE_DEFAULT_DESCRIPTIONS: Record<lesson_type, string> = {
   video_session: "",
   write_word: "",
   speak: "",
-  identify_picture: "Escucha el audio y selecciona la imagen correcta",
+  identify_picture: "Listen to the audio and select the correct picture",
 };

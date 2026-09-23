@@ -238,7 +238,7 @@ export default function MatchWordsExerciseForm({ order_index }: Props) {
                     className="text-slate-400 hover:text-slate-655 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/50 transition-colors"
                     onMouseDown={() => setDraggableIndex(pairIndex)}
                     onMouseUp={() => setDraggableIndex(null)}
-                    title="Arrastrar para reordenar"
+                    title="Drag to reorder"
                   >
                     <GripVertical size={16} />
                   </div>
@@ -315,10 +315,10 @@ export default function MatchWordsExerciseForm({ order_index }: Props) {
             <AlertCircle className="w-4.5 h-4.5 shrink-0 text-amber-600" />
             <span>
               {isTooFew
-                ? "Se requieren al menos 2 parejas de palabras para crear la lección."
+                ? "At least 2 word pairs are required to create the exercise."
                 : type === "translation"
-                  ? "Todas las palabras en inglés y traducciones al español deben estar llenas."
-                  : "Todas las palabras en inglés de ambas columnas deben estar llenas."}
+                  ? "All English words and Spanish translations must be filled in."
+                  : "All English words in both columns must be filled in."}
             </span>
           </div>
         )}

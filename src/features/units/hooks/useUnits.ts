@@ -22,7 +22,7 @@ export const useCreateUnit = () => {
       queryClient.invalidateQueries({ queryKey: ["units", data.id_course] });
     },
     onError: (error) => {
-      console.error("Error al crear la unidad:", error);
+      console.error("Error creating unit:", error);
     },
   });
 };
@@ -37,7 +37,7 @@ export const useUpdateUnit = () => {
       queryClient.invalidateQueries({ queryKey: ["units", data.id_course] });
     },
     onError: (error) => {
-      console.error("Error al actualizar la unidad:", error);
+      console.error("Error updating unit:", error);
     },
   });
 };
@@ -51,7 +51,7 @@ export const useDeleteUnit = () => {
       queryClient.invalidateQueries({ queryKey: ["units"] });
     },
     onError: (error) => {
-      console.error("Error al eliminar la unidad:", error);
+      console.error("Error deleting unit:", error);
     },
   });
 };

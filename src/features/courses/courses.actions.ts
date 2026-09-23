@@ -5,15 +5,15 @@ import { z } from "zod";
 import { Course } from "./course.types";
 
 const createCourseSchema = z.object({
-  name: z.string().min(1, "El nombre del curso es requerido").max(100, "El nombre es muy largo"),
-  id_grade: z.string().uuid("El grado no es válido"),
-  description: z.string().max(500, "La descripción es muy larga").nullable().optional(),
+  name: z.string().min(1, "Course name is required").max(100, "Name is too long"),
+  id_grade: z.string().uuid("Invalid grade"),
+  description: z.string().max(500, "Description is too long").nullable().optional(),
 });
 
 const updateCourseSchema = z.object({
-  name: z.string().min(1, "El nombre del curso es requerido").max(100, "El nombre es muy largo").optional(),
-  id_grade: z.string().uuid("El grado no es válido").optional(),
-  description: z.string().max(500, "La descripción es muy larga").nullable().optional(),
+  name: z.string().min(1, "Course name is required").max(100, "Name is too long").optional(),
+  id_grade: z.string().uuid("Invalid grade").optional(),
+  description: z.string().max(500, "Description is too long").nullable().optional(),
 });
 
 export async function createCourseAction(rawData: unknown) {
@@ -31,7 +31,7 @@ export async function createCourseAction(rawData: unknown) {
     return { success: true, data: data as Course };
   } catch (error: any) {
     console.error("Error in createCourseAction:", error);
-    return { success: false, error: error.message || "Error al crear el curso" };
+    return { success: false, error: error.message || "Failed to create course" };
   }
 }
 
@@ -40,7 +40,7 @@ export async function updateCourseAction(id: string, rawData: unknown) {
     const { supabase } = await checkAdmin();
     
     if (!id || typeof id !== "string") {
-      throw new Error("ID de curso no válido");
+      throw new Error("Invalid course ID");
     }
     
     const validated = updateCourseSchema.parse(rawData);
@@ -56,7 +56,7 @@ export async function updateCourseAction(id: string, rawData: unknown) {
     return { success: true, data: data as Course };
   } catch (error: any) {
     console.error("Error in updateCourseAction:", error);
-    return { success: false, error: error.message || "Error al actualizar el curso" };
+    return { success: false, error: error.message || "Failed to update course" };
   }
 }
 
@@ -65,7 +65,7 @@ export async function deleteCourseAction(id: string) {
     const { supabase } = await checkAdmin();
     
     if (!id || typeof id !== "string") {
-      throw new Error("ID de curso no válido");
+      throw new Error("Invalid course ID");
     }
     
     const { error } = await supabase
@@ -77,6 +77,6 @@ export async function deleteCourseAction(id: string) {
     return { success: true };
   } catch (error: any) {
     console.error("Error in deleteCourseAction:", error);
-    return { success: false, error: error.message || "Error al eliminar el curso" };
+    return { success: false, error: error.message || "Failed to delete course" };
   }
 }

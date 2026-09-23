@@ -39,37 +39,37 @@ export default function GoalsPage() {
     rewardId?: string,
   ): Promise<boolean> => {
     if (selectedGoal) {
-      // Editar
+      // Edit
       const res = await updateGoal(selectedGoal.id, goalData, rewardId);
       if (res.success) {
         showAlert({
-          title: "Objetivo guardado",
-          message: "El objetivo ha sido actualizado correctamente.",
+          title: "Goal saved",
+          message: "The goal has been updated successfully.",
           type: "success",
         });
         return true;
       } else {
         showAlert({
           title: "Error",
-          message: `Error al actualizar el objetivo: ${res.error}`,
+          message: `Error updating goal: ${res.error}`,
           type: "error",
         });
         return false;
       }
     } else {
-      // Crear
+      // Create
       const res = await createGoal(goalData, rewardId);
       if (res.success) {
         showAlert({
-          title: "Objetivo creado",
-          message: "El objetivo ha sido creado correctamente.",
+          title: "Goal created",
+          message: "The goal has been created successfully.",
           type: "success",
         });
         return true;
       } else {
         showAlert({
           title: "Error",
-          message: `Error al crear el objetivo: ${res.error}`,
+          message: `Error creating goal: ${res.error}`,
           type: "error",
         });
         return false;
@@ -82,13 +82,13 @@ export default function GoalsPage() {
     if (!res.success) {
       showAlert({
         title: "Error",
-        message: `Error al eliminar el objetivo: ${res.error}`,
+        message: `Error deleting goal: ${res.error}`,
         type: "error",
       });
     } else {
       showAlert({
-        title: "Objetivo eliminado",
-        message: "El objetivo ha sido eliminado correctamente.",
+        title: "Goal deleted",
+        message: "The goal has been deleted successfully.",
         type: "success",
       });
     }
@@ -100,11 +100,10 @@ export default function GoalsPage() {
       <div className="border-b border-slate-200/80 p-2 md:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="space-y-1">
           <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-            Objetivos de Aprendizaje
+            Learning Goals
           </h1>
           <p className="text-sm font-semibold text-slate-500">
-            Define los hitos y metas que motivarán el progreso diario de tus
-            estudiantes.
+            Define milestones and targets that will motivate your students' daily progress.
           </p>
         </div>
 
@@ -114,7 +113,7 @@ export default function GoalsPage() {
             onClick={refreshGoals}
             disabled={isLoading}
             className="p-3"
-            aria-label="Refrescar lista"
+            aria-label="Refresh list"
           >
             <RefreshCw
               className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
@@ -127,7 +126,7 @@ export default function GoalsPage() {
             leftIcon={<Plus className="w-5 h-5" />}
             className="shadow-sm flex-1 sm:flex-initial"
           >
-            Nuevo Objetivo
+            New Goal
           </Button>
         </div>
       </div>
@@ -137,14 +136,14 @@ export default function GoalsPage() {
         <div className="bg-rose-50 border border-rose-100 text-rose-800 rounded-2xl p-5 flex items-start space-x-3.5 shadow-sm">
           <AlertCircle className="w-6 h-6 text-rose-500 shrink-0 mt-0.5" />
           <div>
-            <h4 className="font-bold text-rose-900">Error al cargar datos</h4>
+            <h4 className="font-bold text-rose-900">Error loading data</h4>
             <p className="text-sm text-rose-700/90 mt-1">{error}</p>
             <Button
               variant="outlined"
               onClick={refreshGoals}
               className="mt-3.5 text-xs py-2 bg-white text-rose-700 border-rose-200 hover:bg-rose-100/50"
             >
-              Intentar de nuevo
+              Try again
             </Button>
           </div>
         </div>
@@ -172,11 +171,10 @@ export default function GoalsPage() {
           </div>
           <div className="space-y-1.5">
             <h3 className="text-lg font-bold text-slate-800">
-              No hay objetivos
+              No goals found
             </h3>
             <p className="text-sm font-semibold text-slate-400 max-w-xs mx-auto">
-              Define tu primer objetivo académico para asociarle recompensas y
-              motivar a tus alumnos.
+              Define your first academic goal to associate rewards and motivate your students.
             </p>
           </div>
           <Button
@@ -185,7 +183,7 @@ export default function GoalsPage() {
             leftIcon={<Plus className="w-5 h-5" />}
             className="px-6"
           >
-            Nuevo Objetivo
+            New Goal
           </Button>
         </div>
       ) : (

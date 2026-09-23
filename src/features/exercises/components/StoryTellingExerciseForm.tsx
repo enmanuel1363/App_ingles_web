@@ -532,7 +532,7 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
                     className="text-slate-400 hover:text-slate-655 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/50 transition-colors"
                     onMouseDown={() => setDraggableItemIndex(itemIndex)}
                     onMouseUp={() => setDraggableItemIndex(null)}
-                    title="Arrastrar para reordenar sesión"
+                    title="Drag to reorder session"
                   >
                     <GripVertical size={18} />
                   </div>
@@ -647,7 +647,7 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
                               setDraggableFragIndex({ itemIndex, fragIndex })
                             }
                             onMouseUp={() => setDraggableFragIndex(null)}
-                            title="Arrastrar para reordenar fragmento"
+                            title="Drag to reorder fragment"
                           >
                             <GripVertical size={16} />
                           </div>
@@ -957,7 +957,7 @@ export default function StoryTellingExerciseForm({ order_index }: Props) {
                               setDraggableQAIndex({ itemIndex, qIndex })
                             }
                             onMouseUp={() => setDraggableQAIndex(null)}
-                            title="Arrastrar para reordenar pregunta"
+                            title="Drag to reorder question"
                           >
                             <GripVertical size={16} />
                           </div>

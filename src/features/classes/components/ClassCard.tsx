@@ -67,7 +67,7 @@ export default function ClassCard({
             {`${order_index}. ${name}`}
           </h3>
           <div className="flex items-center space-x-1.5 text-[10px] font-semibold text-slate-500">
-            <span>Creada:</span>
+            <span>Created:</span>
             <span className="text-slate-650">
               {formatDate(created_at || "")}
             </span>
@@ -83,7 +83,7 @@ export default function ClassCard({
             e.stopPropagation();
             onEdit?.();
           }}
-          title="Editar clase"
+          title="Edit lesson"
         >
           <Edit2 className="w-4 h-4" />
         </button>
@@ -93,7 +93,7 @@ export default function ClassCard({
             e.stopPropagation();
             onDelete?.();
           }}
-          title="Eliminar clase"
+          title="Delete lesson"
         >
           <Trash2 className="w-4 h-4" />
         </button>

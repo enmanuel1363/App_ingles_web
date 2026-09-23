@@ -78,16 +78,16 @@ export default function CreateRewardModal({
     e.preventDefault();
     if (!name.trim()) {
       showAlert({
-        title: "Campo requerido",
-        message: "El nombre es requerido.",
+        title: "Required Field",
+        message: "Name is required.",
         type: "error",
       });
       return;
     }
     if (!previewUrl) {
       showAlert({
-        title: "Imagen requerida",
-        message: "Debes seleccionar una imagen o GIF.",
+        title: "Image Required",
+        message: "You must select an image or GIF.",
         type: "error",
       });
       return;
@@ -110,7 +110,7 @@ export default function CreateRewardModal({
       console.error(err);
       showAlert({
         title: "Error",
-        message: "Ocurrió un error al guardar la recompensa.",
+        message: "An error occurred while saving the reward.",
         type: "error",
       });
     } finally {
@@ -141,7 +141,7 @@ export default function CreateRewardModal({
         {/* Header */}
         <div className="flex justify-between items-center border-b border-slate-100 pb-4">
           <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-            {isEdit ? "Editar Recompensa" : "Nueva Recompensa"}
+            {isEdit ? "Edit Reward" : "New Reward"}
           </h2>
           <button
             onClick={handleClose}
@@ -156,8 +156,8 @@ export default function CreateRewardModal({
             {/* Left Column: Form Fields */}
             <div className="space-y-4">
               <FormInput
-                label="Nombre de la recompensa"
-                placeholder="Ej. Sticker Estrella Brillante"
+                label="Reward Name"
+                placeholder="e.g. Glowing Star Sticker"
                 value={name}
                 onChangeText={setName}
               />
@@ -165,29 +165,29 @@ export default function CreateRewardModal({
               {/* Type Select */}
               <div className="flex flex-col space-y-1.5">
                 <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                  Tipo de Recompensa
+                  Reward Type
                 </label>
                 <select
                   value={type}
                   onChange={(e) => setType(e.target.value as RewardType)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-semibold text-slate-850 outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary-dark transition-all duration-200"
                 >
-                  <option value="gif">GIF Animado</option>
-                  <option value="sticker">Sticker (Imagen estática)</option>
+                  <option value="gif">Animated GIF</option>
+                  <option value="sticker">Sticker (Static image)</option>
                 </select>
               </div>
 
               {/* Goal Select */}
               <div className="flex flex-col space-y-1.5">
                 <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                  Asociar a un Objetivo (Opcional)
+                  Associate with a Goal (Optional)
                 </label>
                 <select
                   value={idGoal}
                   onChange={(e) => setIdGoal(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-semibold text-slate-850 outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary-dark transition-all duration-200"
                 >
-                  <option value="">Ninguno (Disponible globalmente)</option>
+                  <option value="">None (Globally available)</option>
                   {goals.map((goal) => (
                     <option key={goal.id} value={goal.id}>
                       {goal.name} ({goal.type})
@@ -195,7 +195,7 @@ export default function CreateRewardModal({
                   ))}
                 </select>
                 <span className="text-[10px] text-slate-400 font-semibold leading-relaxed">
-                  Las recompensas asociadas a un objetivo se desbloquean cuando el estudiante lo completa.
+                  Rewards associated with a goal are unlocked when the student completes it.
                 </span>
               </div>
             </div>
@@ -204,7 +204,7 @@ export default function CreateRewardModal({
             <div className="space-y-4 flex flex-col justify-center">
               <div className="flex flex-col space-y-1.5 mb-2">
                 <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                  Imagen o GIF de la Recompensa
+                  Reward Image or GIF
                 </label>
               </div>
 
@@ -214,7 +214,7 @@ export default function CreateRewardModal({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={previewUrl}
-                    alt="vista previa"
+                    alt="preview"
                     className="object-contain w-full h-full p-3 group-hover:scale-105 transition-transform duration-300"
                   />
                   
@@ -236,10 +236,10 @@ export default function CreateRewardModal({
                     <ImagePlus className="w-5 h-5 text-primary-dark" />
                   </div>
                   <span className="text-xs font-bold text-slate-700 group-hover:text-slate-900 transition-colors">
-                    Seleccionar imagen o GIF
+                    Select image or GIF
                   </span>
                   <span className="text-[10px] text-slate-400 mt-1 font-semibold">
-                    PNG, JPG, SVG o GIF
+                    PNG, JPG, SVG or GIF
                   </span>
                 </button>
               )}
@@ -263,7 +263,7 @@ export default function CreateRewardModal({
               leftIcon={isEdit ? <Save className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
               className="min-w-[140px]"
             >
-              {isEdit ? "Guardar Cambios" : "Crear Recompensa"}
+              {isEdit ? "Save Changes" : "Create Reward"}
             </Button>
             <Button
               type="button"
@@ -271,7 +271,7 @@ export default function CreateRewardModal({
               onClick={handleClose}
               disabled={isSubmitting}
             >
-              Cancelar
+              Cancel
             </Button>
           </div>
         </form>

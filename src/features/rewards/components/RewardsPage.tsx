@@ -42,37 +42,37 @@ export default function RewardsPage() {
     file?: File,
   ): Promise<boolean> => {
     if (selectedReward) {
-      // Editar
+      // Edit
       const res = await updateReward(selectedReward.id, rewardData, file);
       if (res.success) {
         showAlert({
-          title: "Recompensa guardada",
-          message: "La recompensa ha sido actualizada correctamente.",
+          title: "Reward saved",
+          message: "The reward has been updated successfully.",
           type: "success",
         });
         return true;
       } else {
         showAlert({
           title: "Error",
-          message: `Error al actualizar la recompensa: ${res.error}`,
+          message: `Error updating reward: ${res.error}`,
           type: "error",
         });
         return false;
       }
     } else {
-      // Crear
+      // Create
       const res = await createReward(rewardData, file);
       if (res.success) {
         showAlert({
-          title: "Recompensa creada",
-          message: "La recompensa ha sido creada correctamente.",
+          title: "Reward created",
+          message: "The reward has been created successfully.",
           type: "success",
         });
         return true;
       } else {
         showAlert({
           title: "Error",
-          message: `Error al crear la recompensa: ${res.error}`,
+          message: `Error creating reward: ${res.error}`,
           type: "error",
         });
         return false;
@@ -85,13 +85,13 @@ export default function RewardsPage() {
     if (!res.success) {
       showAlert({
         title: "Error",
-        message: `Error al eliminar la recompensa: ${res.error}`,
+        message: `Error deleting reward: ${res.error}`,
         type: "error",
       });
     } else {
       showAlert({
-        title: "Recompensa eliminada",
-        message: "La recompensa ha sido eliminada correctamente.",
+        title: "Reward deleted",
+        message: "The reward has been deleted successfully.",
         type: "success",
       });
     }
@@ -103,11 +103,10 @@ export default function RewardsPage() {
       <div className="border-b border-slate-200/80  p-2 md:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 ">
         <div className="space-y-1">
           <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-            Gestión de Recompensas
+            Rewards Management
           </h1>
           <p className="text-sm font-semibold text-slate-500">
-            Administra los stickers y GIFs animados que los estudiantes pueden
-            desbloquear completando objetivos.
+            Manage stickers and animated GIFs that students can unlock by completing goals.
           </p>
         </div>
 
@@ -117,7 +116,7 @@ export default function RewardsPage() {
             onClick={refreshRewards}
             disabled={isLoading}
             className="p-3"
-            aria-label="Refrescar lista"
+            aria-label="Refresh list"
           >
             <RefreshCw
               className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
@@ -130,7 +129,7 @@ export default function RewardsPage() {
             leftIcon={<Plus className="w-5 h-5" />}
             className="shadow-sm flex-1 sm:flex-initial"
           >
-            Agregar Recompensa
+            Add Reward
           </Button>
         </div>
       </div>
@@ -140,14 +139,14 @@ export default function RewardsPage() {
         <div className="bg-rose-50 border border-rose-100 text-rose-800 rounded-2xl p-5 flex items-start space-x-3.5 shadow-sm">
           <AlertCircle className="w-6 h-6 text-rose-500 shrink-0 mt-0.5" />
           <div>
-            <h4 className="font-bold text-rose-900">Error al cargar datos</h4>
+            <h4 className="font-bold text-rose-900">Error loading data</h4>
             <p className="text-sm text-rose-700/90 mt-1">{error}</p>
             <Button
               variant="outlined"
               onClick={refreshRewards}
               className="mt-3.5 text-xs py-2 bg-white text-rose-700 border-rose-200 hover:bg-rose-100/50"
             >
-              Intentar de nuevo
+              Try again
             </Button>
           </div>
         </div>
@@ -175,11 +174,10 @@ export default function RewardsPage() {
           </div>
           <div className="space-y-1.5">
             <h3 className="text-lg font-bold text-slate-800">
-              No hay recompensas
+              No rewards found
             </h3>
             <p className="text-sm font-semibold text-slate-400 max-w-xs mx-auto">
-              Crea tu primera recompensa para que los estudiantes comiencen a
-              coleccionarlas.
+              Create your first reward so students can start collecting them.
             </p>
           </div>
           <Button
@@ -188,7 +186,7 @@ export default function RewardsPage() {
             leftIcon={<Plus className="w-5 h-5" />}
             className="px-6"
           >
-            Agregar Recompensa
+            Add Reward
           </Button>
         </div>
       ) : (

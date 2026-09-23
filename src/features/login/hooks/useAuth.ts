@@ -85,13 +85,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (user) {
           const role = await fetchUserRole(user.id);
           if (role !== "admin") {
-            return "Esta cuenta no tiene acceso de administrador";
+            return "This account does not have administrator access";
           }
           setUserRole("admin");
         }
         return null;
       } catch (e: any) {
-        return e?.message ?? "Error al iniciar sesión";
+        return e?.message ?? "Failed to sign in";
       } finally {
         setAuthLoading(false);
       }
@@ -106,7 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) return error.message;
       return null;
     } catch (e: any) {
-      return e?.message ?? "Error al conectar con Google";
+      return e?.message ?? "Failed to connect with Google";
     } finally {
       setAuthLoading(false);
     }

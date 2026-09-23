@@ -55,7 +55,7 @@ export const useGoals = () => {
       await createGoalMutation.mutateAsync({ goal, rewardId });
       return { success: true };
     } catch (err: any) {
-      return { success: false, error: err.message || "Error al crear el objetivo" };
+      return { success: false, error: err.message || "Failed to create goal" };
     }
   };
 
@@ -68,7 +68,7 @@ export const useGoals = () => {
       await updateGoalMutation.mutateAsync({ id, goal, rewardId });
       return { success: true };
     } catch (err: any) {
-      return { success: false, error: err.message || "Error al actualizar el objetivo" };
+      return { success: false, error: err.message || "Failed to update goal" };
     }
   };
 
@@ -77,7 +77,7 @@ export const useGoals = () => {
       await deleteGoalMutation.mutateAsync(id);
       return { success: true };
     } catch (err: any) {
-      return { success: false, error: err.message || "Error al eliminar el objetivo" };
+      return { success: false, error: err.message || "Failed to delete goal" };
     }
   };
 

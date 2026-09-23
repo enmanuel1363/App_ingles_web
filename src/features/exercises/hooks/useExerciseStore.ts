@@ -12,7 +12,7 @@ function replaceFilesWithPlaceholders(val: any): any {
   ) {
     return {
       __isDraftPlaceholder: true,
-      name: (val as any).name || "archivo_temporal",
+      name: (val as any).name || "temp_file",
       type: val.type,
       size: val.size,
     };
@@ -192,7 +192,7 @@ export const useExerciseStore = create<StoreTypes>()(
                   {
                     id_class: classId,
                     name: "",
-                    description: "Completa la palabra con las letras correctas",
+                    description: "Complete the word with the correct letters",
                     type: "complete_word",
                     content: {
                       word: "",
@@ -266,7 +266,7 @@ export const useExerciseStore = create<StoreTypes>()(
                   {
                     id_class: classId,
                     name: "",
-                    description: "Completa la palabra con las letras correctas",
+                    description: "Complete the word with the correct letters",
                     type: "complete_word",
                     content: {
                       word: "",
@@ -413,7 +413,7 @@ export const useExerciseStore = create<StoreTypes>()(
                   {
                     id_class: classId,
                     name: "",
-                    description: "Completa la palabra con las letras correctas",
+                    description: "Complete the word with the correct letters",
                     type: "complete_word",
                     content: {
                       word: "",

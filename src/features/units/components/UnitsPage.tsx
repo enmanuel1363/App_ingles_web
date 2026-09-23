@@ -50,15 +50,15 @@ export default function UnitsPage({ courseId, courseTitle, initialUnits }: Props
         setUnitToDelete(null);
         setIsDeleting(false);
         showAlert({
-          title: "Unidad eliminada",
-          message: "La unidad ha sido eliminada correctamente.",
+          title: "Unit deleted",
+          message: "The unit has been successfully deleted.",
           type: "success",
         });
       },
       onError: (err: any) => {
         showAlert({
           title: "Error",
-          message: err.message || "No se pudo eliminar la unidad.",
+          message: err.message || "Failed to delete unit.",
           type: "error",
         });
         setIsDeleting(false);
@@ -83,16 +83,16 @@ export default function UnitsPage({ courseId, courseTitle, initialUnits }: Props
           onClick={() => router.push("/courses")}
         >
           <ArrowLeft className="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" />
-          <span>My Classes</span>
+          <span>My Courses</span>
         </button>
         
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
           <div>
             <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              {courseTitle ? `${courseTitle} — Unidades` : "Unidades"}
+              {courseTitle ? `${courseTitle} — Units` : "Units"}
             </h1>
             <p className="text-slate-500 text-sm mt-1">
-              Organiza las lecciones, desafíos y objetivos de aprendizaje de esta clase.
+              Organize lessons, challenges, and learning goals for this course.
             </p>
           </div>
           <div className="sm:self-end">
@@ -106,12 +106,12 @@ export default function UnitsPage({ courseId, courseTitle, initialUnits }: Props
         {isLoading ? (
           <div className="col-span-full py-20 flex flex-col items-center justify-center text-slate-400 space-y-3">
             <Loader2 className="w-8 h-8 animate-spin text-cyan-505" />
-            <span className="text-sm font-semibold">Cargando unidades...</span>
+            <span className="text-sm font-semibold">Loading units...</span>
           </div>
         ) : units.length === 0 ? (
           <div className="col-span-full py-16 flex flex-col items-center justify-center text-slate-400 space-y-3">
             <BookOpen className="w-10 h-10 text-slate-350" />
-            <p className="text-sm font-semibold">No hay unidades configuradas en esta clase.</p>
+            <p className="text-sm font-semibold">No units configured for this course yet.</p>
           </div>
         ) : (
           units.map((item) => (
@@ -147,9 +147,9 @@ export default function UnitsPage({ courseId, courseTitle, initialUnits }: Props
           setUnitToDelete(null);
         }}
         onConfirm={handleConfirmDelete}
-        title="¿Eliminar Unidad?"
-        description={`¿Estás seguro de que deseas eliminar la unidad "${unitToDelete?.name}"? Esta acción borrará todas sus lecciones y ejercicios asociados de manera permanente.`}
-        confirmText="Eliminar Unidad"
+        title="Delete Unit?"
+        description={`Are you sure you want to delete the unit "${unitToDelete?.name}"? This action will permanently remove all associated lessons and exercises.`}
+        confirmText="Delete Unit"
         isLoading={isDeleting}
         variant="danger"
       />

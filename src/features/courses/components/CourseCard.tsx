@@ -31,7 +31,7 @@ export default function CourseCard({ id, title, grade, students, onEdit, onDelet
             {title}
           </h3>
           <p className="text-xs font-semibold text-slate-500">
-            Nivel: {grade}
+            Level: {grade}
           </p>
         </div>
         <div className="flex items-center space-x-2 shrink-0">
@@ -43,7 +43,7 @@ export default function CourseCard({ id, title, grade, students, onEdit, onDelet
                   onEdit();
                 }}
                 className="text-slate-400 hover:text-cyan-600 p-1 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
-                title="Editar curso"
+                title="Edit course"
               >
                 <Edit2 className="w-3.5 h-3.5" />
               </button>
@@ -55,7 +55,7 @@ export default function CourseCard({ id, title, grade, students, onEdit, onDelet
                   onDelete();
                 }}
                 className="text-slate-400 hover:text-rose-600 p-1 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
-                title="Eliminar curso"
+                title="Delete course"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -83,7 +83,7 @@ export default function CourseCard({ id, title, grade, students, onEdit, onDelet
             )
           }
         >
-          <span>Ver clase</span>
+          <span>View course</span>
           <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" />
         </button>
       </div>
