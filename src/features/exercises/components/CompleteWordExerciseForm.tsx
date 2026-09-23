@@ -154,8 +154,7 @@ export default function CompleteWordExerciseForm({ order_index }: Props) {
 
       <p className="flex flex-row items-center gap-2 text-sm text-gray-400">
         <Info className="w-4 h-4" />
-        Tip: usa 3 guiones bajos ( _ ) para indicar donde ira la palabra
-        faltante en tu frase
+        Tip: use 3 underscores ( ___ ) to indicate where the missing word goes in your sentence
       </p>
       {items.map((item: any, itemIndex: number) => {
         const isItemInvalid =
@@ -219,7 +218,7 @@ export default function CompleteWordExerciseForm({ order_index }: Props) {
                     className="text-slate-400 hover:text-slate-655 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/50 transition-colors"
                     onMouseDown={() => setDraggableIndex(itemIndex)}
                     onMouseUp={() => setDraggableIndex(null)}
-                    title="Arrastrar para reordenar"
+                    title="Drag to reorder"
                   >
                     <GripVertical size={18} />
                   </div>
@@ -253,7 +252,7 @@ export default function CompleteWordExerciseForm({ order_index }: Props) {
 
             <div className="mt-4">
               <label className="text-sm font-medium text-slate-650 mb-2 block">
-                Posibles respuestas
+                Possible answers
               </label>
               <div className="flex flex-wrap gap-2 mb-4">
                 {item.possible_answers?.map((answer: string, idx: number) => (
@@ -283,8 +282,7 @@ export default function CompleteWordExerciseForm({ order_index }: Props) {
               <div className="mt-3 flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50/50 p-2 rounded-lg border border-amber-100">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>
-                  Se requiere asignar una respuesta correcta y al menos una
-                  posible respuesta.
+                  A correct answer and at least one possible answer are required.
                 </span>
               </div>
             )}

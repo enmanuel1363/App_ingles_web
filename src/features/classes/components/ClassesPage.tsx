@@ -46,8 +46,8 @@ export default function ClassesPage({
 
   const handleDeleteClass = async (id: string, className: string) => {
     const confirmed = await confirm({
-      title: "Eliminar clase",
-      description: `¿Estás seguro de que deseas eliminar la clase "${className}"?`,
+      title: "Delete Lesson",
+      description: `Are you sure you want to delete the lesson "${className}"?`,
       variant: "danger",
     });
     if (!confirmed) return;
@@ -55,14 +55,14 @@ export default function ClassesPage({
     try {
       await deleteClassMutation({ classId: id, unitId });
       showAlert({
-        title: "Clase eliminada",
-        message: `La clase "${className}" ha sido eliminada correctamente.`,
+        title: "Lesson deleted",
+        message: `The lesson "${className}" has been successfully deleted.`,
         type: "success",
       });
     } catch {
       showAlert({
         title: "Error",
-        message: "No se pudo eliminar la clase. Por favor, inténtalo de nuevo.",
+        message: "Failed to delete lesson. Please try again.",
         type: "error",
       });
     }
@@ -83,7 +83,7 @@ export default function ClassesPage({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-5 gap-4">
           <div className="flex items-center space-x-3.5">
             <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              {unitName ? `Unidad ${unitOrder}: ${unitName}` : "Clases Creadas"}
+              {unitName ? `Unit ${unitOrder}: ${unitName}` : "Created Lessons"}
             </h1>
             <span className="bg-cyan-500/10 text-cyan-700 border border-cyan-500/20 px-2.5 py-0.5 rounded-full text-xs font-bold">
               {lessons.length}
@@ -95,7 +95,7 @@ export default function ClassesPage({
               leftIcon={<Plus className="w-4 h-4 text-slate-950" />}
               onClick={handleAddClass}
             >
-              añadir lección
+              Add Lesson
             </Button>
           </div>
         </div>
@@ -133,7 +133,7 @@ export default function ClassesPage({
           {lessons.length === 0 && (
             <div className="col-span-full py-16 flex flex-col items-center justify-center text-slate-400 space-y-3">
               <BookOpen className="w-10 h-10 text-slate-350" />
-              <p className="text-sm font-semibold">No classes created yet.</p>
+              <p className="text-sm font-semibold">No lessons created yet.</p>
             </div>
           )}
         </div>

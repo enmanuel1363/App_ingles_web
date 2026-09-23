@@ -15,7 +15,7 @@ export default function CreateCourseButton() {
         leftIcon={<Plus className="w-4 h-4 text-slate-950" />}
         onClick={() => setVisible(true)}
       >
-        Crear Curso
+        Create Course
       </Button>
 
       <CreateCourseModal visible={visible} onClose={() => setVisible(false)} />

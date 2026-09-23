@@ -7,16 +7,16 @@ import { Unit } from "./unit.types";
 const difficultySchema = z.enum(["low", "medium", "hard"]);
 
 const createUnitSchema = z.object({
-  id_course: z.string().uuid("El curso no es válido"),
-  name: z.string().min(1, "El nombre de la unidad es requerido").max(100, "El nombre es muy largo"),
-  order_index: z.number().int("El índice de orden debe ser un número entero"),
+  id_course: z.string().uuid("Invalid course"),
+  name: z.string().min(1, "Unit name is required").max(100, "Name is too long"),
+  order_index: z.number().int("Order index must be an integer"),
   difficulty: difficultySchema,
 });
 
 const updateUnitSchema = z.object({
-  id_course: z.string().uuid("El curso no es válido").optional(),
-  name: z.string().min(1, "El nombre de la unidad es requerido").max(100, "El nombre es muy largo").optional(),
-  order_index: z.number().int("El índice de orden debe ser un número entero").optional(),
+  id_course: z.string().uuid("Invalid course").optional(),
+  name: z.string().min(1, "Unit name is required").max(100, "Name is too long").optional(),
+  order_index: z.number().int("Order index must be an integer").optional(),
   difficulty: difficultySchema.optional(),
 });
 
@@ -35,7 +35,7 @@ export async function createUnitAction(rawData: unknown) {
     return { success: true, data: data as Unit };
   } catch (error: any) {
     console.error("Error in createUnitAction:", error);
-    return { success: false, error: error.message || "Error al crear la unidad" };
+    return { success: false, error: error.message || "Failed to create unit" };
   }
 }
 
@@ -44,7 +44,7 @@ export async function updateUnitAction(id: string, rawData: unknown) {
     const { supabase } = await checkAdmin();
     
     if (!id || typeof id !== "string") {
-      throw new Error("ID de unidad no válido");
+      throw new Error("Invalid unit ID");
     }
     
     const validated = updateUnitSchema.parse(rawData);
@@ -60,7 +60,7 @@ export async function updateUnitAction(id: string, rawData: unknown) {
     return { success: true, data: data as Unit };
   } catch (error: any) {
     console.error("Error in updateUnitAction:", error);
-    return { success: false, error: error.message || "Error al actualizar la unidad" };
+    return { success: false, error: error.message || "Failed to update unit" };
   }
 }
 
@@ -69,7 +69,7 @@ export async function deleteUnitAction(id: string) {
     const { supabase } = await checkAdmin();
     
     if (!id || typeof id !== "string") {
-      throw new Error("ID de unidad no válido");
+      throw new Error("Invalid unit ID");
     }
     
     const { error } = await supabase
@@ -81,6 +81,6 @@ export async function deleteUnitAction(id: string) {
     return { success: true };
   } catch (error: any) {
     console.error("Error in deleteUnitAction:", error);
-    return { success: false, error: error.message || "Error al eliminar la unidad" };
+    return { success: false, error: error.message || "Failed to delete unit" };
   }
 }

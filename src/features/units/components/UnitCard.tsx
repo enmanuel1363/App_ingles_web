@@ -18,17 +18,17 @@ const DIFFICULTY_CONFIG: Record<
   low: {
     level: 1,
     colorClass: "bg-lime-400 shadow-[0_0_8px_rgba(180,255,43,0.2)]",
-    label: "Fácil",
+    label: "Easy",
   },
   medium: {
     level: 2,
     colorClass: "bg-cyan-400 shadow-[0_0_8px_rgba(36,223,226,0.2)]",
-    label: "Intermedio",
+    label: "Intermediate",
   },
   hard: {
     level: 3,
     colorClass: "bg-amber-400 shadow-[0_0_8px_rgba(255,148,0,0.2)]",
-    label: "Avanzado",
+    label: "Advanced",
   },
 };
 
@@ -47,7 +47,7 @@ export default function UnitCard({ order, name, difficulty, onPress, onEdit, onD
 
         <div className="space-y-1.5 flex-1 min-w-0">
           <p className="text-xs font-bold text-cyan-600 uppercase tracking-wider">
-            Unidad {order}
+            Unit {order}
           </p>
           <div className="flex items-center justify-between gap-1.5 w-full">
             <h3 className="text-base font-bold text-slate-800 group-hover:text-slate-950 transition-colors line-clamp-2 leading-snug truncate">
@@ -61,7 +61,7 @@ export default function UnitCard({ order, name, difficulty, onPress, onEdit, onD
                     onEdit();
                   }}
                   className="text-slate-400 hover:text-cyan-600 p-1 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
-                  title="Editar unidad"
+                  title="Edit unit"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
                 </button>
@@ -73,7 +73,7 @@ export default function UnitCard({ order, name, difficulty, onPress, onEdit, onD
                     onDelete();
                   }}
                   className="text-slate-400 hover:text-rose-600 p-1 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
-                  title="Eliminar unidad"
+                  title="Delete unit"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -87,7 +87,7 @@ export default function UnitCard({ order, name, difficulty, onPress, onEdit, onD
       <div className="flex justify-between items-center mt-6 pt-4 border-t border-slate-100 w-full">
         <div className="space-y-1">
           <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-            Dificultad: {config.label}
+            Difficulty: {config.label}
           </p>
           <div className="flex space-x-1.5 w-16">
             {[1, 2, 3].map((segmentIndex) => {

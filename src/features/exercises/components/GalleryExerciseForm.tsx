@@ -218,7 +218,7 @@ export default function GalleryExerciseForm({ order_index }: Props) {
           {isItemInvalid && (
             <div className="mt-3 flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50/50 p-2 rounded-lg border border-amber-100">
               <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>Se requiere agregar al menos una imagen con su respectiva descripción.</span>
+              <span>At least one image with its corresponding description is required.</span>
             </div>
           )}
         </div>

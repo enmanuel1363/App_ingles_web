@@ -185,7 +185,7 @@ export default function CreateClassModal({
             disabled={isPending || !name.trim()}
             className="min-w-[120px]"
           >
-            {classToEdit ? "Save Changes" : "Create Class"}
+            {classToEdit ? "Save Changes" : "Create Lesson"}
           </Button>
         </div>
       </div>

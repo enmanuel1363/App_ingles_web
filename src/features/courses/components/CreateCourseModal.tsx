@@ -45,7 +45,7 @@ export default function CreateCourseModal({ visible, onClose, courseToEdit }: Pr
 
   const handleSave = async () => {
     if (!className.trim() || !academicLevel) {
-      setError("Completa el nombre de la clase y selecciona un nivel.");
+      setError("Complete the course name and select a level.");
       return;
     }
 
@@ -58,14 +58,14 @@ export default function CreateCourseModal({ visible, onClose, courseToEdit }: Pr
       if (result.success) {
         onClose();
       } else {
-        setError(result.error || "No se pudo actualizar el curso");
+        setError(result.error || "Failed to update course");
       }
     } else {
       const result = await createCourse(className, academicLevel, description);
       if (result.success) {
         onClose();
       } else {
-        setError(result.error || "No se pudo crear el curso");
+        setError(result.error || "Failed to create course");
       }
     }
   };
@@ -82,7 +82,7 @@ export default function CreateCourseModal({ visible, onClose, courseToEdit }: Pr
         {/* Header */}
         <div className="flex justify-between items-center border-b border-slate-100 pb-4">
           <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-            {courseToEdit ? "Edit Class" : "New Class"}
+            {courseToEdit ? "Edit Course" : "New Course"}
           </h2>
           <button
             onClick={onClose}
@@ -96,7 +96,7 @@ export default function CreateCourseModal({ visible, onClose, courseToEdit }: Pr
         <div className="space-y-4">
           <div className="space-y-1.5">
             <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-450">
-              Class Name
+              Course Name
             </label>
             <input
               className="w-full bg-slate-55 border border-slate-200 text-slate-900 rounded-xl p-3 placeholder-slate-400 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all duration-200 disabled:opacity-50 text-sm"
@@ -138,7 +138,7 @@ export default function CreateCourseModal({ visible, onClose, courseToEdit }: Pr
             </label>
             <textarea
               className="w-full bg-slate-55 border border-slate-200 text-slate-900 rounded-xl p-3 placeholder-slate-400 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all duration-200 disabled:opacity-50 text-sm min-h-[100px] resize-y"
-              placeholder="Brief class summary or requirements..."
+              placeholder="Brief course summary or requirements..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               disabled={isLoading}

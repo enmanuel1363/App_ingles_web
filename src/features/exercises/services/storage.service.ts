@@ -33,7 +33,7 @@ export async function uploadFile(
 
     return publicUrlData.publicUrl;
   } catch (error) {
-    console.error("Error al subir el archivo:", error);
+    console.error("Error uploading file:", error);
     throw error;
   }
 }
@@ -157,7 +157,7 @@ export async function processExerciseFiles<T extends { type: string; content: an
 
     return { ...exercise, content: newContent };
   } catch (error) {
-    console.error(`Error procesando archivos para ejercicio tipo ${type}:`, error);
+    console.error(`Error processing files for exercise type ${type}:`, error);
     throw error;
   }
 }

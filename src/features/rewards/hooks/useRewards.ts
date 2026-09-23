@@ -60,7 +60,7 @@ export const useRewards = () => {
       await createRewardMutation.mutateAsync({ reward, file });
       return { success: true };
     } catch (err: any) {
-      return { success: false, error: err.message || "Error al crear la recompensa" };
+      return { success: false, error: err.message || "Failed to create reward" };
     }
   };
 
@@ -73,7 +73,7 @@ export const useRewards = () => {
       await updateRewardMutation.mutateAsync({ id, reward, file });
       return { success: true };
     } catch (err: any) {
-      return { success: false, error: err.message || "Error al actualizar la recompensa" };
+      return { success: false, error: err.message || "Failed to update reward" };
     }
   };
 
@@ -82,7 +82,7 @@ export const useRewards = () => {
       await deleteRewardMutation.mutateAsync(id);
       return { success: true };
     } catch (err: any) {
-      return { success: false, error: err.message || "Error al eliminar la recompensa" };
+      return { success: false, error: err.message || "Failed to delete reward" };
     }
   };
 

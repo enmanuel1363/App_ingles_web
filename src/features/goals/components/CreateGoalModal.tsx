@@ -17,14 +17,14 @@ interface CreateGoalModalProps {
 }
 
 const GOAL_TYPES: { value: GoalType; label: string }[] = [
-  { value: "points", label: "Puntos de Experiencia (XP)" },
-  { value: "lesson", label: "Lección Completada" },
-  { value: "time", label: "Tiempo récord (segundos)" },
-  { value: "classes", label: "Curso completado" },
-  { value: "streak", label: "Días de racha activa" },
-  { value: "approvals", label: "Lecciones aprobadas (acumuladas)" },
-  { value: "collection", label: "Colección de recompensas" },
-  { value: "ranking", label: "Puesto en la Liga (Top N)" },
+  { value: "points", label: "Experience Points (XP)" },
+  { value: "lesson", label: "Completed Lesson" },
+  { value: "time", label: "Record Time (seconds)" },
+  { value: "classes", label: "Completed Course" },
+  { value: "streak", label: "Active Streak Days" },
+  { value: "approvals", label: "Approved Lessons (accumulated)" },
+  { value: "collection", label: "Reward Collection" },
+  { value: "ranking", label: "League Rank (Top N)" },
 ];
 
 export default function CreateGoalModal({
@@ -57,7 +57,7 @@ export default function CreateGoalModal({
         setCourses(coursesData);
         setClasses(classesData);
       } catch (err) {
-        console.error("Error al cargar cursos o clases:", err);
+        console.error("Error loading courses or classes:", err);
       }
     }
     loadCatalogs();
@@ -73,7 +73,7 @@ export default function CreateGoalModal({
         const rewards = await goalsService.getAvailableRewards(goalToEdit?.id);
         setAvailableRewards(rewards);
       } catch (err) {
-        console.error("Error al cargar recompensas para objetivos:", err);
+        console.error("Error loading rewards for goals:", err);
       } finally {
         setIsLoadingRewards(false);
       }
@@ -122,8 +122,8 @@ export default function CreateGoalModal({
     e.preventDefault();
     if (!name.trim()) {
       showAlert({
-        title: "Campo requerido",
-        message: "El nombre es requerido.",
+        title: "Required Field",
+        message: "Name is required.",
         type: "error",
       });
       return;
@@ -132,16 +132,16 @@ export default function CreateGoalModal({
     const isStringType = type === "lesson" || type === "classes";
     if (isStringType && !target) {
       showAlert({
-        title: "Selección requerida",
-        message: `Debes seleccionar la ${type === "lesson" ? "lección" : "clase/curso"} requerida.`,
+        title: "Selection Required",
+        message: `You must select the required ${type === "lesson" ? "lesson" : "course"}.`,
         type: "error",
       });
       return;
     }
     if (!isStringType && (typeof target !== "number" || target <= 0)) {
       showAlert({
-        title: "Valor inválido",
-        message: "La meta numérica debe ser mayor a cero.",
+        title: "Invalid Value",
+        message: "The numeric target must be greater than zero.",
         type: "error",
       });
       return;
@@ -164,7 +164,7 @@ export default function CreateGoalModal({
       console.error(err);
       showAlert({
         title: "Error",
-        message: "Ocurrió un error al guardar el objetivo.",
+        message: "An error occurred while saving the goal.",
         type: "error",
       });
     } finally {
@@ -195,7 +195,7 @@ export default function CreateGoalModal({
         {/* Header */}
         <div className="flex justify-between items-center border-b border-slate-100 pb-4">
           <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-            {isEdit ? "Editar Objetivo" : "Nuevo Objetivo"}
+            {isEdit ? "Edit Goal" : "New Goal"}
           </h2>
           <button
             onClick={handleClose}
@@ -207,15 +207,15 @@ export default function CreateGoalModal({
 
         <form onSubmit={handleSave} className="space-y-5">
           <FormInput
-            label="Nombre del Objetivo"
-            placeholder="Ej. Constancia Semanal"
+            label="Goal Name"
+            placeholder="e.g. Weekly Consistency"
             value={name}
             onChangeText={setName}
           />
 
           <FormInput
-            label="Descripción"
-            placeholder="Ej. Completa una clase por día durante 7 días seguidos."
+            label="Description"
+            placeholder="e.g. Complete one lesson per day for 7 consecutive days."
             value={description}
             onChangeText={setDescription}
             multiline
@@ -225,7 +225,7 @@ export default function CreateGoalModal({
             {/* Type Dropdown */}
             <div className="flex flex-col space-y-1.5">
               <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-450">
-                Tipo de Objetivo
+                Goal Type
               </label>
               <select
                 value={type}
@@ -244,18 +244,18 @@ export default function CreateGoalModal({
             <div className="flex flex-col space-y-1.5">
               <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-450">
                 {type === "time"
-                  ? "Tiempo Récord en Juego (Segundos)"
+                  ? "Record Time in Game (Seconds)"
                   : type === "lesson"
-                    ? "Selecciona la Lección"
+                    ? "Select Lesson"
                     : type === "classes"
-                      ? "Selecciona el Curso"
+                      ? "Select Course"
                       : type === "approvals"
-                        ? "Lecciones a Aprobar"
+                        ? "Lessons to Pass"
                         : type === "collection"
-                          ? "Recompensas a Acumular"
+                          ? "Rewards to Collect"
                           : type === "ranking"
-                            ? "Puesto Máximo en Liga (Top N)"
-                            : "Meta Requerida"}
+                            ? "Highest League Rank (Top N)"
+                            : "Required Target"}
               </label>
               {type === "lesson" ? (
                 <select
@@ -263,7 +263,7 @@ export default function CreateGoalModal({
                   onChange={(e) => setTarget(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-205 rounded-xl px-4 py-3 font-semibold text-slate-850 outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary-dark transition-all duration-200"
                 >
-                  <option value="">Selecciona una lección...</option>
+                  <option value="">Select a lesson...</option>
                   {classes.map((cls) => (
                     <option key={cls.id} value={cls.id}>
                       {cls.name}
@@ -276,7 +276,7 @@ export default function CreateGoalModal({
                   onChange={(e) => setTarget(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-205 rounded-xl px-4 py-3 font-semibold text-slate-850 outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary-dark transition-all duration-200"
                 >
-                  <option value="">Selecciona un curso...</option>
+                  <option value="">Select a course...</option>
                   {courses.map((crs) => (
                     <option key={crs.id} value={crs.id}>
                       {crs.name}
@@ -294,7 +294,7 @@ export default function CreateGoalModal({
               )}
               {type === "time" && (
                 <span className="text-[9px] text-slate-400 font-bold leading-none mt-1">
-                  Tiempo máximo permitido para finalizar la lección.
+                  Maximum allowed time to complete the lesson.
                 </span>
               )}
             </div>
@@ -303,7 +303,7 @@ export default function CreateGoalModal({
           {/* Reward Dropdown */}
           <div className="flex flex-col space-y-1.5">
             <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-450">
-              Recompensa a Entregar (Opcional)
+              Reward to Grant (Optional)
             </label>
             <select
               value={rewardId}
@@ -312,7 +312,7 @@ export default function CreateGoalModal({
               className="w-full bg-slate-50 border border-slate-205 rounded-xl px-4 py-3 font-semibold text-slate-850 outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary-dark transition-all duration-200 disabled:opacity-50"
             >
               <option value="">
-                Sin Recompensa (Se desbloquea logro sin item)
+                No Reward (Achievement unlocked without item)
               </option>
               {availableRewards.map((reward) => (
                 <option key={reward.id} value={reward.id}>
@@ -321,7 +321,7 @@ export default function CreateGoalModal({
               ))}
             </select>
             <span className="text-[10px] text-slate-400 font-semibold leading-relaxed">
-              Las recompensas libres pueden ser enlazadas a un único objetivo.
+              Unassigned rewards can be linked to a single goal.
             </span>
           </div>
 
@@ -340,7 +340,7 @@ export default function CreateGoalModal({
               }
               className="min-w-[140px]"
             >
-              {isEdit ? "Guardar Cambios" : "Crear Objetivo"}
+              {isEdit ? "Save Changes" : "Create Goal"}
             </Button>
             <Button
               type="button"
@@ -348,7 +348,7 @@ export default function CreateGoalModal({
               onClick={handleClose}
               disabled={isSubmitting}
             >
-              Cancelar
+              Cancel
             </Button>
           </div>
         </form>

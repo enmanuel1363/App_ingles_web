@@ -33,7 +33,7 @@ export const useCreateExercises = () => {
       queryClient.invalidateQueries({ queryKey: ["exercises"] });
     },
     onError: (error) => {
-      console.error("Error al crear los ejercicios:", error);
+      console.error("Error creating exercises:", error);
     },
   });
 };

@@ -9,8 +9,8 @@ export default function PlaceholderExerciseForm({ type }: Props) {
     <div className="w-full">
       <div className="p-4 bg-slate-50/50 border border-slate-200 rounded-2xl shadow-md">
         <p className="m-0 text-slate-500 text-sm">
-          El formulario para <strong className="text-slate-850">{type}</strong> se implementa en una
-          siguiente sub-fase.
+          The form for <strong className="text-slate-850">{type}</strong> will be implemented in a
+          subsequent phase.
         </p>
       </div>
     </div>

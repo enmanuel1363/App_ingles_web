@@ -16,9 +16,9 @@ type Props = {
 type DifficultyLevel = "low" | "medium" | "hard";
 
 const LEVEL_LABELS: Record<DifficultyLevel, string> = {
-  low: "Fácil",
-  medium: "Intermedio",
-  hard: "Avanzado",
+  low: "Easy",
+  medium: "Intermediate",
+  hard: "Advanced",
 };
 
 const LEVEL_ORDER: DifficultyLevel[] = ["low", "medium", "hard"];
@@ -128,7 +128,7 @@ export default function CreateUnitModal({ visible, onClose, courseId, unitToEdit
                   ? "border-rose-500 focus:border-rose-500 focus:ring-rose-500" 
                   : "border-slate-200 focus:border-cyan-500 focus:ring-cyan-500"
               }`}
-              placeholder="Ej: 1"
+              placeholder="e.g. 1"
               value={orderIndex}
               onChange={(e) => handleOrderIndexChange(e.target.value)}
               inputMode="numeric"
@@ -137,7 +137,7 @@ export default function CreateUnitModal({ visible, onClose, courseId, unitToEdit
             {hasError && (
               <div className="flex items-center space-x-1.5 text-rose-500 text-xs mt-1">
                 <AlertCircle className="w-3.5 h-3.5" />
-                <span>Solo se permiten números en este campo</span>
+                <span>Only numbers are allowed in this field</span>
               </div>
             )}
           </div>
@@ -146,7 +146,7 @@ export default function CreateUnitModal({ visible, onClose, courseId, unitToEdit
             <div className="flex justify-between items-center">
               <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-450">Difficulty</label>
               <span className="text-xs font-bold text-slate-600">
-                Nivel: <span className="text-cyan-600 font-extrabold">{LEVEL_LABELS[level]}</span>
+                Level: <span className="text-cyan-600 font-extrabold">{LEVEL_LABELS[level]}</span>
               </span>
             </div>
             
@@ -176,7 +176,7 @@ export default function CreateUnitModal({ visible, onClose, courseId, unitToEdit
               })}
             </div>
             <p className="text-[10px] text-slate-500 font-semibold">
-              Select the difficulty level of the class
+              Select the difficulty level of the unit
             </p>
           </div>
         </div>

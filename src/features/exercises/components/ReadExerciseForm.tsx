@@ -44,7 +44,7 @@ export default function ReadExerciseForm({ order_index }: Props) {
   ) {
     questions = [
       {
-        question: firstItem.question || "Pregunta 1",
+        question: firstItem.question || "Question 1",
         correct_answer: firstItem.correct_answer || "",
         possible_answers: firstItem.possible_answers || [],
       },
@@ -212,7 +212,7 @@ export default function ReadExerciseForm({ order_index }: Props) {
 
       <div className="mt-4 p-5 bg-slate-50/70 rounded-xl border border-slate-200/80">
         <span className="font-semibold text-cyan-650 text-sm tracking-wide uppercase block mb-3">
-          Lectura (Quiz de Lectura)
+          Reading (Reading Quiz)
         </span>
 
         <FormInput
@@ -226,7 +226,7 @@ export default function ReadExerciseForm({ order_index }: Props) {
         <div className="mt-6 space-y-6">
           <div className="border-t border-slate-200/60 pt-4">
             <span className="font-bold text-slate-700 text-sm tracking-wide block mb-4">
-              Preguntas Asociadas ({questions.length})
+              Associated Questions ({questions.length})
             </span>
           </div>
 
@@ -297,20 +297,20 @@ export default function ReadExerciseForm({ order_index }: Props) {
                           className="text-slate-400 hover:text-slate-655 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/50 transition-colors mt-0.5"
                           onMouseDown={() => setDraggableQIndex(qIndex)}
                           onMouseUp={() => setDraggableQIndex(null)}
-                          title="Arrastrar para reordenar"
+                          title="Drag to reorder"
                         >
                           <GripVertical size={16} />
                         </div>
                       )}
                       <div>
                         <span className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-650 block mb-1">
-                          Pregunta {qIndex + 1}
+                          Question {qIndex + 1}
                         </span>
                         <p className="font-semibold text-slate-800 text-sm">
                           Q:{" "}
                           {q.question || (
                             <span className="text-slate-400 italic">
-                              Pregunta no formulada
+                              Question not formulated
                             </span>
                           )}
                         </p>
@@ -321,7 +321,7 @@ export default function ReadExerciseForm({ order_index }: Props) {
                         type="button"
                         className="p-1.5 text-slate-500 hover:text-cyan-600 hover:bg-cyan-500/5 rounded-lg transition-colors cursor-pointer"
                         onClick={() => setEditingQIndex(qIndex)}
-                        title="Editar pregunta"
+                        title="Edit question"
                       >
                         <Edit3 size={16} />
                       </button>
@@ -329,7 +329,7 @@ export default function ReadExerciseForm({ order_index }: Props) {
                         type="button"
                         className="text-slate-400 hover:text-rose-600 transition-colors p-1.5 rounded-lg hover:bg-rose-500/5 cursor-pointer"
                         onClick={() => removeQuestion(qIndex)}
-                        title="Eliminar pregunta"
+                        title="Delete question"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -346,7 +346,7 @@ export default function ReadExerciseForm({ order_index }: Props) {
                             className={`px-3 py-1.5 rounded-full text-xs border flex items-center gap-1.5 ${
                               isCorrect
                                 ? "bg-emerald-500/5 border-emerald-500/30 text-emerald-600 font-semibold"
-                                : "bg-white border-slate-200/80 text-slate-650"
+                                : "bg-white border-slate-200/80 text-slate-655"
                             }`}
                           >
                             {isCorrect ? (
@@ -368,8 +368,8 @@ export default function ReadExerciseForm({ order_index }: Props) {
                     <div className="flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50/50 p-2 rounded-lg border border-amber-100 mt-3.5">
                       <AlertCircle className="w-4 h-4 shrink-0" />
                       <span>
-                        Se requiere una pregunta, respuesta correcta y al menos
-                        una posible respuesta.
+                        A question, correct answer, and at least one possible
+                        answer are required.
                       </span>
                     </div>
                   )}
@@ -430,20 +430,20 @@ export default function ReadExerciseForm({ order_index }: Props) {
                         className="text-slate-400 hover:text-slate-655 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/50 transition-colors"
                         onMouseDown={() => setDraggableQIndex(qIndex)}
                         onMouseUp={() => setDraggableQIndex(null)}
-                        title="Arrastrar para reordenar"
+                        title="Drag to reorder"
                       >
                         <GripVertical size={16} />
                       </div>
                     )}
                     <span className="text-xs font-extrabold uppercase tracking-wider text-cyan-650">
-                      Editando Pregunta {qIndex + 1}
+                      Editing Question {qIndex + 1}
                     </span>
                   </div>
                   <button
                     type="button"
                     className="text-slate-400 hover:text-rose-600 transition-colors p-1.5 rounded-lg hover:bg-rose-500/5 cursor-pointer"
                     onClick={() => removeQuestion(qIndex)}
-                    title="Eliminar pregunta"
+                    title="Delete question"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -451,7 +451,7 @@ export default function ReadExerciseForm({ order_index }: Props) {
 
                 <div className="space-y-3">
                   <FormInput
-                    label="Pregunta"
+                    label="Question"
                     placeholder="e.g. Where did we go?"
                     value={q.question || ""}
                     onChangeText={(text) =>
@@ -460,7 +460,7 @@ export default function ReadExerciseForm({ order_index }: Props) {
                   />
 
                   <FormInput
-                    label="Respuesta Correcta"
+                    label="Correct Answer"
                     placeholder="e.g. to the beach"
                     value={q.correct_answer || ""}
                     onChangeText={(text) => updateCorrectAnswer(qIndex, text)}
@@ -468,7 +468,7 @@ export default function ReadExerciseForm({ order_index }: Props) {
 
                   <div>
                     <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-450 mb-1.5 block">
-                      Posibles Respuestas (Opciones de Quiz)
+                      Possible Answers (Quiz Options)
                     </label>
                     <div className="flex flex-wrap gap-1.5 mb-2">
                       {q.possible_answers?.map(
@@ -500,8 +500,8 @@ export default function ReadExerciseForm({ order_index }: Props) {
                     <div className="flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50/50 p-2 rounded-lg border border-amber-100 mt-2">
                       <AlertCircle className="w-4 h-4 shrink-0" />
                       <span>
-                        Se requiere una pregunta, respuesta correcta y al menos
-                        una posible respuesta.
+                        A question, correct answer, and at least one possible
+                        answer are required.
                       </span>
                     </div>
                   )}
@@ -513,7 +513,7 @@ export default function ReadExerciseForm({ order_index }: Props) {
                       onClick={() => setEditingQIndex(null)}
                       className="py-1.5 px-4 text-xs bg-cyan-500 hover:bg-cyan-600 text-slate-900 border-none"
                     >
-                      Listo
+                      Done
                     </Button>
                   </div>
                 </div>
@@ -528,7 +528,7 @@ export default function ReadExerciseForm({ order_index }: Props) {
             leftIcon={<Plus size={16} />}
             className="w-full border-dashed hover:border-cyan-500/30 text-cyan-650 hover:bg-cyan-500/5 py-2.5"
           >
-            Agregar pregunta
+            Add Question
           </Button>
         </div>
       </div>

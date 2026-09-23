@@ -15,15 +15,15 @@ interface GoalCardProps {
 // Mapea el tipo de objetivo a un string más legible
 function formatGoalType(type: string): string {
   const types: Record<string, string> = {
-    points: "Puntos de Experiencia (XP)",
-    lesson: "Lecciones completadas",
-    time: "Tiempo récord por lección",
-    classes: "Clases completadas",
-    collection: "Colección de palabras",
-    streak: "Días de Racha",
-    approvals: "Lecciones aprobadas",
-    ranking: "Puesto en la Liga",
-    hearts: "Corazones conservados",
+    points: "Experience Points (XP)",
+    lesson: "Completed Lessons",
+    time: "Record Time per Lesson",
+    classes: "Completed Courses",
+    collection: "Word Collection",
+    streak: "Streak Days",
+    approvals: "Approved Lessons",
+    ranking: "League Rank",
+    hearts: "Preserved Hearts",
   };
   return types[type] || type;
 }
@@ -49,8 +49,8 @@ export default function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
 
   const handleDelete = async () => {
     const confirmed = await confirm({
-      title: "Eliminar objetivo",
-      description: `¿Estás seguro de que deseas eliminar el objetivo "${goal.name}"?`,
+      title: "Delete Goal",
+      description: `Are you sure you want to delete the goal "${goal.name}"?`,
       variant: "danger",
     });
     if (confirmed) {
@@ -89,7 +89,7 @@ export default function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
             {goal.name}
           </h3>
           <p className="text-xs text-slate-550 leading-relaxed font-semibold line-clamp-2 min-h-[32px]">
-            {goal.description || "Sin descripción proporcionada."}
+            {goal.description || "No description provided."}
           </p>
         </div>
 
@@ -98,24 +98,24 @@ export default function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
           <div className="flex items-center space-x-2">
             <Info className="w-4 h-4 text-slate-400" />
             <span className="text-xs font-bold text-slate-500">
-              {goal.type === "lesson" || goal.type === "classes" ? "Asociado a:" : "Meta Requerida:"}
+              {goal.type === "lesson" || goal.type === "classes" ? "Associated with:" : "Required Target:"}
             </span>
           </div>
           <span className="text-xs font-extrabold text-slate-800 text-right truncate max-w-[180px]" title={goal.targetLabel || ""}>
             {goal.type === "lesson" || goal.type === "classes" 
-              ? (goal.targetLabel || "No especificado")
+              ? (goal.targetLabel || "Not specified")
               : `${targetValue} ${
                   goal.type === "points" 
                     ? "XP" 
                     : goal.type === "time" 
-                      ? "Segs" 
+                      ? "Secs" 
                       : goal.type === "ranking" 
-                        ? "º Lugar" 
+                        ? "th Place" 
                         : goal.type === "collection" 
-                          ? "Premios" 
+                          ? "Rewards" 
                           : goal.type === "approvals" 
-                            ? "Lecciones" 
-                            : "veces"
+                            ? "Lessons" 
+                            : "times"
                 }`}
           </span>
         </div>
@@ -138,7 +138,7 @@ export default function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
               )}
               <div className="min-w-0 flex-1">
                 <p className="text-[9px] font-extrabold text-amber-700 uppercase tracking-widest leading-none">
-                  Recompensa Entregada
+                  Reward Granted
                 </p>
                 <p className="text-xs font-bold text-slate-800 truncate mt-1">
                   {goal.reward.name}
@@ -147,7 +147,7 @@ export default function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
             </div>
           ) : (
             <div className="text-xs text-slate-400 italic bg-slate-50/50 border border-slate-100 border-dashed rounded-xl p-3 text-center">
-              Sin recompensa asociada
+              No associated reward
             </div>
           )}
         </div>
@@ -161,7 +161,7 @@ export default function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
           className="flex-1 py-2 px-3 rounded-lg text-xs"
           leftIcon={<Edit2 className="w-3.5 h-3.5" />}
         >
-          Editar
+          Edit
         </Button>
         <Button
           variant="danger"
@@ -170,7 +170,7 @@ export default function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
           className="py-2 px-3 rounded-lg text-xs hover:bg-rose-600"
           leftIcon={<Trash2 className="w-3.5 h-3.5" />}
         >
-          Eliminar
+          Delete
         </Button>
       </div>
     </div>

@@ -45,7 +45,7 @@ export default function MatchWordChallengeForm({
       currentItem.wordToMatch = val;
     } else if (field === "correctAnswer") {
       currentItem.correctAnswer = val;
-      // Actualizamos también la primera opción en options para que coincida con correctAnswer
+      // Also update the first option in options to match correctAnswer
       const updatedOpts = [...(currentItem.options || ["", "", ""])];
       updatedOpts[0] = val;
       currentItem.options = updatedOpts;
@@ -57,7 +57,7 @@ export default function MatchWordChallengeForm({
 
   const handleIncorrectOptionChange = (
     itemIdx: number,
-    optIdx: number, // 1 para la primera incorrecta, 2 para la segunda
+    optIdx: number, // 1 for first incorrect option, 2 for second
     val: string
   ) => {
     const updatedItems = [...items];
@@ -187,7 +187,7 @@ export default function MatchWordChallengeForm({
                     onChange={(e) =>
                       handleItemFieldChange(idx, "correctAnswer", e.target.value)
                     }
-                    placeholder="e.g. Perro"
+                    placeholder="e.g. Can (or Canine)"
                     className="w-full bg-green-50/20 border border-green-200/80 text-slate-900 rounded-xl p-2.5 text-xs focus:outline-none focus:bg-white focus:border-green-500 font-bold transition-all"
                   />
                 </div>
@@ -208,7 +208,7 @@ export default function MatchWordChallengeForm({
                       onChange={(e) =>
                         handleIncorrectOptionChange(idx, 1, e.target.value)
                       }
-                      placeholder="e.g. Gato (Incorrect 1)"
+                      placeholder="e.g. Cat (Incorrect 1)"
                       className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl p-2.5 text-xs focus:outline-none focus:bg-white focus:border-rose-400 font-bold transition-all"
                     />
                   </div>
@@ -221,7 +221,7 @@ export default function MatchWordChallengeForm({
                       onChange={(e) =>
                         handleIncorrectOptionChange(idx, 2, e.target.value)
                       }
-                      placeholder="e.g. Loro (Incorrect 2)"
+                      placeholder="e.g. Parrot (Incorrect 2)"
                       className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl p-2.5 text-xs focus:outline-none focus:bg-white focus:border-rose-400 font-bold transition-all"
                     />
                   </div>

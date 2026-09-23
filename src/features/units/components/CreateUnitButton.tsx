@@ -19,7 +19,7 @@ export default function CreateUnitButton({ courseId }: Props) {
         leftIcon={<Plus className="w-4 h-4 text-slate-950" />}
         onClick={() => setVisible(true)}
       >
-        Crear unidad
+        Create Unit
       </Button>
 
       <CreateUnitModal

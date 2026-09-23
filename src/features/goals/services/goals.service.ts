@@ -32,11 +32,11 @@ export const goalsService = {
         if (goal.type === "lesson") {
           const lessonId = val.lesson;
           const matchedClass = classes.find((c) => c.id === lessonId);
-          targetLabel = matchedClass ? matchedClass.name : (lessonId || "Desconocida");
+          targetLabel = matchedClass ? matchedClass.name : (lessonId || "Unknown");
         } else if (goal.type === "classes") {
           const courseId = val.classes;
           const matchedCourse = courses.find((c) => c.id === courseId);
-          targetLabel = matchedCourse ? matchedCourse.name : (courseId || "Desconocido");
+          targetLabel = matchedCourse ? matchedCourse.name : (courseId || "Unknown");
         }
       }
 

@@ -125,48 +125,48 @@ export default function TypeAnswerExerciseForm({ order_index }: Props) {
           <div className="flex justify-between items-center mb-3">
             <div className="flex items-center gap-2">
               {items.length > 1 && (
-                <div
-                  className="text-slate-400 hover:text-slate-655 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/50 transition-colors"
-                  onMouseDown={() => setDraggableIndex(itemIndex)}
-                  onMouseUp={() => setDraggableIndex(null)}
-                  title="Arrastrar para reordenar"
+                  <div
+                    className="text-slate-400 hover:text-slate-655 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/50 transition-colors"
+                    onMouseDown={() => setDraggableIndex(itemIndex)}
+                    onMouseUp={() => setDraggableIndex(null)}
+                    title="Drag to reorder"
+                  >
+                    <GripVertical size={18} />
+                  </div>
+                )}
+                <span className="font-semibold text-cyan-650 text-sm tracking-wide uppercase">Item {itemIndex + 1}</span>
+              </div>
+              {items.length > 1 && (
+                <button
+                  className="text-slate-500 hover:text-rose-600 transition-colors p-1 rounded-lg hover:bg-rose-500/5"
+                  onClick={() => removeItem(itemIndex)}
                 >
-                  <GripVertical size={18} />
-                </div>
+                  <X size={18} />
+                </button>
               )}
-              <span className="font-semibold text-cyan-650 text-sm tracking-wide uppercase">Item {itemIndex + 1}</span>
             </div>
-            {items.length > 1 && (
-              <button
-                className="text-slate-500 hover:text-rose-600 transition-colors p-1 rounded-lg hover:bg-rose-500/5"
-                onClick={() => removeItem(itemIndex)}
-              >
-                <X size={18} />
-              </button>
+
+            <FormInput
+              label="Descriptive Text"
+              placeholder="Instruction or context for this item..."
+              value={item.descriptive_text}
+              onChangeText={(text) => updateItem(itemIndex, "descriptive_text", text)}
+              multiline
+            />
+            <div className="h-px bg-slate-100 my-4" />
+            <FormInput
+              label="Correct Answer"
+              placeholder="Type the expected response..."
+              value={item.correct_answer}
+              onChangeText={(text) => updateItem(itemIndex, "correct_answer", text)}
+            />
+
+            {isItemInvalid && (
+              <div className="mt-3 flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50/50 p-2 rounded-lg border border-amber-100">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>Context/instruction and expected response are required.</span>
+              </div>
             )}
-          </div>
-
-          <FormInput
-            label="Descriptive Text"
-            placeholder="Instruction or context for this item..."
-            value={item.descriptive_text}
-            onChangeText={(text) => updateItem(itemIndex, "descriptive_text", text)}
-            multiline
-          />
-          <div className="h-px bg-slate-100 my-4" />
-          <FormInput
-            label="Correct Answer"
-            placeholder="Type the expected response..."
-            value={item.correct_answer}
-            onChangeText={(text) => updateItem(itemIndex, "correct_answer", text)}
-          />
-
-          {isItemInvalid && (
-            <div className="mt-3 flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50/50 p-2 rounded-lg border border-amber-100">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>Se requiere agregar la instrucción/contexto y la respuesta esperada.</span>
-            </div>
-          )}
         </div>
       );
     })}

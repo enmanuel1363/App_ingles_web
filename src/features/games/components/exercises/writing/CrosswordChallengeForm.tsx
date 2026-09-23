@@ -523,7 +523,7 @@ export default function CrosswordChallengeForm({
                 <div className="bg-white border border-slate-200 p-4 rounded-2xl space-y-2 shadow-sm text-center">
                   <Lightbulb className="w-6 h-6 text-amber-500 mx-auto animate-bounce" />
                   <h4 className="text-xs font-black text-slate-800 mt-1">
-                    Assign Pistas / Clues
+                    Assign Clues
                   </h4>
                   <p className="text-[11px] text-slate-500 font-medium">
                     Select any active cell (white) on the grid to assign it a

@@ -136,7 +136,7 @@ export default function VideoExerciseForm({ order_index }: Props) {
                   className="text-slate-400 hover:text-slate-655 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/50 transition-colors"
                   onMouseDown={() => setDraggableIndex(itemIndex)}
                   onMouseUp={() => setDraggableIndex(null)}
-                  title="Arrastrar para reordenar"
+                  title="Drag to reorder"
                 >
                   <GripVertical size={18} />
                 </div>
@@ -171,7 +171,7 @@ export default function VideoExerciseForm({ order_index }: Props) {
           {isItemInvalid && (
             <div className="mt-3 flex items-center gap-1.5 text-xs text-amber-600 font-semibold bg-amber-50/50 p-2 rounded-lg border border-amber-100">
               <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>Se requiere ingresar la URL del video de YouTube.</span>
+              <span>A YouTube video URL is required.</span>
             </div>
           )}
         </div>
