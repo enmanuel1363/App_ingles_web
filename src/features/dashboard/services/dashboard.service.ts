@@ -65,9 +65,9 @@ export const dashboardService = {
       score: item.score || 0,
       isComplete: !!item.is_complete,
       createdAt: item.created_at,
-      exerciseName: item.exercise?.name || "Ejercicio",
+      exerciseName: item.exercise?.name || "Exercise",
       exerciseType: item.exercise?.type || "speak",
-      studentName: item.student?.full_name || "Estudiante",
+      studentName: item.student?.full_name || "Student",
     }));
   },
 
@@ -88,7 +88,7 @@ export const dashboardService = {
       id: item.id,
       currentStreak: item.current_streak || 0,
       longestStreak: item.longest_streak || 0,
-      studentName: item.student?.full_name || "Estudiante",
+      studentName: item.student?.full_name || "Student",
       avatarUrl: item.student?.avatar_url || null,
     }));
   },

@@ -9,7 +9,6 @@ import {
   BookOpen,
   Gamepad2,
   Award,
-  User,
   LogOut,
   Target,
 } from "lucide-react";
@@ -44,15 +43,15 @@ export default function AdminNav({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#fffcf2] text-slate-900 font-sans">
+    <div className="flex h-screen overflow-hidden bg-neutral-bg text-slate-900 font-sans">
       {/* Sidebar navigation */}
-      <aside className="w-64 h-full flex-shrink-0 bg-white border-r border-slate-200/80 flex flex-col justify-between p-6 overflow-y-auto">
+      <aside className="w-64 h-full shrink-0 bg-white border-r border-slate-200/80 flex flex-col justify-between p-6 overflow-y-auto">
         <div>
           {/* Brand header */}
           <div className="flex items-center space-x-3 mb-8 px-2">
             <Image src={Logo} alt="App Logo" width={40} height={40} priority />
 
-            <span className="text-xl font-extrabold bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent tracking-tight">
+            <span className="text-xl font-extrabold bg-linear-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent tracking-tight">
               Zóe Admin
             </span>
           </div>
@@ -118,13 +117,13 @@ export default function AdminNav({ children }: { children: React.ReactNode }) {
             onClick={handleLogout}
           >
             <LogOut className="w-5 h-5" />
-            <span>Cerrar sesión</span>
+            <span>Log Out</span>
           </button>
         </div>
       </aside>
 
       {/* Main content display area */}
-      <main className="flex-1 h-full bg-[#fffcf2] overflow-y-auto p-8 lg:p-12">
+      <main className="flex-1 h-full bg-neutral-bg overflow-y-auto p-8 lg:p-12">
         <div className="max-w-6xl mx-auto">{children}</div>
       </main>
     </div>

@@ -20,46 +20,48 @@ import Button from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
 import { useDashboard } from "./hooks/useDashboard";
 
-// Función helper para formatear tiempo relativo en español
+// Helper function to format relative time in English
 function formatRelativeTime(dateString: string): string {
   try {
     const date = new Date(dateString);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
 
-    // Si la fecha es en el futuro o el reloj está ligeramente desalineado
-    if (diffMs < 0) return "Hace un momento";
+    // If date is in the future or clock is slightly skewed
+    if (diffMs < 0) return "Just now";
 
     const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 1) return "Hace un momento";
-    if (diffMins < 60) return `Hace ${diffMins} min${diffMins > 1 ? "s" : ""}`;
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? "s" : ""} ago`;
 
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours < 24)
-      return `Hace ${diffHours} hora${diffHours > 1 ? "s" : ""}`;
+      return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
 
     const diffDays = Math.floor(diffHours / 24);
-    if (diffDays === 1) return "Ayer";
-    return `Hace ${diffDays} día${diffDays > 1 ? "s" : ""}`;
+    if (diffDays === 1) return "Yesterday";
+    return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
   } catch (e) {
-    return "Recientemente";
+    return "Recently";
   }
 }
 
-// Formatear tipo de lección para hacerlo más amigable al usuario
+// Format lesson type to make it user-friendly
 function formatLessonType(type: string): string {
   const types: Record<string, string> = {
-    speak: "Hablar/Pronunciación",
-    write_word: "Escribir palabra",
-    image_gallery: "Galería de imágenes",
-    reading_quiz: "Lectura/Quiz",
-    video_session: "Sesión de video",
-    type_answer: "Escribir respuesta",
-    complete_word: "Completar palabra",
-    say_word: "Decir palabra",
-    audio_session: "Comprensión auditiva",
-    match_names: "Emparejar nombres",
-    overview_session: "Repaso general",
+    speak: "Speaking",
+    write_word: "Write a word",
+    image_gallery: "Image gallery",
+    reading_quiz: "Reading quiz",
+    video_session: "Video session",
+    type_answer: "Type answer",
+    complete_word: "Complete word",
+    say_word: "Say the word",
+    audio_session: "Story Telling",
+    match_names: "Match the names",
+    match_words: "Match the words",
+    overview_session: "Vocabulary",
+    identify_picture: "Identify picture",
   };
   return types[type] || type;
 }
@@ -75,36 +77,36 @@ export default function DashboardPage() {
     refreshDashboard,
   } = useDashboard();
 
-  // Mapeo dinámico para las tarjetas de estadísticas reales
+  // Dynamic mapping for real stats cards
   const statsConfig = [
     {
-      label: "Estudiantes Activos",
+      label: "Active Students",
       value: stats.activeStudents.toString(),
-      subtitle: "Alumnos registrados",
+      subtitle: "Registered students",
       Icon: Users,
       color: "text-cyan-600 bg-cyan-50 border-cyan-100",
       route: "/students",
     },
     {
-      label: "Lecciones Creadas",
+      label: "Lessons Created",
       value: stats.totalClasses.toString(),
-      subtitle: "Clases en la plataforma",
+      subtitle: "Classes on platform",
       Icon: GraduationCap,
       color: "text-lime-600 bg-lime-50 border-lime-100",
       route: "/courses",
     },
     {
-      label: "Recompensas Reclamadas",
+      label: "Claimed Rewards",
       value: stats.claimedRewards.toString(),
-      subtitle: "Medallas desbloqueadas",
+      subtitle: "Unlocked badges",
       Icon: Trophy,
       color: "text-amber-600 bg-amber-50 border-amber-100",
       route: "/rewards",
     },
     {
-      label: "Rendimiento Promedio",
+      label: "Average Performance",
       value: `${stats.averageScore} pts`,
-      subtitle: "Puntaje promedio global",
+      subtitle: "Overall average score",
       Icon: BarChart3,
       color: "text-indigo-600 bg-indigo-50 border-indigo-100",
       route: undefined,
@@ -113,20 +115,20 @@ export default function DashboardPage() {
 
   const shortcuts = [
     {
-      title: "Crear Nueva Lección",
-      desc: "Añade contenido interactivo",
+      title: "Create New Lesson",
+      desc: "Add interactive content",
       route: "/courses",
       Icon: BookOpen,
     },
     {
-      title: "Configurar Recompensas",
-      desc: "Medallas, premios y logros",
+      title: "Configure Rewards",
+      desc: "Badges, prizes and achievements",
       route: "/rewards",
       Icon: Trophy,
     },
     {
-      title: "Ver Mini Juegos",
-      desc: "Monitorea mecánicas lúdicas",
+      title: "View Mini Games",
+      desc: "Monitor game mechanics",
       route: "/games",
       Icon: Gamepad2,
     },
@@ -139,7 +141,7 @@ export default function DashboardPage() {
         <div className="relative z-10 max-w-2xl space-y-4">
           <div className="flex items-center space-x-2">
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-cyan-500/10 text-cyan-700 border border-cyan-500/20">
-              Panel del Profesor
+              Teacher Dashboard
             </span>
             <Button
               variant="outlined"
@@ -151,17 +153,17 @@ export default function DashboardPage() {
                 <RefreshCw
                   className={`w-3 h-3 ${isLoading ? "animate-spin" : ""}`}
                 />
-                Sincronizar
+                Sync
               </div>
             </Button>
           </div>
 
           <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
-            ¡Welcome back, Teacher! 👋
+            Welcome back, Teacher! 👋
           </h1>
           <p className="text-slate-600 text-base md:text-lg leading-relaxed font-medium">
-            Administra tus clases, diseña juegos interactivos y recompensa el
-            progreso de tus estudiantes en tiempo real.
+            Manage your classes, design interactive games, and reward your
+            students' progress in real time.
           </p>
           <div className="pt-2 flex flex-wrap gap-4">
             <Button
@@ -169,10 +171,10 @@ export default function DashboardPage() {
               leftIcon={<Play className="w-4 h-4 fill-current" />}
               onClick={() => router.push("/courses")}
             >
-              Ver mis clases
+              View my classes
             </Button>
             <Button variant="outlined" onClick={() => router.push("/games")}>
-              Crear Juego Rápido
+              Create Quick Game
             </Button>
           </div>
         </div>
@@ -188,7 +190,7 @@ export default function DashboardPage() {
           <AlertCircle className="w-6 h-6 text-rose-500 shrink-0 mt-0.5" />
           <div>
             <h4 className="font-bold text-rose-900">
-              Error al sincronizar dashboard
+              Error syncing dashboard
             </h4>
             <p className="text-sm text-rose-700/90 mt-1">{error}</p>
           </div>
@@ -215,7 +217,7 @@ export default function DashboardPage() {
                     onClick={() => router.push(stat.route!)}
                     className="text-[10px] font-bold text-cyan-600 bg-cyan-500/10 px-2.5 py-1 rounded-full border border-cyan-500/20 flex items-center space-x-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer focus:outline-none"
                   >
-                    <span>Detalle</span>
+                    <span>Details</span>
                     <ArrowUpRight className="w-3 h-3" />
                   </button>
                 ) : null}
@@ -248,17 +250,17 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-                Actividad Reciente
+                Recent Activity
               </h2>
               <p className="text-slate-500 text-sm font-medium">
-                Progreso en tiempo real de tus estudiantes en lecciones
+                Real-time progress of your students in lessons
               </p>
             </div>
             <button
               onClick={() => router.push("/courses")}
               className="text-cyan-600 hover:text-cyan-700 text-sm font-bold transition-colors duration-200 cursor-pointer focus:outline-none"
             >
-              Ver clases
+              View classes
             </button>
           </div>
 
@@ -286,7 +288,7 @@ export default function DashboardPage() {
                   <BookOpen className="w-6 h-6 stroke-[1.5]" />
                 </div>
                 <p className="text-sm font-bold text-slate-400">
-                  Sin actividad registrada en los ejercicios aún.
+                  No activity recorded in exercises yet.
                 </p>
               </div>
             ) : (
@@ -304,7 +306,7 @@ export default function DashboardPage() {
                         <span className="text-primary-dark font-extrabold">
                           {act.studentName}
                         </span>{" "}
-                        completó{" "}
+                        completed{" "}
                         <span className="font-semibold text-slate-750">
                           {act.exerciseName}
                         </span>
@@ -327,7 +329,7 @@ export default function DashboardPage() {
                           : "bg-amber-500/10 text-amber-700 border-amber-500/20"
                       }`}
                     >
-                      {act.isComplete ? "Completado" : "En curso"}
+                      {act.isComplete ? "Completed" : "In progress"}
                     </span>
                     <span className="text-xs font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/60 shadow-sm">
                       {act.score}/10
@@ -346,10 +348,10 @@ export default function DashboardPage() {
             <div>
               <h2 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-1.5">
                 <Flame className="w-5 h-5 text-orange-500 fill-current animate-pulse" />
-                Rachas de Estudiantes
+                Top Streaks
               </h2>
               <p className="text-slate-500 text-sm font-medium">
-                Todos los estudiantes registrados, de mayor a menor racha
+                Most consistent students in the classroom
               </p>
             </div>
 
@@ -369,7 +371,7 @@ export default function DashboardPage() {
                 ))
               ) : topStreaks.length === 0 ? (
                 <div className="text-center py-4 text-xs font-bold text-slate-400 italic">
-                  Aún no hay rachas acumuladas.
+                  No streaks accumulated yet.
                 </div>
               ) : (
                 topStreaks.map((streak, index) => (
@@ -396,14 +398,17 @@ export default function DashboardPage() {
                           {streak.studentName}
                         </p>
                         <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
-                          Puesto #{index + 1}
+                          Rank #{index + 1}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center space-x-1.5 bg-orange-50 border border-orange-100 text-orange-700 px-3 py-1.5 rounded-xl text-xs font-extrabold shadow-sm shrink-0">
                       <Flame className="w-4 h-4 fill-current" />
-                      <span>{streak.currentStreak} días</span>
+                      <span>
+                        {streak.currentStreak}{" "}
+                        {streak.currentStreak === 1 ? "day" : "days"}
+                      </span>
                     </div>
                   </div>
                 ))
@@ -415,10 +420,10 @@ export default function DashboardPage() {
           <div className="bg-white border border-slate-200/80 rounded-3xl p-6 md:p-8 space-y-6 shadow-sm">
             <div>
               <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-                Accesos Rápidos
+                Quick Actions
               </h2>
               <p className="text-slate-500 text-sm font-medium">
-                Accesos rápidos para tu flujo diario
+                Shortcuts for your daily workflow
               </p>
             </div>
 
@@ -459,10 +464,10 @@ export default function DashboardPage() {
               </div>
               <div className="min-w-0">
                 <p className="text-[10px] text-indigo-750 font-bold uppercase tracking-wider leading-none">
-                  Métricas de Aula
+                  Classroom Metrics
                 </p>
                 <h5 className="font-extrabold text-indigo-900 text-xs mt-1 leading-snug">
-                  Monitoreando {stats.activeStudents} estudiantes activos
+                  Monitoring {stats.activeStudents} active students
                 </h5>
               </div>
             </div>
