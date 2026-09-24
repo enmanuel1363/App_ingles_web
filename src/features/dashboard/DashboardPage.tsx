@@ -355,7 +355,7 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[420px] overflow-y-auto pr-1">
               {isLoading ? (
                 Array.from({ length: 2 }).map((_, idx) => (
                   <div
