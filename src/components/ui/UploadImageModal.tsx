@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import FormInput from "./FormInput";
-import { X, ImagePlus, Trash2, Plus } from "lucide-react";
+import { X, ImagePlus, Trash2, Plus, Camera, Check } from "lucide-react";
 import Button from "./Button";
 import { useModal } from "@/components/ui/ModalProvider";
 
@@ -13,6 +13,9 @@ type Props = {
   title?: string;
   descriptionLabel?: string;
   descriptionPlaceholder?: string;
+  initialUrl?: string | File | null;
+  initialDescription?: string;
+  submitButtonText?: string;
 };
 
 export default function UploadImageModal({
@@ -22,11 +25,38 @@ export default function UploadImageModal({
   title = "Add image",
   descriptionLabel = "Description",
   descriptionPlaceholder = "Write a description...",
+  initialUrl,
+  initialDescription = "",
+  submitButtonText,
 }: Props) {
   const [file, setFile] = useState<File | null>(null);
+  const [currentUrl, setCurrentUrl] = useState<string | File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [description, setDescription] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Sync state when modal opens or initial values change
+  useEffect(() => {
+    if (visible) {
+      setDescription(initialDescription || "");
+      if (initialUrl) {
+        setCurrentUrl(initialUrl);
+        if (typeof initialUrl === "string") {
+          setPreviewUrl(initialUrl);
+        } else if (initialUrl instanceof File) {
+          setPreviewUrl(URL.createObjectURL(initialUrl));
+        } else if (typeof initialUrl === "object" && (initialUrl as any)?.__isDraftPlaceholder) {
+          setPreviewUrl("/600x600.png");
+        } else {
+          setPreviewUrl("");
+        }
+      } else {
+        setCurrentUrl(null);
+        setPreviewUrl("");
+      }
+      setFile(null);
+    }
+  }, [visible, initialUrl, initialDescription]);
 
   // Clean up Object URL to prevent memory leaks
   useEffect(() => {
@@ -44,17 +74,29 @@ export default function UploadImageModal({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (!selected) return;
+    if (previewUrl && previewUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(previewUrl);
+    }
     setFile(selected);
+    setCurrentUrl(selected);
     setPreviewUrl(URL.createObjectURL(selected));
   };
 
   const handleRemove = () => {
+    if (previewUrl && previewUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(previewUrl);
+    }
     setFile(null);
+    setCurrentUrl(null);
     setPreviewUrl("");
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
   };
 
   const handleSave = () => {
-    if (!file) {
+    const targetImage = file || currentUrl;
+    if (!targetImage) {
       showAlert({
         title: "Seleccionar imagen",
         message: "Debes seleccionar una imagen para continuar.",
@@ -62,7 +104,7 @@ export default function UploadImageModal({
       });
       return;
     }
-    if (description.length < 2) {
+    if (description.trim().length < 2) {
       showAlert({
         title: "Descripción corta",
         message: "La descripción es demasiado corta.",
@@ -70,18 +112,25 @@ export default function UploadImageModal({
       });
       return;
     }
-    onSave({ url: file, description });
+    onSave({ url: targetImage, description: description.trim() });
     handleClose();
   };
 
   const handleClose = () => {
+    if (previewUrl && previewUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(previewUrl);
+    }
     setFile(null);
+    setCurrentUrl(null);
     setPreviewUrl("");
     setDescription("");
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
     onClose();
   };
 
-  const canSave = file && description.length >= 2;
+  const canSave = Boolean(file || currentUrl) && description.trim().length >= 2;
 
   return (
     <div 
@@ -109,12 +158,25 @@ export default function UploadImageModal({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={previewUrl} alt="preview" className="object-contain w-full h-full" />
             
-            <button 
-              className="absolute top-3 right-3 bg-rose-500 hover:bg-rose-600 text-white p-2 rounded-lg transition-colors cursor-pointer shadow-lg z-10"
-              onClick={handleRemove}
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+            <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+              <button
+                type="button"
+                className="bg-white/95 hover:bg-white text-slate-700 hover:text-cyan-600 p-2 rounded-lg transition-colors cursor-pointer shadow-lg flex items-center gap-1.5 text-xs font-semibold"
+                onClick={() => inputRef.current?.click()}
+                title="Change image"
+              >
+                <Camera className="w-4 h-4" />
+                <span>Change</span>
+              </button>
+              <button 
+                type="button"
+                className="bg-rose-500 hover:bg-rose-600 text-white p-2 rounded-lg transition-colors cursor-pointer shadow-lg"
+                onClick={handleRemove}
+                title="Remove image"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         ) : (
           <button
@@ -154,10 +216,10 @@ export default function UploadImageModal({
             variant={canSave ? "primary" : "outlined"}
             onClick={handleSave}
             disabled={!canSave}
-            leftIcon={<Plus className="w-4 h-4" />}
+            leftIcon={currentUrl && !file ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             className="min-w-[120px]"
           >
-            Add
+            {submitButtonText || (initialUrl ? "Save" : "Add")}
           </Button>
           <Button
             variant="outlined"
