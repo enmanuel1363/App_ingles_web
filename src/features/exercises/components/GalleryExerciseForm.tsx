@@ -5,7 +5,7 @@ import Button from "@/components/ui/Button";
 import UploadImageModal from "@/components/ui/UploadImageModal";
 import { useState } from "react";
 import { useExerciseStore } from '../hooks/useExerciseStore';
-import { X, Plus, Image as ImageIcon, AlertCircle } from "lucide-react";
+import { X, Plus, Image as ImageIcon, AlertCircle, Edit3 } from "lucide-react";
 import { previewSrc, isDraftPlaceholder } from "../utils/imagePreview";
 
 
@@ -28,6 +28,7 @@ export default function GalleryExerciseForm({ order_index }: Props) {
   const items = exercise.content?.items || [EMPTY_ITEM];
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadingItemIndex, setUploadingItemIndex] = useState<number | null>(null);
+  const [editingImgIndex, setEditingImgIndex] = useState<number | null>(null);
   const [draggedImgInfo, setDraggedImgInfo] = useState<{ itemIndex: number; imgIndex: number } | null>(null);
   const [dragOverImgInfo, setDragOverImgInfo] = useState<{ itemIndex: number; imgIndex: number } | null>(null);
 
@@ -66,6 +67,36 @@ export default function GalleryExerciseForm({ order_index }: Props) {
     const item = items[itemIndex];
     const newImages = [...(item.images || []), imageData];
     updateItem(itemIndex, { images: newImages });
+  };
+
+  const updateImageDescription = (
+    itemIndex: number,
+    imgIndex: number,
+    description: string,
+  ) => {
+    const item = items[itemIndex];
+    const newImages = (item.images || []).map((img: any, i: number) =>
+      i === imgIndex ? { ...img, description } : img,
+    );
+    updateItem(itemIndex, { images: newImages });
+  };
+
+  const handleSaveImageModal = (imageData: {
+    url: string | File;
+    description: string;
+  }) => {
+    if (uploadingItemIndex === null) return;
+    if (editingImgIndex !== null) {
+      const item = items[uploadingItemIndex];
+      const newImages = (item.images || []).map((img: any, i: number) =>
+        i === editingImgIndex
+          ? { ...img, url: imageData.url, description: imageData.description }
+          : img,
+      );
+      updateItem(uploadingItemIndex, { images: newImages });
+    } else {
+      addImageToItem(uploadingItemIndex, imageData);
+    }
   };
 
   const removeImageFromItem = (itemIndex: number, imgIndex: number) => {
@@ -182,17 +213,49 @@ export default function GalleryExerciseForm({ order_index }: Props) {
                         draggable={false}
                       />
                     )}
-                    <button
-                      className="absolute top-2 right-2 p-1.5 bg-slate-50/80 rounded-lg text-slate-650 hover:text-rose-600 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeImageFromItem(itemIndex, imgIndex);
-                      }}
-                    >
-                      <X size={16} />
-                    </button>
+                    <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                      <button
+                        type="button"
+                        title="Edit image or description"
+                        className="p-1.5 bg-white/95 hover:bg-white text-slate-600 hover:text-cyan-600 rounded-lg shadow-sm transition-colors cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setUploadingItemIndex(itemIndex);
+                          setEditingImgIndex(imgIndex);
+                          setShowUploadModal(true);
+                        }}
+                      >
+                        <Edit3 size={15} />
+                      </button>
+                      <button
+                        type="button"
+                        title="Remove image"
+                        className="p-1.5 bg-white/95 hover:bg-white text-slate-600 hover:text-rose-600 rounded-lg shadow-sm transition-colors cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeImageFromItem(itemIndex, imgIndex);
+                        }}
+                      >
+                        <X size={15} />
+                      </button>
+                    </div>
                   </div>
-                  <p className="p-3 text-sm text-slate-650 text-center font-medium select-none">{img.description}</p>
+                  <div className="p-2 border-t border-slate-100 bg-white">
+                    <input
+                      type="text"
+                      value={img.description || ""}
+                      onChange={(e) =>
+                        updateImageDescription(itemIndex, imgIndex, e.target.value)
+                      }
+                      placeholder="Image description..."
+                      title="Click to edit description"
+                      className="w-full px-2.5 py-1.5 text-xs text-center text-slate-800 bg-slate-50/80 hover:bg-slate-100/80 focus:bg-white border border-slate-200/80 focus:border-cyan-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500/20 font-medium transition-all"
+                      onClick={(e) => e.stopPropagation()}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onDragStart={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
@@ -207,6 +270,7 @@ export default function GalleryExerciseForm({ order_index }: Props) {
             variant="outlined"
             onClick={() => {
               setUploadingItemIndex(itemIndex);
+              setEditingImgIndex(null);
               setShowUploadModal(true);
             }}
             leftIcon={<Plus size={18} />}
@@ -229,13 +293,25 @@ export default function GalleryExerciseForm({ order_index }: Props) {
 
       <UploadImageModal
         visible={showUploadModal}
-        onClose={() => setShowUploadModal(false)}
-        onSave={(imgData) => {
-          if (uploadingItemIndex !== null) addImageToItem(uploadingItemIndex, imgData);
+        onClose={() => {
+          setShowUploadModal(false);
+          setUploadingItemIndex(null);
+          setEditingImgIndex(null);
         }}
-        title="Add to Gallery"
+        onSave={handleSaveImageModal}
+        title={editingImgIndex !== null ? "Edit Gallery Image" : "Add to Gallery"}
         descriptionLabel="Image description"
         descriptionPlaceholder="e.g. Red apple"
+        initialUrl={
+          uploadingItemIndex !== null && editingImgIndex !== null
+            ? items[uploadingItemIndex]?.images?.[editingImgIndex]?.url
+            : undefined
+        }
+        initialDescription={
+          uploadingItemIndex !== null && editingImgIndex !== null
+            ? items[uploadingItemIndex]?.images?.[editingImgIndex]?.description
+            : ""
+        }
       />
     </div>
   );

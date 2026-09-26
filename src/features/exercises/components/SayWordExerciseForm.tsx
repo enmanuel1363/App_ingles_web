@@ -209,8 +209,14 @@ export default function SayWordExerciseForm({ order_index }: Props) {
                   <X size={16} />
                 </button>
               </div>
-              <div className="p-3 border-t border-slate-200 bg-slate-50">
-                <span className="text-sm font-medium text-slate-700">{item.image_title}</span>
+              <div className="p-3 border-t border-slate-200 bg-white">
+                <FormInput
+                  label="Word to speak"
+                  placeholder="e.g. Apple"
+                  value={item.image_title || ""}
+                  onChangeText={(text) => updateItem(itemIndex, { image_title: text })}
+                  onCopy={() => navigator.clipboard.writeText(item.image_title || "")}
+                />
               </div>
             </div>
           ) : (
@@ -252,9 +258,14 @@ export default function SayWordExerciseForm({ order_index }: Props) {
 
       <UploadImageModal
         visible={showUploadModal}
-        onClose={() => setShowUploadModal(false)}
+        onClose={() => {
+          setShowUploadModal(false);
+          setUploadingItemIndex(null);
+        }}
         onSave={handleSaveImage}
-        title="Exercise Image"
+        initialUrl={uploadingItemIndex !== null ? items[uploadingItemIndex]?.image_url : undefined}
+        initialDescription={uploadingItemIndex !== null ? items[uploadingItemIndex]?.image_title : ""}
+        title={uploadingItemIndex !== null && items[uploadingItemIndex]?.image_url ? "Edit Exercise Image" : "Exercise Image"}
         descriptionLabel="Word to speak"
         descriptionPlaceholder="e.g. Apple"
       />
