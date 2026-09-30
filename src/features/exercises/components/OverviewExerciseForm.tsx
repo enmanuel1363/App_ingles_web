@@ -4,7 +4,7 @@ import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
 import { useState } from "react";
 import { useExerciseStore } from '../hooks/useExerciseStore';
-import { BookOpen, Trash2, Plus, AlertCircle, Copy, GripVertical } from "lucide-react";
+import { BookOpen, Trash2, Plus, AlertCircle, Copy, GripVertical, Pencil, Check, X } from "lucide-react";
 
 type VocabWord = { word: string; translation: string };
 type Item = { words: VocabWord[] };
@@ -28,6 +28,12 @@ export default function OverviewExerciseForm({ order_index }: Props) {
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
   const [dragOverItemIndex, setDragOverItemIndex] = useState<number | null>(null);
   const [draggableIndex, setDraggableIndex] = useState<number | null>(null);
+  const [editingWord, setEditingWord] = useState<{
+    itemIndex: number;
+    wordIndex: number;
+    word: string;
+    translation: string;
+  } | null>(null);
 
   const getWordInput = (itemIndex: number) =>
     wordInputs[itemIndex] || { word: "", translation: "" };
@@ -48,6 +54,7 @@ export default function OverviewExerciseForm({ order_index }: Props) {
   };
 
   const reorderItems = (fromIndex: number, toIndex: number) => {
+    setEditingWord(null);
     const newItems = [...items];
     const [movedItem] = newItems.splice(fromIndex, 1);
     newItems.splice(toIndex, 0, movedItem);
@@ -78,6 +85,13 @@ export default function OverviewExerciseForm({ order_index }: Props) {
   };
 
   const removeItem = (index: number) => {
+    if (editingWord) {
+      if (editingWord.itemIndex === index) {
+        setEditingWord(null);
+      } else if (editingWord.itemIndex > index) {
+        setEditingWord({ ...editingWord, itemIndex: editingWord.itemIndex - 1 });
+      }
+    }
     updateContent(
       "items",
       items.filter((_, i) => i !== index),
@@ -101,12 +115,52 @@ export default function OverviewExerciseForm({ order_index }: Props) {
   };
 
   const removeWordFromItem = (itemIndex: number, wordIndex: number) => {
+    if (editingWord && editingWord.itemIndex === itemIndex) {
+      if (editingWord.wordIndex === wordIndex) {
+        setEditingWord(null);
+      } else if (editingWord.wordIndex > wordIndex) {
+        setEditingWord({ ...editingWord, wordIndex: editingWord.wordIndex - 1 });
+      }
+    }
     const updated = items.map((item, i) =>
       i === itemIndex
         ? { ...item, words: item.words.filter((_, j) => j !== wordIndex) }
         : item,
     );
     updateContent("items", updated);
+  };
+
+  const startEditingWord = (itemIndex: number, wordIndex: number, word: VocabWord) => {
+    setEditingWord({
+      itemIndex,
+      wordIndex,
+      word: word.word,
+      translation: word.translation,
+    });
+  };
+
+  const cancelEditingWord = () => {
+    setEditingWord(null);
+  };
+
+  const saveEditingWord = () => {
+    if (!editingWord) return;
+    const w = editingWord.word.trim();
+    const t = editingWord.translation.trim();
+    if (!w || !t) return;
+
+    const updated = items.map((item, i) =>
+      i === editingWord.itemIndex
+        ? {
+            ...item,
+            words: item.words.map((word, j) =>
+              j === editingWord.wordIndex ? { word: w, translation: t } : word,
+            ),
+          }
+        : item,
+    );
+    updateContent("items", updated);
+    setEditingWord(null);
   };
 
   return (
@@ -209,20 +263,105 @@ export default function OverviewExerciseForm({ order_index }: Props) {
               </button>
             </div>
 
-            {item.words.map((word, wordIndex) => (
-              <div key={wordIndex} className="flex items-center justify-between p-3 mb-2 bg-slate-50/50 border border-slate-200/50 rounded-lg">
-                <div className="flex flex-col">
-                  <span className="font-medium text-slate-700">{word.word}</span>
-                  <span className="text-sm text-slate-500">{word.translation}</span>
-                </div>
-                <button
-                  className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-500/5 rounded-lg transition-colors"
-                  onClick={() => removeWordFromItem(itemIndex, wordIndex)}
+            {item.words.map((word, wordIndex) => {
+              const isEditing =
+                editingWord?.itemIndex === itemIndex &&
+                editingWord?.wordIndex === wordIndex;
+
+              if (isEditing) {
+                return (
+                  <div
+                    key={wordIndex}
+                    className="p-3 mb-2 bg-cyan-50/40 border border-cyan-300 rounded-xl transition-all"
+                  >
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          className="w-full bg-white border border-slate-200 text-slate-900 rounded-lg px-3 py-2 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all placeholder-slate-400"
+                          value={editingWord.word}
+                          onChange={(e) =>
+                            setEditingWord({ ...editingWord, word: e.target.value })
+                          }
+                          placeholder="English Word"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") saveEditingWord();
+                            if (e.key === "Escape") cancelEditingWord();
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          className="w-full bg-white border border-slate-200 text-slate-900 rounded-lg px-3 py-2 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all placeholder-slate-400"
+                          value={editingWord.translation}
+                          onChange={(e) =>
+                            setEditingWord({ ...editingWord, translation: e.target.value })
+                          }
+                          placeholder="Translation"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") saveEditingWord();
+                            if (e.key === "Escape") cancelEditingWord();
+                          }}
+                        />
+                      </div>
+                      <div className="flex items-center gap-1.5 self-end sm:self-center shrink-0">
+                        <button
+                          type="button"
+                          className="p-2 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border border-emerald-200 bg-white rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+                          disabled={
+                            !editingWord.word.trim() || !editingWord.translation.trim()
+                          }
+                          onClick={saveEditingWord}
+                          title="Save changes (Enter)"
+                        >
+                          <Check size={16} />
+                        </button>
+                        <button
+                          type="button"
+                          className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 border border-slate-200 bg-white rounded-lg transition-colors shadow-sm"
+                          onClick={cancelEditingWord}
+                          title="Cancel (Esc)"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div
+                  key={wordIndex}
+                  className="flex items-center justify-between p-3 mb-2 bg-slate-50/50 border border-slate-200/50 rounded-lg group hover:border-slate-300 transition-colors"
                 >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ))}
+                  <div className="flex flex-col">
+                    <span className="font-medium text-slate-700">{word.word}</span>
+                    <span className="text-sm text-slate-500">{word.translation}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      className="p-1.5 text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"
+                      onClick={() => startEditingWord(itemIndex, wordIndex, word)}
+                      title="Edit word"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-500/5 rounded-lg transition-colors"
+                      onClick={() => removeWordFromItem(itemIndex, wordIndex)}
+                      title="Delete word"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
 
             {item.words.length === 0 && (
               <p className="text-sm text-slate-500 text-center py-4">No words in this section</p>
